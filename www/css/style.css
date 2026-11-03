@@ -424,3 +424,110 @@ h2.section { font-family: var(--display); font-weight: 500; font-size: 15px; let
 .feedback .good-order + p, .feedback .good-pairs + p, .feedback .detail + p { margin-top: 10px; }
 .fact .stars { display: flex; justify-content: center; margin: 4px 0 2px; }
 .review li b { white-space: pre-line; }
+
+/* ===================================================================
+   V3 : niveaux, illustrations, récompenses
+   =================================================================== */
+.scene { display: block; width: 100%; height: 100%; }
+
+/* Carte d'époque illustrée */
+.era { position: relative; display: block; padding: 0; overflow: hidden; min-height: 112px; background: #0d1838; }
+.era-art { position: absolute; inset: 0; opacity: 0.9; }
+.era-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11, 20, 48, 0.9) 10%, rgba(11, 20, 48, 0.55) 50%, rgba(11, 20, 48, 0)); }
+.era-body { position: relative; display: grid; grid-template-columns: 58px 1fr 22px; gap: 14px; align-items: center; padding: 14px 14px 14px 12px; }
+.era .numeral { display: flex; align-items: center; gap: 6px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--gold-300); }
+.era-text { display: grid; gap: 1px; }
+.era-text .era-period { margin-top: 0; }
+.era-go { color: var(--gold-300); }
+.era-go svg { width: 22px; height: 22px; }
+.era.soon { opacity: 0.55; filter: saturate(0.4); }
+.sealed { display: inline-grid; color: var(--gold-300); }
+.sealed svg { width: 15px; height: 15px; }
+
+/* Bouton Reprendre */
+.resume { width: 100%; margin-top: 12px; display: flex; align-items: center; gap: 14px; text-align: left; padding: 14px 16px; border-radius: var(--radius); border: 0; color: var(--night); background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); box-shadow: 0 2px 0 var(--gold-700), 0 10px 22px rgba(0, 0, 0, 0.4); animation: glow 2.6s ease-in-out infinite; }
+.resume:active { transform: translateY(2px); }
+.resume-medal { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--night); box-shadow: 0 0 0 2px rgba(11, 20, 48, 0.4); }
+.resume-medal svg { width: 26px; height: 26px; }
+.resume-text { display: grid; line-height: 1.2; }
+.resume-text b { font-family: var(--display); font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; }
+.resume-text span { font-size: 16px; }
+.resume .go { margin-left: auto; flex: none; }
+.resume .go svg { width: 22px; height: 22px; }
+@keyframes glow { 50% { box-shadow: 0 2px 0 var(--gold-700), 0 10px 26px rgba(233, 207, 142, 0.45); } }
+
+.brand { position: relative; }
+.gear { display: none; }
+
+/* Bandeau illustré de l'époque */
+.art-hero { position: relative; margin: -4px -16px 0; height: 230px; overflow: hidden; border-radius: 0 0 22px 22px; border-bottom: 1px solid var(--gold-500); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4); }
+.art-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 20, 48, 0) 45%, rgba(11, 20, 48, 0.82)); }
+.back-float { position: absolute; top: 14px; left: 14px; z-index: 2; background: rgba(11, 20, 48, 0.65); }
+.art-title { position: absolute; z-index: 2; left: 18px; right: 18px; bottom: 16px; display: flex; align-items: center; gap: 14px; }
+.art-title .medal { width: 62px; height: 62px; flex: none; }
+.art-title .medal svg { width: 34px; height: 34px; }
+.art-title h1 { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.15; color: var(--gold-200); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); }
+.art-title .numeral-big { margin-bottom: 2px; }
+.art-title .era-period { margin-top: 2px; font-size: 16px; color: var(--parch); }
+.intro-line { margin: 18px 4px 0; font-size: 18px; text-align: center; font-style: italic; opacity: 0.92; }
+.fact b.gold { color: var(--gold-300); }
+.inline-ico { display: inline-block; width: 16px; height: 16px; vertical-align: -3px; color: var(--gold-300); }
+.inline-ico svg { width: 16px; height: 16px; }
+
+/* Chemin des niveaux */
+.levels { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+.lv { position: relative; display: grid; grid-template-columns: 1fr 48px; gap: 8px; }
+.lv:not(:last-child)::after { content: ""; position: absolute; left: 29px; top: 100%; width: 2px; height: 10px; background: rgba(191, 150, 64, 0.35); }
+.lv-main { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(160deg, rgba(33, 58, 130, 0.42), rgba(16, 28, 69, 0.8)); }
+.lv-main:not([disabled]):active { transform: scale(0.985); border-color: var(--gold-400); }
+.lv-num { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--gold-200); border: 2px solid var(--gold-500); background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.4)); }
+.lv-num svg { width: 20px; height: 20px; }
+.lv-text { display: grid; line-height: 1.2; min-width: 0; }
+.lv-text b { font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: 0.02em; color: var(--parch); }
+.lv-text small { font-size: 14px; font-style: italic; color: var(--parch-dim); }
+.lv .stars svg { width: 17px; height: 17px; }
+.lv.now .lv-main { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 18px -4px var(--accent); }
+.lv.now .lv-num { background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); color: var(--night); border-color: var(--gold-200); animation: pulse 2s ease-in-out infinite; }
+.lv.done .lv-num { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.lv.locked .lv-main { opacity: 0.5; border-style: dashed; }
+.lv-read { width: 48px; border-radius: 14px; border: 1px solid var(--line); background: rgba(16, 28, 69, 0.6); color: var(--gold-300); display: grid; place-items: center; }
+.lv-read svg { width: 22px; height: 22px; }
+.lv-read:active { background: rgba(216, 181, 101, 0.16); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(233, 207, 142, 0.25); } }
+
+.lesson-crumb { font-family: var(--display); font-size: 14px; letter-spacing: 0.06em; color: var(--gold-300); }
+.sc-text + .sc-text { margin-top: 14px; }
+.sc-text::first-letter { all: unset; }
+.sc-text:first-of-type::first-letter { font-family: var(--display); font-weight: 700; font-size: 3.5em; float: left; line-height: 0.82; padding: 6px 10px 0 0; color: #8f1d2c; text-shadow: 1px 1px 0 rgba(191, 150, 64, 0.6); }
+
+/* Résultats */
+.res-era { font-family: var(--display); font-size: 14px; letter-spacing: 0.12em; color: var(--gold-400); margin-bottom: 8px; }
+.need { margin-top: 6px; font-size: 16px; color: var(--ko); }
+.result .stack .btn { margin: 0; }
+.seal-card { display: flex; align-items: center; gap: 14px; text-align: left; margin-top: 18px; padding: 14px 16px; border-radius: var(--radius); border: 1px solid var(--gold-300); background: linear-gradient(135deg, rgba(233, 207, 142, 0.3), rgba(33, 58, 130, 0.4)); animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.4s both; }
+.seal-ico { width: 54px; height: 54px; flex: none; display: grid; place-items: center; border-radius: 50%; color: var(--night); background: radial-gradient(circle at 35% 30%, var(--gold-200), var(--gold-500)); box-shadow: 0 0 0 3px rgba(11, 20, 48, 0.7), 0 0 20px rgba(233, 207, 142, 0.5); }
+.seal-ico svg { width: 30px; height: 30px; }
+.seal-card small { display: block; font-family: var(--display); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-300); }
+.seal-card b { display: block; font-family: var(--display); font-size: 18px; color: var(--gold-200); line-height: 1.2; }
+.seal-card span:not(.seal-ico) { font-size: 15px; color: var(--parch-dim); }
+.rankup { animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.5s both; }
+
+/* Bonne / mauvaise réponse : petite animation */
+.feedback.good { animation: enter 0.22s ease-out, flash-ok 0.7s ease-out; }
+.feedback.bad { animation: enter 0.22s ease-out, shake 0.4s ease-out; }
+@keyframes flash-ok { 0% { box-shadow: 0 0 0 0 rgba(108, 199, 154, 0.55); } 100% { box-shadow: 0 0 0 18px rgba(108, 199, 154, 0); } }
+@keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.opt.correct, .tf-btn.correct { animation: bounce 0.4s ease-out; }
+@keyframes bounce { 40% { transform: scale(1.03); } }
+
+/* Confettis */
+#confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+#confetti i { position: absolute; top: -20px; border-radius: 2px; opacity: 0; animation: fall linear forwards; }
+@keyframes fall { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0.9; transform: translateY(105vh) rotate(720deg); } }
+
+/* Réglages */
+.toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.toggle { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(11, 20, 48, 0.5); color: var(--parch-dim); font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.05em; }
+.toggle svg { width: 22px; height: 22px; }
+.toggle.on { border-color: var(--gold-400); background: rgba(191, 150, 64, 0.2); color: var(--gold-200); }
+.sheet .stack { margin-top: 16px; }
