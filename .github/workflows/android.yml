@@ -10,6 +10,9 @@ jobs:
       VERSION_CODE: ${{ github.run_number }}
       VERSION_NAME: 1.0.${{ github.run_number }}
       HAS_KEY: ${{ secrets.KEYSTORE_BASE64 != '' }}
+      # Le fichier de clé reste secret (dans KEYSTORE_BASE64). Son mot de passe seul ne sert à rien sans le fichier.
+      KEY_ALIAS: historia
+      KEYSTORE_PASSWORD: HistoriaPlay2026
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,12 +55,9 @@ jobs:
         if: env.HAS_KEY == 'true'
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
-          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+          jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KEYSTORE_PASSWORD" -keypass "$KEYSTORE_PASSWORD" \
             android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
           jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab | tail -1
 
