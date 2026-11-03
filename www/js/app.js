@@ -347,7 +347,7 @@
         ${paras(L.p)}
       </article>
       <div class="stack">
-        <button class="btn btn-gold" data-act="start" data-id="${e.id}" data-lv="${i}" data-from="lesson">${unlocked(e, i) ? "Jouer ce niveau" : "Niveau verrouillé"}</button>
+        <button class="btn btn-gold" data-act="start" data-id="${e.id}" data-lv="${i}" ${unlocked(e, i) ? "" : "disabled"}>${unlocked(e, i) ? "Jouer ce niveau" : "Réussis le niveau précédent pour jouer"}</button>
       </div>
     </div>`;
   }
