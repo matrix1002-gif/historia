@@ -1,0 +1,9 @@
+{
+  "appId": "com.historiaquiz.app",
+  "appName": "Historia",
+  "webDir": "www",
+  "backgroundColor": "#0b1430",
+  "android": {
+    "allowMixedContent": false
+  }
+}

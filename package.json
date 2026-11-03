@@ -1,0 +1,18 @@
+{
+  "name": "historia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Historia - quiz d'histoire de France et de la chrétienté",
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/cli": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/eb-garamond": "^5.3.0",
+    "sharp": "^0.32.6"
+  }
+}

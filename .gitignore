@@ -1,0 +1,7 @@
+node_modules/
+android/
+*.jks
+*.keystore
+www/fonts/
+www/icons/*.png
+assets/*.png
