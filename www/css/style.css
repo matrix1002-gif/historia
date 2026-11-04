@@ -861,3 +861,14 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .lv-thumb img.photo { object-position: center; }
 
 .era-art { left: 40%; }
+
+/* Apprendre / Quiz */
+.learn-note { margin: -4px 4px 14px; color: var(--muted, #6f5f47); font-size: 17px; font-style: italic; }
+.quiz-intro { margin-top: 4px; }
+.lv-quiz { width: 58px; display: grid; place-items: center; gap: 2px; padding: 6px 2px; background: linear-gradient(180deg, var(--fill-a), var(--fill-b)); color: #2b1d0e; border-color: var(--gold-500); }
+.lv-quiz .qi svg { width: 20px; height: 20px; }
+.lv-quiz .qt { font-family: var(--display); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.lv-quiz[disabled] { background: rgba(120, 85, 30, 0.12); color: #8a7656; border-color: var(--line); }
+.lv.locked .lv-thumb { filter: none; }
+.lv.locked .lv-main { opacity: 1; }
+.lv.locked .lv-main { border-style: solid; }

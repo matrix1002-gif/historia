@@ -192,5 +192,104 @@
     setTimeout(() => box.remove(), 3600);
   }
 
-  window.HistoriaArt = { scene, ICONS_EXTRA, play, confetti };
+
+  /* ===== Musique d'ambiance (synthèse WebAudio, aucun fichier) ===== */
+  const Music = (() => {
+    const BEAT = 0.9; // secondes
+    const CHORDS = [
+      [146.83, 174.61, 220], [116.54, 146.83, 174.61], [130.81, 164.81, 196], [110, 130.81, 164.81],
+      [146.83, 174.61, 220], [98, 116.54, 146.83], [130.81, 164.81, 196], [146.83, 174.61, 220]
+    ];
+    const MEL = [261.63, 293.66, 329.63, 349.23, 392, 440, 523.25, 587.33];
+    let on = false, master = null, drone = [], echo = null, timer = null, nextT = 0, step = 0, chord = 0;
+
+    function ensure() {
+      if (!AC) return null;
+      if (!ctx) ctx = new AC();
+      return ctx;
+    }
+    const osc = (type, f, t0, t1, gain, dest, detune = 0) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = f; o.detune.value = detune;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.linearRampToValueAtTime(gain, t0 + 2.4);
+      g.gain.setValueAtTime(gain, t1 - 2.6);
+      g.gain.linearRampToValueAtTime(0.0001, t1);
+      o.connect(g).connect(dest);
+      o.start(t0); o.stop(t1 + 0.1);
+    };
+    function pluck(f, t, vol) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+      o.connect(g); g.connect(master); g.connect(echo);
+      o.start(t); o.stop(t + 1.5);
+    }
+    function drum(t, vol) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.28);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+      o.connect(g).connect(master); o.start(t); o.stop(t + 0.55);
+    }
+    function schedule() {
+      if (!on || !ctx) return;
+      while (nextT < ctx.currentTime + 0.8) {
+        const t = nextT, k = step % 16;
+        if (k === 0) {
+          const c = CHORDS[chord % CHORDS.length];
+          const len = BEAT * 8;
+          const pad = ctx.createBiquadFilter(); pad.type = "lowpass"; pad.frequency.value = 900; pad.connect(master);
+          c.forEach((f, i) => { osc("triangle", f, t, t + len + 1.5, 0.05, pad, -6 + i * 6); osc("sine", f * 2, t, t + len + 1.5, 0.012, pad); });
+          chord++;
+        }
+        if (k % 4 === 0) drum(t, k === 0 ? 0.2 : 0.09);
+        const strong = k % 2 === 0;
+        if (Math.random() < (strong ? 0.5 : 0.18)) {
+          const tones = CHORDS[(chord - 1 + CHORDS.length) % CHORDS.length].map((f) => f * 2);
+          const pool = Math.random() < 0.65 ? tones : MEL;
+          pluck(pool[Math.floor(Math.random() * pool.length)], t, 0.07);
+        }
+        step++; nextT += BEAT / 2;
+      }
+    }
+    function start() {
+      if (on || !ensure()) return;
+      try {
+        if (ctx.state === "suspended") ctx.resume();
+        on = true;
+        master = ctx.createGain(); master.gain.setValueAtTime(0.0001, ctx.currentTime);
+        master.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 3);
+        master.connect(ctx.destination);
+        echo = ctx.createDelay(1); echo.delayTime.value = BEAT * 0.75;
+        const fb = ctx.createGain(); fb.gain.value = 0.38;
+        const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
+        echo.connect(lp); lp.connect(fb); fb.connect(echo); lp.connect(master);
+        const dl = ctx.createBiquadFilter(); dl.type = "lowpass"; dl.frequency.value = 420; dl.connect(master);
+        drone = [[73.42, 0.07], [110, 0.04]].map(([f, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.value = v; o.connect(g).connect(dl); o.start(); return o; });
+        step = 0; chord = 0; nextT = ctx.currentTime + 0.2;
+        timer = setInterval(schedule, 200); schedule();
+      } catch (e) { on = false; }
+    }
+    function stop() {
+      if (!on) return;
+      on = false; clearInterval(timer);
+      const m = master, d = drone;
+      try {
+        m.gain.cancelScheduledValues(ctx.currentTime);
+        m.gain.setValueAtTime(m.gain.value, ctx.currentTime);
+        m.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
+        setTimeout(() => { d.forEach((o) => { try { o.stop(); } catch (e) {} }); try { m.disconnect(); } catch (e) {} }, 1500);
+      } catch (e) { /* rien */ }
+      master = null; drone = [];
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (!ctx) return;
+      if (document.hidden) { try { ctx.suspend(); } catch (e) {} } else if (on) { try { ctx.resume(); } catch (e) {} }
+    });
+    return { sync: (wanted) => (wanted ? start() : stop()) };
+  })();
+
+  window.HistoriaArt = Object.assign(window.HistoriaArt || {}, { scene, ICONS_EXTRA, play, confetti, music: Music });
 })();

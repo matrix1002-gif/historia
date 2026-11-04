@@ -64,7 +64,7 @@
   const playable = ERAS.filter((e) => e.levels.length);
 
   /* ===== Sauvegarde locale ===== */
-  const defaults = () => ({ xp: 0, lv: {}, ok: {}, seals: {}, streak: { count: 0, last: "" }, daily: "", last: null, sound: true, vib: true, medals: {}, stats: {}, rec: {} });
+  const defaults = () => ({ xp: 0, lv: {}, ok: {}, seals: {}, streak: { count: 0, last: "" }, daily: "", last: null, sound: true, music: true, vib: true, medals: {}, stats: {}, rec: {} });
   const load = () => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY));
@@ -217,8 +217,6 @@
     { id: "f14", name: "Sentinelle", desc: "Joue 14 jours de suite.", icon: "flame", tier: 2, cur: () => S.stats.bestStreak || 0, max: 14 },
     { id: "f30", name: "Mois de feu", desc: "Joue 30 jours de suite.", icon: "flame", tier: 2, cur: () => S.stats.bestStreak || 0, max: 30 },
     { id: "f100", name: "Flamme éternelle", desc: "Joue 100 jours de suite.", icon: "flame", tier: 3, cur: () => S.stats.bestStreak || 0, max: 100 },
-    { id: "d1", name: "Défi relevé", desc: "Termine un défi du jour.", icon: "scroll", tier: 1, cur: () => S.stats.daily || 0, max: 1 },
-    { id: "d10", name: "Habitué du jour", desc: "Termine 10 défis du jour.", icon: "scroll", tier: 2, cur: () => S.stats.daily || 0, max: 10 },
     { id: "t1", name: "Entrée à la cour", desc: "Joue au Trésor du Royaume.", icon: "lis", tier: 1, cur: () => S.stats.tGames || 0, max: 1 },
     { id: "t5", name: "Coffre de bronze", desc: "Atteins le palier 1 000 écus.", icon: "lis", tier: 1, cur: () => S.stats.tBest || 0, max: 5 },
     { id: "t10", name: "Coffre d'argent", desc: "Atteins le palier 32 000 écus.", icon: "lis", tier: 2, cur: () => S.stats.tBest || 0, max: 10 },
@@ -410,8 +408,8 @@
 
   /* ===== Écrans ===== */
   const TABS = [
-    { v: "home", label: "Époques", ico: () => ICONS.book },
-    { v: "tresor", label: "Trésor", ico: () => ICONS.seal },
+    { v: "home", label: "Apprendre", ico: () => ICONS.book },
+    { v: "tresor", label: "Quiz", ico: () => ICONS.scroll },
     { v: "gallery", label: "Personnages", ico: () => ICONS.helmet },
     { v: "medals", label: "Médailles", ico: () => ICONS.crown }
   ];
@@ -439,6 +437,7 @@
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
+    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame"));
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
@@ -518,17 +517,8 @@
         </span>
       </button>
 
-      ${resume}
-
-      <button class="daily" data-act="daily" ${doneToday ? 'aria-disabled="true"' : ""}>
-        <span>
-          <h2>Défi du jour</h2>
-          <p>${doneToday ? "Relevé. Revenez demain pour un nouveau défi." : `${CONFIG.questionsPerDaily} défis de toutes les époques, +${CONFIG.xpDailyBonus} XP`}</p>
-        </span>
-        <span class="go">${doneToday ? UI.star(true) : UI.go}</span>
-      </button>
-
-      <h2 class="section">Les époques</h2>
+      <h2 class="section">Apprendre, époque par époque</h2>
+      <p class="learn-note">Choisis une époque, lis la fiche de chaque niveau, puis passe au quiz pour valider ce que tu as appris.</p>
       <ul class="eras">${eraCards}</ul>
 
       ${adSlot()}
@@ -543,15 +533,15 @@
       const open = unlocked(e, i);
       const s = starsOf(e.id, i);
       const cls = !open ? "locked" : s >= 1 ? "done" : "now";
-      const act = open ? `data-act="start" data-id="${e.id}" data-lv="${i}"` : "disabled";
+      const qz = open ? `data-act="start" data-id="${e.id}" data-lv="${i}"` : "disabled";
       return `
       <li class="lv ${cls}">
-        <button class="lv-main" ${act} aria-label="Niveau ${i + 1}, ${esc(lv.title)}${open ? "" : ", verrouillé"}">
-          <span class="lv-pic"><span class="lv-thumb">${Art.situation(e.id, i)}</span><span class="lv-num">${open ? i + 1 : UI.lock}</span></span>
+        <button class="lv-main" data-act="lesson" data-id="${e.id}" data-lv="${i}" aria-label="Apprendre : niveau ${i + 1}, ${esc(lv.title)}">
+          <span class="lv-pic"><span class="lv-thumb">${Art.situation(e.id, i)}</span><span class="lv-num">${i + 1}</span></span>
           <span class="lv-text"><b>${esc(lv.title)}</b><small>${esc(lv.lesson.d)}</small></span>
           ${open ? starsRow(s) : ""}
         </button>
-        <button class="lv-read" data-act="lesson" data-id="${e.id}" data-lv="${i}" aria-label="Lire la fiche du niveau ${i + 1}" title="Lire la fiche">${UI.book}</button>
+        <button class="lv-read lv-quiz" ${qz} aria-label="${open ? `Quiz du niveau ${i + 1}` : `Quiz du niveau ${i + 1}, verrouillé : réussis le quiz précédent`}"><span class="qi">${open ? UI.go : UI.lock}</span><span class="qt">Quiz</span></button>
       </li>`;
     }).join("");
 
@@ -575,7 +565,7 @@
         <div class="fact"><b>${st}/${e.levels.length * 3}</b><span>étoiles</span></div>
         <div class="fact"><b class="${sealed(e) ? "gold" : ""}">${sealed(e) ? "Obtenu" : "—"}</b><span>sceau</span></div>
       </div>
-      <p class="mix-note">Touche un niveau pour jouer tout de suite. La fiche (<span class="inline-ico">${UI.book}</span>) est facultative.</p>
+      <p class="mix-note">Touche un niveau pour lire sa fiche, puis passe au quiz (<span class="inline-ico">${UI.go}</span>). Réussir un quiz débloque le niveau suivant.</p>
       <ol class="levels">${rows}</ol>
       ${adSlot()}
     </div>`;
@@ -608,7 +598,7 @@
         ${fun}
       </article>
       <div class="stack">
-        <button class="btn btn-gold" data-act="start" data-id="${e.id}" data-lv="${i}" ${unlocked(e, i) ? "" : "disabled"}>${unlocked(e, i) ? "Jouer ce niveau" : "Réussis le niveau précédent pour jouer"}</button>
+        <button class="btn btn-gold" data-act="start" data-id="${e.id}" data-lv="${i}" ${unlocked(e, i) ? "" : "disabled"}>${unlocked(e, i) ? "Passer au quiz du niveau" : "Réussis le quiz précédent pour débloquer le quiz"}</button>
       </div>
     </div>`;
   }
@@ -901,7 +891,7 @@
         buttons = `<button class="btn btn-gold" data-act="replay">Réessayer le niveau</button>
           <button class="btn btn-line with-icon" data-act="lesson" data-id="${e.id}" data-lv="${R.lvl}"><span class="bi">${UI.book}</span>Lire la fiche</button>`;
       } else {
-        buttons = (R.nextOpen ? `<button class="btn btn-gold" data-act="next-level">Niveau suivant</button>` : "")
+        buttons = (R.nextOpen ? `<button class="btn btn-gold" data-act="next-level">Niveau suivant : la fiche</button>` : "")
           + `<button class="btn ${R.nextOpen ? "btn-line" : "btn-gold"}" data-act="replay">${R.stars < 3 ? "Viser 3 étoiles" : "Rejouer le niveau"}</button>`;
       }
       buttons += `<button class="btn btn-line" data-act="era" data-id="${e.id}">Carte de l'époque</button>`;
@@ -950,7 +940,8 @@
     const ladder = LADDER.map((v, i) => `<li class="${SAFE.includes(i) ? "safe" : ""} ${i === 14 ? "top" : ""}"><span>${i + 1}</span><b>${fmtEcus(v)}</b>${SAFE.includes(i) ? "<em>palier</em>" : ""}</li>`).reverse().join("");
     return `
     <div class="screen">
-      ${topBar("Le Trésor du Royaume")}
+      ${topBar("Quiz")}
+      <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1125,6 +1116,7 @@
         </ul>
         <p class="note">${m} bonne${m > 1 ? "s" : ""} réponse${m > 1 ? "s" : ""} découverte${m > 1 ? "s" : ""} sur ${bankSize()}. Chaque réponse nouvelle rapporte ${CONFIG.xpPerNewAnswer} XP, un niveau réussi ${CONFIG.xpLevelFirst} XP, un sceau d'époque ${CONFIG.xpSeal} XP.</p>
         <div class="toggles">
+          <button class="toggle ${S.music !== false ? "on" : ""}" data-act="tmusic" aria-pressed="${S.music !== false}">${UI.sound(S.music !== false)}<span>Musique</span></button>
           <button class="toggle ${S.sound ? "on" : ""}" data-act="tsound" aria-pressed="${S.sound}">${UI.sound(S.sound)}<span>Sons</span></button>
           <button class="toggle ${S.vib ? "on" : ""}" data-act="tvib" aria-pressed="${S.vib}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg><span>Vibrations</span></button>
         </div>
@@ -1154,7 +1146,7 @@
       case "lesson": go("lesson", { id: el.dataset.id, lv: Number(el.dataset.lv) }, view.name === "result" ? "replace" : "push"); break;
       case "start": launch(eraById(el.dataset.id), Number(el.dataset.lv), view.name === "lesson"); break;
       case "replay": launch(eraById(R.eraId), R.lvl, true); break;
-      case "next-level": launch(eraById(R.eraId), R.lvl + 1, true); break;
+      case "next-level": go("lesson", { id: R.eraId, lv: R.lvl + 1 }, "replace"); sfx("tap"); break;
       case "tab": { const v = el.dataset.v; if (v !== view.name) go(v, {}, "replace"); sfx("tap"); break; }
       case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
       case "tstart": startTresor(el.dataset.scope); break;
@@ -1240,6 +1232,7 @@
       case "quit": Q = null; back(); break;
       case "ranks": openRanks(); break;
       case "close-sheet": closeSheet(); break;
+      case "tmusic": S.music = S.music === false; save(); closeSheet(); openRanks(); sfx("tap"); break;
       case "tsound": S.sound = !S.sound; save(); closeSheet(); openRanks(); sfx("tap"); break;
       case "tvib": S.vib = !S.vib; save(); closeSheet(); openRanks(); buzz(30); break;
       case "reset":
