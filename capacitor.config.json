@@ -2,7 +2,7 @@
   "appId": "com.historiaquiz.app",
   "appName": "Historia",
   "webDir": "www",
-  "backgroundColor": "#0b1430",
+  "backgroundColor": "#f1e6c8",
   "android": {
     "allowMixedContent": false
   }

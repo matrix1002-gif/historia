@@ -35,7 +35,7 @@ jobs:
       - name: Créer le projet Android
         run: |
           npx cap add android
-          npx @capacitor/assets generate --android --iconBackgroundColor '#14224f' --splashBackgroundColor '#0b1430'
+          npx @capacitor/assets generate --android --iconBackgroundColor '#14224f' --splashBackgroundColor '#f1e6c8'
           npx cap sync android
           node scripts/patch-android.mjs
 

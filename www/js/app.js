@@ -418,6 +418,15 @@
   const tabBar = (active) => `<nav class="tabbar" aria-label="Navigation">${TABS.map((t) => `<button class="tab ${t.v === active ? "on" : ""}" data-act="tab" data-v="${t.v}" ${t.v === active ? 'aria-current="page"' : ""}><span class="tab-ico">${t.ico()}</span><span>${t.label}</span></button>`).join("")}</nav>`;
   const withTabs = (html, active) => { document.body.classList.add("has-tabs"); return html + tabBar(active); };
 
+  // Illustration de la situation : retrouve l'époque et le niveau d'une question.
+  const sitOfItem = (it) => {
+    const e = it && ERAS.find((x) => x.title === it.era);
+    if (!e) return "";
+    const i = e.levels.findIndex((l) => l.title === it.lvl);
+    return Art.situation(e.id, i < 0 ? null : i);
+  };
+  const picOfItem = (it, cap) => { const h = sitOfItem(it); return h ? `<figure class="pic sm" aria-hidden="true">${h}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ""}</figure>` : ""; };
+
   // Ambiance : la couleur de l'époque teinte tout l'écran.
   const setTint = () => {
     const eid = view.name === "era" || view.name === "lesson" ? view.id : view.name === "quiz" && Q && Q.eraId ? Q.eraId : view.name === "result" && R && R.eraId ? R.eraId : view.name === "tgame" && T && T.scope !== "all" ? T.scope : null;
@@ -466,7 +475,7 @@
       return `
       <li>
         <button class="era ${soon ? "soon" : ""}" style="--accent:${e.accent}" data-act="era" data-id="${e.id}" ${soon ? "disabled" : ""} aria-label="${esc(e.title)}, ${p} niveaux réussis sur ${n}">
-          <span class="era-art">${Art.scene(e.scene, e.accent)}</span>
+          <span class="era-art">${Art.situation(e.id)}</span>
           <span class="era-body">
             <span class="medal">${ICONS[e.icon]}</span>
             <span class="era-text">
@@ -538,7 +547,7 @@
       return `
       <li class="lv ${cls}">
         <button class="lv-main" ${act} aria-label="Niveau ${i + 1}, ${esc(lv.title)}${open ? "" : ", verrouillé"}">
-          <span class="lv-num">${open ? i + 1 : UI.lock}</span>
+          <span class="lv-pic"><span class="lv-thumb">${Art.situation(e.id, i)}</span><span class="lv-num">${open ? i + 1 : UI.lock}</span></span>
           <span class="lv-text"><b>${esc(lv.title)}</b><small>${esc(lv.lesson.d)}</small></span>
           ${open ? starsRow(s) : ""}
         </button>
@@ -549,7 +558,7 @@
     return `
     <div class="screen" style="--accent:${e.accent}">
       <div class="art-hero">
-        ${Art.scene(e.scene, e.accent)}
+        ${Art.situation(e.id)}
         <button class="icon-btn back-float" data-act="back" aria-label="Retour">${UI.back}</button>
         <div class="art-title">
           <span class="medal">${ICONS[e.icon]}</span>
@@ -586,7 +595,7 @@
         <button class="icon-btn" data-act="back" aria-label="Fermer la fiche">${UI.close}</button>
         <p class="lesson-crumb">Niveau ${i + 1} · ${esc(lv.title)}</p>
       </div>
-      <figure class="illum" aria-hidden="true">${Art.scene(e.scene, e.accent)}<figcaption>${esc(e.title)} · ${esc(L.d)}</figcaption></figure>
+      <figure class="illum" aria-hidden="true">${Art.situation(e.id, i)}<figcaption>${esc(Art.situationName(e.id, i))} · ${esc(L.d)}</figcaption></figure>
       <article class="scroll-card">
         <div class="sc-head">
           <span class="sc-medal">${ICONS[e.icon]}</span>
@@ -618,12 +627,12 @@
     const segs = Q.items.map((_, k) => `<i class="${k < Q.i ? "done" : k === Q.i ? "now" : ""}"></i>`).join("");
     return `
     <div class="screen" ${e ? `style="--accent:${e.accent}"` : ""}>
-      ${e ? `<div class="decor" aria-hidden="true">${Art.scene(e.scene, e.accent)}</div>` : ""}
       <div class="top">
         <button class="icon-btn" data-act="quit" aria-label="Quitter la partie">${UI.close}</button>
         <div class="progress" aria-hidden="true">${segs}</div>
         <span class="count" aria-label="Défi ${Q.i + 1} sur ${Q.items.length}">${Q.i + 1}/${Q.items.length}</span>
       </div>
+      ${picOfItem(it, Q.mode === "level" ? Art.situationName(Q.eraId, Q.lvl) : "")}
       <section class="q-card">
         <p class="q-era">${esc(Q.mode === "level" ? `Niveau ${Q.lvl + 1} · ${it.lvl}` : it.era)} <span class="q-type">${TYPE_LABEL[it.type]}</span></p>
         <h1 class="q-text" style="font-weight:400">${esc(it.q)}</h1>
@@ -901,7 +910,7 @@
     }
     return `
     <div class="screen result" ${e ? `style="--accent:${e.accent}"` : ""}>
-      ${e ? `<div class="decor" aria-hidden="true">${Art.scene(e.scene, e.accent)}</div>` : ""}
+      ${e && R.mode === "level" ? `<figure class="pic sm" aria-hidden="true">${Art.situation(e.id, R.lvl)}</figure>` : ""}
       ${e ? `<p class="res-era">${esc(e.title)}${R.mode === "level" ? ` · Niveau ${R.lvl + 1}` : ""}</p>` : ""}
       <div class="big-stars" role="img" aria-label="${R.stars} étoile${R.stars > 1 ? "s" : ""} sur 3">${[0, 1, 2].map((i) => UI.star(i < R.stars)).join("")}</div>
       <p class="score">${R.right}<small>/${R.n}</small></p>
@@ -963,7 +972,7 @@
 
   const refreshT = () => { const el = document.getElementById("tgame-body"); if (el) el.innerHTML = tgameInner(); };
 
-  function tgameScreen() { return `<div class="screen tscreen" id="tgame"><div class="decor hall" aria-hidden="true">${Art.scene(T.scope === "all" ? "chevaliers" : eraById(T.scope).scene, T.scope === "all" ? "#d8b565" : eraById(T.scope).accent)}</div><div id="tgame-body">${tgameInner()}</div></div>`; }
+  function tgameScreen() { return `<div class="screen tscreen" id="tgame"><div id="tgame-body">${tgameInner()}</div></div>`; }
 
   function tgameInner() {
     const t = T;
@@ -1007,6 +1016,7 @@
         <div class="prize"><small>${inLegend ? `Légende n°${legendN(t.i)}` : `Question ${t.i + 1} sur 15`}</small><b>${fmtEcus(prize(t.i))}</b></div>
         <span class="safe-chip" title="Palier garanti">${UI.lock}${safe ? fmtEcus(safe) : "Aucun palier"}</span>
       </div>
+      ${picOfItem(it)}
       <div class="lives">${life("fifty", "50/50", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6h6M5 18h6M14 6h5M14 18h5"/><path d="M12 3v18" stroke-dasharray="2 3"/></svg>')}
         ${life("pub", "Public", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20v-6M10 20V8M15 20v-9M20 20V4"/></svg>')}
         ${life("expert", "Historien", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.500 3.500-7 8-7s8 2.500 8 7"/></svg>')}</div>
