@@ -595,7 +595,7 @@
         <button class="icon-btn" data-act="back" aria-label="Fermer la fiche">${UI.close}</button>
         <p class="lesson-crumb">Niveau ${i + 1} · ${esc(lv.title)}</p>
       </div>
-      <figure class="illum" aria-hidden="true">${Art.situation(e.id, i)}<figcaption>${esc(Art.situationName(e.id, i))} · ${esc(L.d)}</figcaption></figure>
+      <figure class="illum" aria-hidden="true">${Art.situation(e.id, i)}<figcaption>${esc(Art.situationName(e.id, i) || lv.title)} · ${esc(L.d)}</figcaption></figure>
       <article class="scroll-card">
         <div class="sc-head">
           <span class="sc-medal">${ICONS[e.icon]}</span>
@@ -632,7 +632,7 @@
         <div class="progress" aria-hidden="true">${segs}</div>
         <span class="count" aria-label="Défi ${Q.i + 1} sur ${Q.items.length}">${Q.i + 1}/${Q.items.length}</span>
       </div>
-      ${picOfItem(it, Q.mode === "level" ? Art.situationName(Q.eraId, Q.lvl) : "")}
+      ${picOfItem(it, Q.mode === "level" ? (Art.situationName(Q.eraId, Q.lvl) || it.lvl) : "")}
       <section class="q-card">
         <p class="q-era">${esc(Q.mode === "level" ? `Niveau ${Q.lvl + 1} · ${it.lvl}` : it.era)} <span class="q-type">${TYPE_LABEL[it.type]}</span></p>
         <h1 class="q-text" style="font-weight:400">${esc(it.q)}</h1>

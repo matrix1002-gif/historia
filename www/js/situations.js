@@ -574,14 +574,24 @@
 
   const pick = (spec) => (Array.isArray(spec) ? spec : [spec]);
   function keyFor(eraId, i) { const spec = pick((MAP[eraId] || [])[i] || EMBLEM[eraId] || ["battle"]); return spec[0]; }
+  // Peintures réalistes (images IA) : numéro d'image (1 à 5) pour chacun des 10 niveaux d'une époque.
+  const PHOTOS = {
+    gaule: [2, 4, 3, 4, 1, 4, 4, 4, 5, 1],
+    evangelisation: [2, 2, 3, 4, 4, 1, 5, 2, 1, 2],
+    carolingiens: [1, 1, 2, 1, 3, 1, 4, 3, 3, 5],
+    moines: [3, 2, 3, 1, 4, 3, 4, 3, 1, 5],
+    chevaliers: [3, 1, 3, 5, 2, 4, 1, 4, 5, 5]
+  };
+  const photo = (eraId, n) => `<img class="photo" src="img/${eraId}-${n}.jpg" alt="" decoding="async">`;
   function situation(eraId, i, cls = "") {
+    if (PHOTOS[eraId]) return photo(eraId, i == null ? 1 : PHOTOS[eraId][i] || 1);
     const spec = pick(i == null ? (EMBLEM[eraId] || ["battle"]) : (MAP[eraId] || [])[i] || EMBLEM[eraId] || ["battle"]);
     const fn = S[spec[0]] || S.battle;
     const n = ++uid;
     return `<svg class="scene ${cls}" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${fn(n, spec[1])}</svg>`;
   }
   Art.situation = situation;
-  Art.situationName = (eraId, i) => CAPTION[keyFor(eraId, i)] || "";
+  Art.situationName = (eraId, i) => (PHOTOS[eraId] ? "" : CAPTION[keyFor(eraId, i)] || "");
   Art.situationKeys = () => Object.keys(S);
   Art._S = S;
 })();
