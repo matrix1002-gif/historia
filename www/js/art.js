@@ -197,6 +197,10 @@
   const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
   const Z = Array(16).fill(0);
   const pat = (obj) => { const a = Z.slice(); Object.keys(obj).forEach((k) => (a[k] = obj[k])); return a; };
+  const NB = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
+  const note = (n) => { const m = /^([a-g])(#|b)?(\d)$/.exec(n); return 12 * (+m[3] + 1) + NB[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0); };
+  // Une phrase = 8 mesures de 16 croches : "d5" note, "." silence, "-" prolonge la note précédente
+  const BARS = (...bars) => bars.map((b) => { const a = new Array(16).fill(null); let last = -1; b.split(/\s+/).forEach((tk, i) => { if (tk === "-") { if (last >= 0) a[last].len++; } else if (tk === ".") last = -1; else { a[i] = { m: note(tk), len: 1 }; last = i; } }); return a; });
   const THEMES = {
     // Moines : la mélodie d'origine
     moines: { beat: 0.9, chords: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 48, 52], [50, 53, 57], [43, 46, 50], [48, 52, 55], [50, 53, 57]], mel: [60, 62, 64, 65, 67, 69, 72, 74], pad: ["triangle", 900, 0.05], drone: [[38, 0.07], [45, 0.04]], k: pat({ 0: 0.2, 4: 0.09, 8: 0.09, 12: 0.09 }), t: Z, pl: { type: "triangle", decay: 1.4, vol: 0.07, p: [0.5, 0.18], chord: 0.65 } },
@@ -207,13 +211,37 @@
     // Carolingiens : cuivres lents, marche solennelle
     carolingiens: { beat: 1.0, chords: [[48, 52, 55], [43, 47, 50], [45, 48, 52], [41, 45, 48], [48, 52, 55], [43, 47, 50], [41, 45, 48], [48, 52, 55]], mel: [60, 62, 64, 67, 69, 72, 74, 76], pad: ["sawtooth", 650, 0.03], drone: [[36, 0.07], [43, 0.04]], k: pat({ 0: 0.22, 8: 0.16 }), t: Z, pl: { type: "triangle", decay: 1.6, vol: 0.06, p: [0.4, 0.1], chord: 0.8 } },
     // Chevaliers : luth héroïque, arpèges
-    chevaliers: { beat: 0.65, chords: [[43, 47, 50], [41, 45, 48], [48, 52, 55], [50, 54, 57], [43, 47, 50], [40, 43, 47], [48, 52, 55], [50, 54, 57]], mel: [67, 69, 71, 72, 74, 76, 79], pad: ["sine", 800, 0.03], drone: [[31, 0.06]], k: pat({ 0: 0.12, 8: 0.1 }), t: pat({ 4: 0.04, 12: 0.04 }), pl: { type: "triangle", decay: 0.75, vol: 0.075, p: [0.85, 0.5], chord: 1, arp: 1 } },
+    chevaliers: { beat: 0.65, chords: [[43, 47, 50], [41, 45, 48], [48, 52, 55], [50, 54, 57], [43, 47, 50], [40, 43, 47], [48, 52, 55], [50, 54, 57]], mel: [67, 69, 71, 72, 74, 76, 79], pad: ["sine", 800, 0.03], drone: [[31, 0.06]], k: pat({ 0: 0.12, 8: 0.1 }), t: pat({ 4: 0.04, 12: 0.04 }), pl: { type: "triangle", decay: 0.75, vol: 0.05, p: [0.8, 0.35], chord: 1, arp: 1 }, lead: { type: "triangle", cut: 3200, att: 0.015, decay: 0.9, vol: 0.11, vib: 0.4, send: 0.35, bars: BARS(
+      "g4 . . a4 b4 . d5 . g5 - - - d5 - b4 -",
+      "a4 . c5 . f5 - - e5 d5 - c5 - a4 - - .",
+      "g4 . c5 . e5 - - . g5 - e5 - d5 c5 d5 e5",
+      "f#5 - - e5 d5 - a4 - d5 - - - . . a4 b4",
+      "g4 . . a4 b4 . d5 . g5 - - - a5 - g5 -",
+      "e5 - - d5 b4 - g4 - b4 - e5 - d5 - b4 -",
+      "c5 . e5 . g5 - - e5 c5 - e5 - d5 - c5 -",
+      "a4 - - - d5 - f#5 - a5 - - - g5 f#5 e5 d5") } },
     // Croisades : gamme orientale (hijaz), luth oriental et darbouka
-    croisades: { beat: 0.55, chords: [[50, 54, 57], [51, 55, 58], [50, 54, 57], [48, 51, 55], [50, 54, 57], [51, 55, 58], [48, 51, 55], [50, 54, 57]], mel: [62, 63, 66, 67, 69, 70, 72, 74, 75, 78], pad: ["sawtooth", 520, 0.022], drone: [[38, 0.09], [45, 0.05]], k: pat({ 0: 0.18, 6: 0.14, 8: 0.18, 14: 0.12 }), t: pat({ 2: 0.1, 4: 0.1, 10: 0.1, 12: 0.1, 15: 0.07 }), pl: { type: "sawtooth", cut: 2400, decay: 0.7, vol: 0.05, p: [0.7, 0.45], chord: 0.2, slide: 1 } },
+    croisades: { beat: 0.55, chords: [[50, 54, 57], [51, 55, 58], [50, 54, 57], [48, 51, 55], [50, 54, 57], [51, 55, 58], [48, 51, 55], [50, 54, 57]], mel: [62, 63, 66, 67, 69, 70, 72, 74, 75, 78], pad: ["sawtooth", 520, 0.022], drone: [[38, 0.09], [45, 0.05]], k: pat({ 0: 0.18, 6: 0.14, 8: 0.18, 14: 0.12 }), t: pat({ 2: 0.1, 4: 0.1, 10: 0.1, 12: 0.1, 15: 0.07 }), pl: { type: "sawtooth", cut: 1800, decay: 0.6, vol: 0.035, p: [0.5, 0.25], chord: 0.2, slide: 1 }, lead: { type: "sawtooth", cut: 1700, att: 0.05, decay: 0.8, vol: 0.075, vib: 1, bend: 1, send: 0.45, bars: BARS(
+      "d5 - eb5 - f#5 - - eb5 d5 - eb5 - d5 - - .",
+      "g5 - - f#5 eb5 - d5 eb5 f#5 - - eb5 d5 - - .",
+      "a5 - - g5 f#5 - eb5 - d5 - eb5 f#5 g5 - f#5 -",
+      "g5 - f#5 - eb5 - d5 - c5 - - d5 eb5 - d5 -",
+      "d5 - - eb5 d5 - c5 - bb4 - a4 - g4 - - .",
+      "bb4 - c5 d5 eb5 - - d5 eb5 - f#5 - g5 - - .",
+      "g5 - - f#5 eb5 f#5 g5 - bb5 - a5 - g5 - f#5 -",
+      "eb5 - d5 - c5 - bb4 - a4 - - - d5 - - -") } },
     // Capétiens : orgue gothique et harpe
     capetiens: { beat: 1.0, chords: [[45, 48, 52], [41, 45, 48], [43, 47, 50], [40, 43, 47], [45, 48, 52], [38, 41, 45], [40, 44, 47], [45, 48, 52]], mel: [64, 67, 69, 71, 72, 74, 76, 79], pad: ["sawtooth", 480, 0.03], drone: [[33, 0.08], [40, 0.05]], k: pat({ 0: 0.15 }), t: Z, pl: { type: "sine", decay: 1.8, vol: 0.075, p: [0.45, 0.12], chord: 0.4 }, fb: 0.45 },
     // Renaissance : luth et danse (pavane)
-    renaissance: { beat: 0.75, chords: [[41, 45, 48], [46, 50, 53], [48, 52, 55], [41, 45, 48], [38, 41, 45], [46, 50, 53], [48, 52, 55], [41, 45, 48]], mel: [65, 67, 69, 70, 72, 74, 77], pad: ["sine", 900, 0.03], drone: [], k: Z, t: pat({ 4: 0.035, 12: 0.035 }), pl: { type: "square", cut: 2000, decay: 0.55, vol: 0.07, p: [0.75, 0.55], chord: 1, arp: 1 } },
+    renaissance: { beat: 0.75, chords: [[41, 45, 48], [46, 50, 53], [48, 52, 55], [41, 45, 48], [38, 41, 45], [46, 50, 53], [48, 52, 55], [41, 45, 48]], mel: [65, 67, 69, 70, 72, 74, 77], pad: ["sine", 900, 0.03], drone: [[29, 0.05]], k: pat({ 0: 0.07, 8: 0.05 }), t: pat({ 4: 0.035, 12: 0.035 }), pl: { type: "triangle", cut: 1800, decay: 0.6, vol: 0.05, p: [0.7, 0.4], chord: 1, arp: 1 }, lead: { type: "sine", cut: 2600, att: 0.09, decay: 0.8, vol: 0.12, vib: 0.7, send: 0.3, bars: BARS(
+      "f5 - a5 - c6 - a5 - f5 - g5 - a5 - - -",
+      "bb5 - a5 - g5 - f5 - d5 - f5 - bb5 - - -",
+      "c6 - bb5 - a5 - g5 - e5 - g5 - c6 - - -",
+      "a5 - g5 - f5 - a5 - c6 - a5 - f5 - - -",
+      "d6 - c6 - a5 - f5 - d5 - f5 - a5 - - -",
+      "bb5 - d6 - c6 - bb5 - a5 - f5 - g5 - - -",
+      "g5 - a5 - bb5 - g5 - e5 - f5 - g5 - - -",
+      "a5 - g5 - f5 - e5 - f5 - - - - - - -") } },
     // Grand Siècle : clavecin baroque et cordes
     "grand-siecle": { beat: 0.6, chords: [[50, 54, 57], [45, 49, 52], [47, 50, 54], [43, 47, 50], [50, 54, 57], [40, 43, 47], [45, 49, 52], [50, 54, 57]], mel: [66, 69, 71, 73, 74, 76, 78, 81], pad: ["sawtooth", 1100, 0.018], drone: [], k: Z, t: Z, pl: { type: "sawtooth", cut: 2600, decay: 0.45, vol: 0.07, p: [0.9, 0.7], chord: 1, arp: 1 } },
     // Révolution : tambours de marche, tension
@@ -252,6 +280,21 @@
       o.connect(g); out.connect(master); out.connect(echo);
       o.start(t); o.stop(t + p.decay + att + 0.1);
     }
+    function leadNote(L, m, t, len) {
+      const f = mtof(m), d = len * cfg.beat / 2, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = L.type; o.frequency.setValueAtTime(L.bend ? f * 0.955 : f, t);
+      if (L.bend) o.frequency.exponentialRampToValueAtTime(f, t + 0.09);
+      if (L.vib && d > 0.5) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = 5.4; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.007 * L.vib, t + 0.35); l.connect(lg).connect(o.frequency); l.start(t); l.stop(t + d + L.decay); }
+      const end = t + d * 0.92 + 0.12;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(L.vol, t + L.att);
+      g.gain.exponentialRampToValueAtTime(L.vol * (len > 2 ? 0.55 : 0.8), t + Math.min(d * 0.8, L.decay));
+      g.gain.exponentialRampToValueAtTime(0.0001, end + 0.25);
+      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = L.cut;
+      o.connect(g); g.connect(lp); lp.connect(master);
+      const sg = ctx.createGain(); sg.gain.value = L.send; lp.connect(sg); sg.connect(echo);
+      o.start(t); o.stop(end + 0.3);
+    }
     function drum(t, vol) {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.type = "sine"; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.28);
@@ -288,6 +331,7 @@
           else f = Math.random() < pl.chord ? tones[Math.floor(Math.random() * 3)] : mtof(cfg.mel[Math.floor(Math.random() * cfg.mel.length)]);
           pluck(f, t);
         }
+        if (cfg.lead) { const n = cfg.lead.bars[(chord - 1 + 8) % 8][k]; if (n) leadNote(cfg.lead, n.m, t, n.len); }
         step++; nextT += B / 2;
       }
     }

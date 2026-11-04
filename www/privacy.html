@@ -14,7 +14,7 @@
 </style>
 </head>
 <body>
-<main>
+<main id="fr">
   <h1>Politique de confidentialité</h1>
   <p>Dernière mise à jour : octobre 2026</p>
 
@@ -32,11 +32,53 @@
   <p>Dans l'Espace économique européen, un formulaire de consentement s'affiche au premier lancement : vous choisissez si vous acceptez les publicités personnalisées, et vous pouvez modifier ce choix plus tard. Vous pouvez aussi réinitialiser ou désactiver l'identifiant publicitaire dans les paramètres de votre téléphone (Paramètres &gt; Google &gt; Annonces).</p>
   <p>Pour en savoir plus : <a href="https://policies.google.com/technologies/ads?hl=fr">comment Google utilise les données des applications partenaires</a>.</p>
 
+  <h2>Achat « sans publicité »</h2>
+  <p>Vous pouvez supprimer les publicités à vie grâce à un achat unique dans l'application. Le paiement est entièrement géré par Google Play ; Historia ne voit jamais vos informations de paiement. Historia demande seulement à Google Play si l'achat existe, afin de le rétablir sur un nouvel appareil.</p>
+
+  <h2>Suggestions de livres et liens affiliés</h2>
+  <p>Certains écrans proposent des livres. Ces liens ouvrent Amazon dans votre navigateur et contiennent notre identifiant de partenaire : en tant que Partenaire Amazon, nous réalisons un bénéfice sur les achats remplissant les conditions requises, sans surcoût pour vous. Historia n'envoie aucune donnée à Amazon ; une fois sur Amazon, sa propre politique de confidentialité s'applique.</p>
+
   <h2>Enfants</h2>
   <p>Historia est destinée aux adolescents et aux adultes. Elle ne demande aucune information personnelle.</p>
 
   <h2>Nous contacter</h2>
   <p class="todo">À compléter avant publication : votre adresse électronique de contact.</p>
 </main>
+<main id="en" lang="en" hidden>
+  <h1>Privacy policy</h1>
+  <p>Last updated: November 2026</p>
+
+  <h2>What Historia does</h2>
+  <p>Historia is a quiz app about the history of France and of Christendom. It works without an account and without a mandatory internet connection.</p>
+
+  <h2>Data we collect</h2>
+  <p>Historia does not collect any personal data (apart from what Google AdMob and Google Play do, see below): no name, e-mail address, location or contacts.</p>
+
+  <h2>Data stored on your device</h2>
+  <p>Your progress (points, rank, stars, daily streak, lessons read) and your language and purchase settings are stored only on your device, in the app's local storage. They are sent nowhere. You can erase them at any time from the “Ranks” window with “Reset my progress”, or by uninstalling the app.</p>
+
+  <h2>Advertising</h2>
+  <p>Historia is free and shows ads served by Google AdMob. To show them and measure their effectiveness, Google may use your device's advertising identifier and technical data (device type, approximate IP address, interactions with ads). Historia does not receive or use this data.</p>
+  <p>In the European Economic Area, a consent form is displayed at first launch: you choose whether to accept personalised ads, and you can change this later. You can also reset or disable the advertising identifier in your phone settings (Settings &gt; Google &gt; Ads).</p>
+  <p>More information: <a href="https://policies.google.com/technologies/ads">how Google uses data from partner apps</a>.</p>
+
+  <h2>Ad-free purchase</h2>
+  <p>You can remove ads for life with a one-time in-app purchase. The payment is handled entirely by Google Play; Historia never sees your payment details. Historia only asks Google Play whether the purchase exists, so that it can restore it on a new device.</p>
+
+  <h2>Book suggestions and affiliate links</h2>
+  <p>Some screens suggest books. These links open Amazon in your browser and include our affiliate tag: as an Amazon Associate we earn from qualifying purchases, at no extra cost to you. Historia itself sends no data to Amazon; once you open Amazon, its own privacy policy applies.</p>
+
+  <h2>Children</h2>
+  <p>Historia is intended for teenagers and adults. It asks for no personal information.</p>
+
+  <h2>Contact</h2>
+  <p class="todo">To complete before publication: your contact e-mail address.</p>
+</main>
+<script>
+  if (/[?&]lang=en/.test(location.search) || (!/[?&]lang=fr/.test(location.search) && !/^fr/i.test(navigator.language || "fr"))) {
+    document.getElementById("fr").hidden = true; document.getElementById("en").hidden = false;
+    document.documentElement.lang = "en"; document.title = "Historia – Privacy policy";
+  }
+</script>
 </body>
 </html>

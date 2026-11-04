@@ -11,6 +11,9 @@
     EVERY_N_QUIZ: 2   // une pub plein écran toutes les N parties terminées
   };
 
+  // Achat « sans publicité » : plus aucune publicité, et pas même de demande de consentement.
+  function adFree() { try { return localStorage.getItem("historia.adfree") === "1"; } catch (e) { return false; } }
+
   var cap = window.Capacitor;
   var AdMob = cap && cap.Plugins && cap.Plugins.AdMob;
   var native = !!(cap && cap.isNativePlatform && cap.isNativePlatform());
@@ -22,7 +25,7 @@
   function setSpace(px) { document.documentElement.style.setProperty("--ad-h", (px || 0) + "px"); }
 
   function showBanner() {
-    if (!ready || bannerOn) return;
+    if (!ready || bannerOn || adFree()) return;
     bannerOn = true;
     AdMob.showBanner({ adId: ADS.BANNER_ID, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: ADS.TEST })
       .catch(function () { bannerOn = false; });
@@ -38,6 +41,7 @@
   }
 
   async function start() {
+    if (adFree()) return;
     try {
       // Consentement européen (RGPD) : le formulaire de Google s'affiche si la loi l'exige.
       var info = await AdMob.requestConsentInfo();
@@ -59,10 +63,11 @@
     },
     quizFinished: function () {
       done++;
-      if (ready && hot && done % ADS.EVERY_N_QUIZ === 0) {
+      if (ready && hot && !adFree() && done % ADS.EVERY_N_QUIZ === 0) {
         AdMob.showInterstitial().catch(function () {});
       }
     }
   };
+  window.addEventListener("historia:adfree", function () { hideBanner(); setSpace(0); });
   start();
 })();

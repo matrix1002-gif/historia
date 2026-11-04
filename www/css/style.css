@@ -872,3 +872,26 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .lv.locked .lv-thumb { filter: none; }
 .lv.locked .lv-main { opacity: 1; }
 .lv.locked .lv-main { border-style: solid; }
+
+/* ===== V7 : langue, sans publicité, suggestions de lecture ===== */
+.brand { padding-top: 40px; }
+.lang-pill { position: absolute; right: 0; top: 2px; min-width: 44px; height: 34px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--gold-500); background: rgba(255, 249, 232, 0.7); color: var(--gold-200); font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; }
+.lang-pill:active { background: rgba(191, 150, 64, 0.2); }
+.langrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.seg { padding: 11px; border-radius: 12px; border: 1px solid var(--line); background: #fffaea; color: var(--ink); font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.05em; }
+.seg.on { border-color: var(--gold-400); background: rgba(191, 150, 64, 0.22); color: var(--gold-200); }
+.noads { margin: 22px 0 6px; padding: 16px; border-radius: 16px; border: 1px solid var(--gold-500); background: rgba(255, 249, 232, 0.65); display: grid; gap: 10px; text-align: center; }
+.noads b { display: block; font-family: var(--display); font-size: 17px; letter-spacing: 0.05em; color: var(--gold-200); }
+.noads span { color: var(--parch-dim); font-size: 16px; }
+.noads-done { text-align: center; margin-top: 18px; color: var(--gold-300); font-family: var(--display); letter-spacing: 0.05em; }
+.books { margin-top: 26px; }
+.books ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.book { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 249, 232, 0.7); color: var(--ink); }
+.book .bk-ico { width: 26px; height: 26px; flex: none; color: var(--gold-400); }
+.book .bk-ico svg { width: 26px; height: 26px; }
+.book .bk-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.book b { font-size: 17px; font-weight: 600; line-height: 1.2; }
+.book small { color: var(--parch-dim); font-size: 14px; }
+.book .go { width: 20px; height: 20px; flex: none; color: var(--gold-300); }
+.book .go svg { width: 20px; height: 20px; }
+.aff-note { margin: 10px 2px 0; font-size: 13px; color: var(--parch-dim); text-align: center; }

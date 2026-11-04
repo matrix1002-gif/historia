@@ -84,7 +84,9 @@
   const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayStr(d); };
   const rankIndex = (xp) => RANKS.reduce((acc, r, i) => (xp >= r.xp ? i : acc), 0);
   const plural = (n, one, many) => (n > 1 ? many : one);
-  const fmtYear = (y) => (y < 0 ? `${-y} av. J.-C.` : String(y));
+  const EN = window.HI && window.HI.lang === "en";
+  const HT = (fr) => (window.HI ? window.HI.t(fr) : fr);
+  const fmtYear = (y) => (y < 0 ? `${-y} ${EN ? "BC" : "av. J.-C."}` : String(y));
   const buzz = (p) => { try { if (S.vib && navigator.vibrate) navigator.vibrate(p); } catch (e) { /* ignoré */ } };
   const sfx = (n) => Art.play(n, S.sound);
   const paras = (t) => String(t).split("\n\n").map((p) => `<p class="sc-text">${esc(p)}</p>`).join("");
@@ -458,6 +460,45 @@
     requestAnimationFrame(() => document.querySelectorAll(".bar > i[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%")));
   };
 
+  /* ===== Sans publicité (achat unique) ===== */
+  const IAP = () => window.HistoriaIAP;
+  const canSell = () => IAP() && IAP().available;
+  function noAdsCard() {
+    if (!canSell()) return "";
+    if (IAP().adFree()) return '<p class="noads-done">Sans publicité ✓</p>';
+    const pr = IAP().price();
+    return `<section class="noads"><div><b>Sans publicité</b><span>${EN ? "Remove ads for life with a single purchase." : "Supprime les publicités à vie, en un seul achat."}</span></div>
+      <button class="btn btn-gold" data-act="noads">${EN ? "Remove ads" : "Supprimer les pubs"}${pr ? ` · ${esc(pr)}` : ""}</button>
+      <button class="linkbtn" data-act="restore">Rétablir mon achat</button></section>`;
+  }
+  function buyNoAds(btn) {
+    if (!canSell()) return;
+    btn.disabled = true;
+    IAP().buy().then(() => { sfx("fanfare"); refreshAfterPurchase(); }).catch(() => { btn.disabled = false; });
+  }
+  function restoreNoAds(btn) {
+    if (!canSell()) return;
+    btn.disabled = true;
+    IAP().restore().then(() => { btn.disabled = false; refreshAfterPurchase(); });
+  }
+  function refreshAfterPurchase() {
+    const open = !!document.getElementById("overlay");
+    if (open) { closeSheet(); openRanks(); }
+    if (view.name === "home") render();
+  }
+  window.addEventListener("historia:adfree", refreshAfterPurchase);
+  window.addEventListener("historia:iap", () => { if (view.name === "home" && !document.getElementById("overlay")) render(); });
+
+  /* ===== Pour aller plus loin (livres, liens affiliés) ===== */
+  function booksSection(e) {
+    const A = window.HistoriaAff;
+    const list = A && A.enabled() ? A.books(e.id) : [];
+    if (!list.length) return "";
+    return `<section class="books"><h2 class="section">Pour aller plus loin</h2>
+      <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${esc(b.author)}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul>
+      <p class="aff-note">${esc(A.disclosure())}</p></section>`;
+  }
+
   function homeScreen() {
     const idx = rankIndex(S.xp);
     const next = RANKS[idx + 1];
@@ -500,6 +541,7 @@
     return `
     <div class="screen">
       <header class="brand">
+        <button class="lang-pill" data-act="lang" aria-label="Langue / Language">${EN ? "FR" : "EN"}</button>
         <h1 class="wordmark">HISTORIA</h1>
         <p class="tagline">L'histoire de France et de la chrétienté</p>
         <div class="rule">${UI.lisSmall}</div>
@@ -521,6 +563,7 @@
       <p class="learn-note">Choisis une époque, lis la fiche de chaque niveau, puis passe au quiz pour valider ce que tu as appris.</p>
       <ul class="eras">${eraCards}</ul>
 
+      ${noAdsCard()}
       ${adSlot()}
       <p class="foot"><button class="linkbtn" data-act="privacy">Confidentialité</button></p>
     </div>`;
@@ -567,6 +610,7 @@
       </div>
       <p class="mix-note">Touche un niveau pour lire sa fiche, puis passe au quiz (<span class="inline-ico">${UI.go}</span>). Réussir un quiz débloque le niveau suivant.</p>
       <ol class="levels">${rows}</ol>
+      ${booksSection(e)}
       ${adSlot()}
     </div>`;
   }
@@ -1120,6 +1164,11 @@
           <button class="toggle ${S.sound ? "on" : ""}" data-act="tsound" aria-pressed="${S.sound}">${UI.sound(S.sound)}<span>Sons</span></button>
           <button class="toggle ${S.vib ? "on" : ""}" data-act="tvib" aria-pressed="${S.vib}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg><span>Vibrations</span></button>
         </div>
+        <div class="langrow" role="group" aria-label="Langue / Language">
+          <button class="seg ${EN ? "" : "on"}" data-act="setlang" data-l="fr">Français</button>
+          <button class="seg ${EN ? "on" : ""}" data-act="setlang" data-l="en">English</button>
+        </div>
+        ${canSell() ? noAdsCard() : ""}
         <div class="stack"><button class="btn btn-line" data-act="close-sheet">Fermer</button></div>
         <div class="links"><button class="linkbtn" data-act="reset">Réinitialiser ma progression</button></div>
       </div>`;
@@ -1185,8 +1234,8 @@
         window.scrollTo(0, 0);
         break;
       }
-      case "tstop": if (T && !T.rev && T.i > 0 && confirm(`Partir avec ${fmtEcus(prize(T.i - 1))} ?`)) endTresor("stop"); break;
-      case "tquit": if (confirm("Abandonner la partie ? Tu garderas ton dernier palier.")) { if (T && T.i > 0) endTresor("wrong"); else { T = null; back(); } } break;
+      case "tstop": if (T && !T.rev && T.i > 0 && confirm(HT(`Partir avec ${fmtEcus(prize(T.i - 1))} ?`))) endTresor("stop"); break;
+      case "tquit": if (confirm(HT("Abandonner la partie ? Tu garderas ton dernier palier."))) { if (T && T.i > 0) endTresor("wrong"); else { T = null; back(); } } break;
       case "daily": {
         if (S.daily === today()) break;
         const pool = [];
@@ -1236,11 +1285,16 @@
       case "tsound": S.sound = !S.sound; save(); closeSheet(); openRanks(); sfx("tap"); break;
       case "tvib": S.vib = !S.vib; save(); closeSheet(); openRanks(); buzz(30); break;
       case "reset":
-        if (confirm("Effacer toute votre progression (XP, rangs, niveaux, sceaux, série) ?")) {
+        if (confirm(HT("Effacer toute votre progression (XP, rangs, niveaux, sceaux, série) ?"))) {
           S = defaults(); save(); closeSheet(); render();
         }
         break;
-      case "privacy": window.open("privacy.html", "_blank", "noopener"); break;
+      case "privacy": window.open(EN ? "privacy.html?lang=en" : "privacy.html", "_blank", "noopener"); break;
+      case "lang": window.HI.set(EN ? "fr" : "en"); break;
+      case "setlang": if (el.dataset.l !== (EN ? "en" : "fr")) window.HI.set(el.dataset.l); break;
+      case "noads": buyNoAds(el); break;
+      case "restore": restoreNoAds(el); break;
+      case "book": ev.preventDefault && ev.preventDefault(); if (window.HistoriaAff) window.HistoriaAff.open(el.dataset.href); break;
     }
   });
 
