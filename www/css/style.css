@@ -303,7 +303,8 @@ h2.section { font-family: var(--display); font-weight: 500; font-size: 15px; let
 .foot { text-align: center; margin-top: 28px; font-size: 14px; color: var(--parch-dim); }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .screen, .feedback, .scroll-card, .lv-num, .resume, .overlay, .sheet { animation: none !important; }
+  * { transition: none !important; }
 }
 @media (min-width: 560px) {
   body { font-size: 19px; }
@@ -355,7 +356,6 @@ h2.section { font-family: var(--display); font-weight: 500; font-size: 15px; let
 .sc-rule::after { transform: scaleX(-1); }
 .sc-rule svg { width: 16px; height: 16px; }
 .sc-text { font-size: 20px; line-height: 1.55; hyphens: auto; -webkit-hyphens: auto; }
-.sc-text::first-letter { font-family: var(--display); font-weight: 700; font-size: 3.5em; float: left; line-height: 0.82; padding: 6px 10px 0 0; color: #8f1d2c; text-shadow: 1px 1px 0 rgba(191, 150, 64, 0.6); }
 .lesson-nav { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 20px; }
 
 /* ===== Vrai ou faux ===== */
@@ -497,8 +497,6 @@ h2.section { font-family: var(--display); font-weight: 500; font-size: 15px; let
 
 .lesson-crumb { font-family: var(--display); font-size: 14px; letter-spacing: 0.06em; color: var(--gold-300); }
 .sc-text + .sc-text { margin-top: 14px; }
-.sc-text::first-letter { all: unset; }
-.sc-text:first-of-type::first-letter { font-family: var(--display); font-weight: 700; font-size: 3.5em; float: left; line-height: 0.82; padding: 6px 10px 0 0; color: #8f1d2c; text-shadow: 1px 1px 0 rgba(191, 150, 64, 0.6); }
 
 /* Résultats */
 .res-era { font-family: var(--display); font-size: 14px; letter-spacing: 0.12em; color: var(--gold-400); margin-bottom: 8px; }
@@ -531,3 +529,130 @@ h2.section { font-family: var(--display); font-weight: 500; font-size: 15px; let
 .toggle svg { width: 22px; height: 22px; }
 .toggle.on { border-color: var(--gold-400); background: rgba(191, 150, 64, 0.2); color: var(--gold-200); }
 .sheet .stack { margin-top: 16px; }
+
+/* ===================================================================
+   V4 : fiches racontées, personnages, médailles, Trésor du Royaume
+   =================================================================== */
+.sc-hook { margin-top: 14px; padding: 12px 14px; border-left: 4px solid #8f1d2c; background: rgba(143, 29, 44, 0.08); font-style: italic; font-size: 19px; line-height: 1.45; border-radius: 0 8px 8px 0; }
+.sc-h { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.25; color: #8f1d2c; margin: 24px 0 8px; letter-spacing: 0.02em; }
+.sc-h::before { content: "\269C\FE0E  "; color: #9a7428; }
+.sc-body .sc-text { margin-top: 10px; }
+.sc-body .sc-h + .sc-text { margin-top: 0; }
+.sc-body .sc-text:first-child::first-letter { font-family: var(--display); font-weight: 700; font-size: 3.5em; float: left; line-height: 0.82; padding: 6px 10px 0 0; color: #8f1d2c; text-shadow: 1px 1px 0 rgba(191, 150, 64, 0.6); }
+.sc-body .sc-text:not(:first-child)::first-letter { all: unset; }
+.sc-body > .sc-text:first-of-type { }
+.fun { margin-top: 26px; padding: 14px 16px 6px; border-radius: 10px; border: 1px dashed #9a7428; background: rgba(191, 150, 64, 0.16); }
+.fun h3 { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: #6d5326; margin-bottom: 8px; }
+.fun h3::before { content: "\2726  "; color: #b0821f; }
+.fun p { font-size: 18px; line-height: 1.45; margin: 0 0 10px; }
+
+/* Accueil : tuiles */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.tile { display: flex; align-items: center; gap: 10px; text-align: left; padding: 12px; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(160deg, rgba(33, 58, 130, 0.42), rgba(16, 28, 69, 0.8)); }
+.tile:active { transform: scale(0.985); border-color: var(--gold-400); }
+.tile b { display: block; font-family: var(--display); font-size: 15px; color: var(--gold-200); line-height: 1.15; }
+.tile small { display: block; font-size: 14px; color: var(--parch-dim); line-height: 1.2; margin-top: 2px; }
+.tile-ico { width: 36px; height: 36px; flex: none; display: grid; place-items: center; color: var(--gold-300); }
+.tile-ico svg { width: 30px; height: 30px; }
+.tile-tresor { grid-column: 1 / -1; border-color: var(--gold-500); background: linear-gradient(135deg, rgba(191, 150, 64, 0.3), rgba(143, 29, 44, 0.3) 70%, rgba(33, 58, 130, 0.4)); }
+.tile-tresor .go { margin-left: auto; color: var(--gold-300); }
+.tile-tresor .go svg { width: 22px; height: 22px; }
+.tile-tresor .tile-ico svg { width: 36px; height: 36px; }
+
+/* Personnages */
+.cameo { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45)); }
+.cameo.legend { filter: drop-shadow(0 0 8px rgba(242, 209, 107, 0.6)); }
+.gal-intro { margin: 0 4px 14px; font-size: 16px; color: var(--parch-dim); font-style: italic; text-align: center; }
+.gal-era { margin-top: 20px; }
+.gal-era h2 { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--display); font-size: 15px; letter-spacing: 0.08em; color: var(--accent); margin: 0 4px 10px; }
+.gal-era h2 small { color: var(--parch-dim); font-size: 13px; }
+.gal { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.gal-card { width: 100%; display: grid; gap: 4px; justify-items: center; padding: 6px 2px; border-radius: 10px; border: 1px solid transparent; background: transparent; }
+.gal-card b { font-family: var(--text); font-weight: 600; font-size: 12px; line-height: 1.15; color: var(--parch); text-align: center; min-height: 28px; }
+.gal-card.locked b { color: var(--parch-dim); }
+.gal-card:active { background: rgba(216, 181, 101, 0.12); }
+.charsheet .cs-head { display: grid; grid-template-columns: 84px 1fr; gap: 14px; align-items: center; }
+.charsheet .cs-head small { font-family: var(--display); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.charsheet .cs-head h2 { margin: 2px 0; }
+.charsheet .cs-head p { font-size: 16px; color: var(--parch-dim); font-style: italic; }
+.cs-bio { margin-top: 16px; font-size: 19px; line-height: 1.5; }
+.char-card { width: 100%; display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; text-align: left; margin-top: 16px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--gold-300); background: linear-gradient(135deg, rgba(233, 207, 142, 0.25), rgba(33, 58, 130, 0.4)); animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.5s both; }
+.char-card small { display: block; font-family: var(--display); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-300); }
+.char-card b { display: block; font-family: var(--display); font-size: 18px; color: var(--gold-200); line-height: 1.2; }
+.char-card span span { font-size: 15px; color: var(--parch-dim); }
+
+/* Médailles */
+.medals { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mrow { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(16, 28, 69, 0.6); text-align: left; }
+.mico { width: 46px; height: 46px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--night); background: radial-gradient(circle at 35% 30%, #f2d6a0, #b87333); box-shadow: 0 0 0 2px rgba(11, 20, 48, 0.7), 0 0 0 3px rgba(184, 115, 51, 0.7); }
+.mico svg { width: 26px; height: 26px; }
+.mrow.t2 .mico { background: radial-gradient(circle at 35% 30%, #f4f6fb, #9aa6bf); box-shadow: 0 0 0 2px rgba(11, 20, 48, 0.7), 0 0 0 3px rgba(154, 166, 191, 0.8); }
+.mrow.t3 .mico { background: radial-gradient(circle at 35% 30%, #fff1b8, #d8a92b); box-shadow: 0 0 0 2px rgba(11, 20, 48, 0.7), 0 0 0 3px rgba(242, 209, 107, 0.9), 0 0 14px rgba(242, 209, 107, 0.4); }
+.mrow.off { opacity: 0.6; }
+.mrow.off .mico { background: rgba(0, 0, 0, 0.35); color: var(--parch-dim); box-shadow: 0 0 0 2px rgba(216, 181, 101, 0.2); }
+.mtext, .mrow > span:nth-child(2) { display: grid; flex: 1; min-width: 0; line-height: 1.2; }
+.mrow b { font-family: var(--display); font-size: 15px; color: var(--gold-200); }
+.mrow small { font-size: 14px; color: var(--parch-dim); }
+.mrow .bar { height: 4px; margin-top: 6px; }
+.mrow .bar > i { display: block; height: 100%; background: var(--gold-400); border-radius: 99px; }
+.mprog { font-family: var(--display); font-size: 13px; color: var(--gold-300); }
+.newmedals { margin-top: 20px; text-align: left; }
+.newmedals h2 { font-family: var(--display); font-weight: 500; font-size: 15px; letter-spacing: 0.12em; color: var(--gold-400); margin-bottom: 10px; }
+.newmedals .mrow { margin-bottom: 8px; animation: pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) 0.6s both; }
+
+/* Le Trésor du Royaume */
+.tresor-hero { text-align: center; padding: 6px 0 4px; }
+.tresor-hero h1 { font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--gold-200); margin-top: 10px; line-height: 1.15; }
+.tresor-hero p { margin: 10px auto 0; font-size: 17px; max-width: 36ch; }
+.coin { width: 72px; height: 72px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; color: #6d4a10; background: radial-gradient(circle at 35% 30%, #fff1b8, #d8a92b 60%, #8a6a26); box-shadow: 0 0 0 3px rgba(11, 20, 48, 0.7), 0 0 0 5px rgba(242, 209, 107, 0.7), 0 0 24px rgba(242, 209, 107, 0.35); }
+.coin svg { width: 40px; height: 40px; }
+.coin.big { width: 92px; height: 92px; margin: 6px auto 4px; animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.coin.big svg { width: 52px; height: 52px; }
+.league { margin: 18px 0; padding: 14px 16px; border-radius: var(--radius); border: 1px solid var(--line); background: rgba(16, 28, 69, 0.6); }
+.league-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 16px; }
+.league-badge { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: 0.06em; color: var(--night); padding: 4px 14px; border-radius: 99px; background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); }
+.league-next { margin-top: 8px; font-size: 15px; color: var(--parch-dim); }
+.league-next b, .league-head b { color: var(--gold-200); font-weight: 600; }
+.tlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tt { width: 100%; display: grid; grid-template-columns: 46px 1fr 22px; gap: 12px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(16, 28, 69, 0.6); }
+.tt .medal { width: 46px; height: 46px; }
+.tt .medal svg { width: 26px; height: 26px; }
+.tt-text { display: grid; line-height: 1.2; }
+.tt-text b { font-family: var(--display); font-size: 15px; color: var(--parch); }
+.tt-text small { font-size: 14px; color: var(--parch-dim); font-style: italic; }
+.tt .go { color: var(--gold-300); }
+.tt .go svg { width: 20px; height: 20px; }
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ladder li { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: rgba(11, 20, 48, 0.5); font-size: 15px; color: var(--parch-dim); }
+.ladder li b { font-family: var(--display); font-weight: 700; color: var(--parch); font-size: 14px; }
+.ladder li.safe { border: 1px solid var(--gold-500); background: rgba(191, 150, 64, 0.16); }
+.ladder li.safe b, .ladder li.top b { color: var(--gold-200); }
+.ladder li em { font-style: normal; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-300); }
+.ladder li.top { border: 1px solid var(--gold-300); background: rgba(233, 207, 142, 0.2); }
+
+.prize { flex: 1; text-align: center; line-height: 1.15; }
+.prize small { display: block; font-size: 13px; color: var(--parch-dim); }
+.prize b { font-family: var(--display); font-size: 22px; color: var(--gold-200); }
+.safe-chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--display); font-size: 11px; color: var(--gold-300); border: 1px solid var(--line); border-radius: 99px; padding: 4px 8px; white-space: nowrap; }
+.safe-chip svg { width: 12px; height: 12px; }
+.lives { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.life { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 12px; border: 1px solid var(--gold-500); background: rgba(191, 150, 64, 0.14); color: var(--gold-200); font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: 0.05em; }
+.life svg { width: 24px; height: 24px; }
+.life:not([disabled]):active { background: rgba(191, 150, 64, 0.3); }
+.life.used, .life[disabled] { opacity: 0.35; border-style: dashed; }
+.opt.chosen { border-color: var(--gold-300); background: rgba(191, 150, 64, 0.22); box-shadow: 0 0 0 2px rgba(233, 207, 142, 0.35); }
+.opt.chosen .letter { background: var(--gold-300); color: var(--night); }
+.opt.gone { opacity: 0.18; }
+.help { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius); border: 1px dashed var(--gold-500); background: rgba(11, 20, 48, 0.6); animation: enter 0.25s ease-out; }
+.help b { font-family: var(--display); font-size: 14px; letter-spacing: 0.05em; color: var(--gold-200); }
+.help p { margin-top: 6px; font-size: 18px; font-style: italic; }
+.crowd { display: flex; align-items: flex-end; justify-content: space-around; height: 110px; margin-top: 10px; }
+.cb { position: relative; width: 52px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.cb i { display: block; width: 28px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); min-height: 3px; transition: height 0.6s ease; }
+.cb span { position: absolute; top: -2px; font-size: 13px; color: var(--parch); }
+.cb em { font-style: normal; font-family: var(--display); font-size: 13px; color: var(--gold-300); margin-top: 3px; }
+.tfoot { display: grid; gap: 10px; margin-top: 16px; }
+.tfoot .btn { margin: 0; }
+.tfoot .feedback { margin-top: 0; }
+.tscore { font-size: 34px; }
+.chip.gold { background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); color: var(--night); border-color: var(--gold-200); }

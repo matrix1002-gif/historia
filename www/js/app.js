@@ -58,17 +58,17 @@
   /* ===== Époques : métadonnées + contenu chargé ===== */
   const ERAS = ERA_META.map((m) => {
     const c = (window.HISTORIA_CONTENT || {})[m.id];
-    return Object.assign({}, m, c ? { intro: c.intro, levels: c.levels } : { intro: "Cette époque arrive bientôt.", levels: [] });
+    return Object.assign({}, m, c ? { intro: c.intro, levels: c.levels, cast: c.cast || [] } : { intro: "Cette époque arrive bientôt.", levels: [] });
   });
   const eraById = (id) => ERAS.find((e) => e.id === id);
   const playable = ERAS.filter((e) => e.levels.length);
 
   /* ===== Sauvegarde locale ===== */
-  const defaults = () => ({ xp: 0, lv: {}, ok: {}, seals: {}, streak: { count: 0, last: "" }, daily: "", last: null, sound: true, vib: true });
+  const defaults = () => ({ xp: 0, lv: {}, ok: {}, seals: {}, streak: { count: 0, last: "" }, daily: "", last: null, sound: true, vib: true, medals: {}, stats: {}, rec: {} });
   const load = () => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY));
-      if (s && typeof s === "object") return Object.assign(defaults(), s);
+      if (s && typeof s === "object") { const d = Object.assign(defaults(), s); ["medals", "stats", "rec"].forEach((k) => { if (!d[k] || typeof d[k] !== "object") d[k] = {}; }); return d; }
     } catch (e) { /* stockage indisponible */ }
     return defaults();
   };
@@ -162,6 +162,196 @@
     return (S.last && tryEra(eraById(S.last.era))) || playable.map(tryEra).find(Boolean) || null;
   }
 
+  /* ===== Personnages à collectionner ===== */
+  // Le personnage k (0 à 4) d'une époque se débloque en réussissant le niveau 2k+2.
+  const castOf = (e) => e.cast || [];
+  const charUnlocked = (e, k) => starsOf(e.id, 2 * k + 1) >= 1;
+  const charsTotal = () => ERAS.reduce((n, e) => n + castOf(e).length, 0);
+  const charsOwned = () => ERAS.reduce((n, e) => n + castOf(e).filter((_, k) => charUnlocked(e, k)).length, 0);
+  const ownedKeys = () => new Set(ERAS.flatMap((e) => castOf(e).map((_, k) => (charUnlocked(e, k) ? `${e.id}:${k}` : null)).filter(Boolean)));
+  const initials = (n) => n.split(/[\s-]+/).filter((w) => /^[A-ZÀ-ÖÉ]/.test(w)).slice(0, 2).map((w) => w[0]).join("") || n[0];
+  function cameo(e, k, locked) {
+    const c = castOf(e)[k];
+    const legend = k === 4;
+    const ring = legend ? "#f2d16b" : "#d8b565";
+    return `<svg class="cameo ${locked ? "locked" : ""} ${legend ? "legend" : ""}" viewBox="0 0 80 96" aria-hidden="true">
+      <defs><radialGradient id="cg${e.id}${k}" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="${locked ? "#2a3566" : e.accent}" stop-opacity="${locked ? 1 : 0.9}"/><stop offset="1" stop-color="#0b1430"/></radialGradient></defs>
+      <path d="M40 3l33 11v30c0 22-15 36-33 45C22 80 7 66 7 44V14z" fill="url(#cg${e.id}${k})" stroke="${locked ? "#4a5686" : ring}" stroke-width="${legend ? 4 : 3}" stroke-linejoin="round"/>
+      ${locked
+        ? '<g transform="translate(26 30)" fill="none" stroke="#7d88b8" stroke-width="3" stroke-linecap="round"><rect x="3" y="14" width="22" height="17" rx="3"/><path d="M8 14v-5a6 6 0 0 1 12 0v5"/></g>'
+        : `<g transform="translate(16 16) scale(1.1)" color="#f3ead2" opacity=".22">${ICONS[e.icon]}</g>
+           <text x="40" y="58" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="700" font-size="${initials(c.n).length > 1 ? 26 : 30}" fill="#f3ead2" stroke="#0b1430" stroke-width=".6">${esc(initials(c.n))}</text>`}
+      ${legend && !locked ? '<path d="M24 12l5 6 6-8 5 8 6-6 5 6" fill="none" stroke="#f2d16b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' : ""}
+    </svg>`;
+  }
+
+  /* ===== Série de connexion ===== */
+  function touchStreak() {
+    if (S.streak.last !== today()) {
+      S.streak = { count: S.streak.last === yesterday() ? S.streak.count + 1 : 1, last: today() };
+    }
+    S.stats.bestStreak = Math.max(S.stats.bestStreak || 0, S.streak.count);
+  }
+
+  /* ===== Médailles ===== */
+  const levelsPassed = () => ERAS.reduce((n, e) => n + passedCount(e), 0);
+  const threeStars = () => ERAS.reduce((n, e) => n + e.levels.filter((_, i) => starsOf(e.id, i) >= 3).length, 0);
+  const sealsCount = () => ERAS.filter(sealed).length;
+  const MEDALS = [
+    { id: "p1", name: "Premiers pas", desc: "Réussis ton premier niveau.", icon: "sword", tier: 1, cur: levelsPassed, max: 1 },
+    { id: "p10", name: "Apprenti", desc: "Réussis 10 niveaux.", icon: "book", tier: 1, cur: levelsPassed, max: 10 },
+    { id: "p30", name: "Compagnon", desc: "Réussis 30 niveaux.", icon: "book", tier: 2, cur: levelsPassed, max: 30 },
+    { id: "p60", name: "Maître", desc: "Réussis 60 niveaux.", icon: "crown", tier: 2, cur: levelsPassed, max: 60 },
+    { id: "p110", name: "Grand Maître", desc: "Réussis les 110 niveaux.", icon: "crown", tier: 3, cur: levelsPassed, max: 110 },
+    { id: "s1", name: "Étoile d'or", desc: "Obtiens 3 étoiles à un niveau.", icon: "star", tier: 1, cur: threeStars, max: 1 },
+    { id: "s10", name: "Constellation", desc: "Obtiens 3 étoiles à 10 niveaux.", icon: "star", tier: 2, cur: threeStars, max: 10 },
+    { id: "s40", name: "Voûte céleste", desc: "Obtiens 3 étoiles à 40 niveaux.", icon: "star", tier: 3, cur: threeStars, max: 40 },
+    { id: "k1", name: "Premier sceau", desc: "Termine une époque entière.", icon: "seal", tier: 1, cur: sealsCount, max: 1 },
+    { id: "k5", name: "Chancelier", desc: "Obtiens 5 sceaux d'époque.", icon: "seal", tier: 2, cur: sealsCount, max: 5 },
+    { id: "k11", name: "Sceau du royaume", desc: "Obtiens les 11 sceaux.", icon: "seal", tier: 3, cur: sealsCount, max: 11 },
+    { id: "c5", name: "Collectionneur", desc: "Débloque 5 personnages.", icon: "helmet", tier: 1, cur: charsOwned, max: 5 },
+    { id: "c25", name: "Galerie royale", desc: "Débloque 25 personnages.", icon: "helmet", tier: 2, cur: charsOwned, max: 25 },
+    { id: "cAll", name: "Panthéon", desc: "Débloque tous les personnages.", icon: "helmet", tier: 3, cur: charsOwned, max: () => Math.max(charsTotal(), 1) },
+    { id: "f3", name: "Veilleur", desc: "Joue 3 jours de suite.", icon: "flame", tier: 1, cur: () => S.stats.bestStreak || 0, max: 3 },
+    { id: "f7", name: "Gardien", desc: "Joue 7 jours de suite.", icon: "flame", tier: 1, cur: () => S.stats.bestStreak || 0, max: 7 },
+    { id: "f14", name: "Sentinelle", desc: "Joue 14 jours de suite.", icon: "flame", tier: 2, cur: () => S.stats.bestStreak || 0, max: 14 },
+    { id: "f30", name: "Mois de feu", desc: "Joue 30 jours de suite.", icon: "flame", tier: 2, cur: () => S.stats.bestStreak || 0, max: 30 },
+    { id: "f100", name: "Flamme éternelle", desc: "Joue 100 jours de suite.", icon: "flame", tier: 3, cur: () => S.stats.bestStreak || 0, max: 100 },
+    { id: "d1", name: "Défi relevé", desc: "Termine un défi du jour.", icon: "scroll", tier: 1, cur: () => S.stats.daily || 0, max: 1 },
+    { id: "d10", name: "Habitué du jour", desc: "Termine 10 défis du jour.", icon: "scroll", tier: 2, cur: () => S.stats.daily || 0, max: 10 },
+    { id: "t1", name: "Entrée à la cour", desc: "Joue au Trésor du Royaume.", icon: "lis", tier: 1, cur: () => S.stats.tGames || 0, max: 1 },
+    { id: "t5", name: "Coffre de bronze", desc: "Atteins le palier 1 000 écus.", icon: "lis", tier: 1, cur: () => S.stats.tBest || 0, max: 5 },
+    { id: "t10", name: "Coffre d'argent", desc: "Atteins le palier 32 000 écus.", icon: "lis", tier: 2, cur: () => S.stats.tBest || 0, max: 10 },
+    { id: "t15", name: "Roi du Trésor", desc: "Gagne 1 000 000 d'écus.", icon: "crown", tier: 3, cur: () => S.stats.tBest || 0, max: 15 },
+    { id: "tn", name: "Sans filet", desc: "Gagne le Trésor sans aucun joker.", icon: "jerusalem", tier: 3, cur: () => S.stats.tClean || 0, max: 1 },
+    { id: "ta", name: "Esprit universel", desc: "Atteins 32 000 écus en « Tous les thèmes ».", icon: "jerusalem", tier: 2, cur: () => S.stats.tAll10 || 0, max: 1 },
+    { id: "r2", name: "Chevalier", desc: "Atteins le rang de Chevalier.", icon: "sword", tier: 1, cur: () => rankIndex(S.xp), max: 2 },
+    { id: "r5", name: "Comte", desc: "Atteins le rang de Comte.", icon: "turret", tier: 2, cur: () => rankIndex(S.xp), max: 5 },
+    { id: "r8", name: "Connétable", desc: "Atteins le rang de Connétable.", icon: "turret", tier: 3, cur: () => rankIndex(S.xp), max: 8 },
+    { id: "m200", name: "Bonne mémoire", desc: "Découvre 200 bonnes réponses.", icon: "scroll", tier: 1, cur: masteredTotal, max: 200 },
+    { id: "m800", name: "Mémoire d'éléphant", desc: "Découvre 800 bonnes réponses.", icon: "scroll", tier: 3, cur: masteredTotal, max: 800 }
+  ];
+  const medalMax = (m) => (typeof m.max === "function" ? m.max() : m.max);
+  const medalIcon = (m) => (ICONS[m.icon] || (m.icon === "flame" ? UI.flame : m.icon === "star" ? UI.star(true) : m.icon === "seal" ? UI.seal : ""));
+  // Débloque les médailles méritées ; renvoie les nouvelles.
+  function checkMedals() {
+    const fresh = [];
+    MEDALS.forEach((m) => {
+      if (!S.medals[m.id] && m.cur() >= medalMax(m)) { S.medals[m.id] = today(); fresh.push(m); }
+    });
+    if (fresh.length) save();
+    return fresh;
+  }
+
+  /* ===== Le Trésor du Royaume (quiz à paliers) ===== */
+  const LADDER = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
+  const SAFE = [4, 9]; // paliers garantis : après la question 5 et la question 10
+  const LEAGUES = [[0, "Manant"], [100, "Artisan"], [1000, "Bourgeois"], [8000, "Chevalier"], [32000, "Baron"], [125000, "Comte"], [500000, "Duc"], [1000000, "Roi"]];
+  const fmtEcus = (n) => `${n.toLocaleString("fr-FR").replace(/ /g, " ")} écu${n > 1 ? "s" : ""}`;
+  const leagueOf = (earn) => LEAGUES.reduce((a, l) => (earn >= l[0] ? l : a), LEAGUES[0]);
+  const safeEarn = (reached) => (reached > SAFE[1] ? LADDER[SAFE[1]] : reached > SAFE[0] ? LADDER[SAFE[0]] : 0); // reached = nb de bonnes réponses
+  const TIERS = [[0, 2], [3, 6], [7, 9]]; // niveaux utilisés pour les questions 1-5, 6-10, 11-15
+
+  function tresorQuestions(scope) {
+    const eras = scope === "all" ? playable : playable.filter((e) => e.id === scope);
+    const used = new Set();
+    const out = [];
+    TIERS.forEach(([a, b]) => {
+      const pool = [];
+      eras.forEach((e) => e.levels.forEach((lv, i) => {
+        if (i < a || i > b) return;
+        lv.items.forEach((d, k) => { if (d.type === "qcm") pool.push(prep("qcm", d, `${e.id}:${i}:${k}`, e.title, lv.title)); });
+      }));
+      shuffle(pool).filter((it) => !used.has(it.q)).slice(0, 5).forEach((it) => { used.add(it.q); out.push(it); });
+    });
+    return out.length === 15 ? out : null;
+  }
+
+  let T = null; // partie du Trésor en cours
+  let TR = null; // résultat
+
+  function startTresor(scope) {
+    const qs = tresorQuestions(scope);
+    if (!qs) return;
+    T = { scope, qs, i: 0, sel: null, rev: false, help: null, removed: [], used: {} };
+    sfx("tap");
+    go("tgame", {}, "push");
+  }
+
+  const crowdFor = (it, removed, rung) => {
+    const okIdx = it.opts.findIndex((o) => o.ok);
+    const live = it.opts.map((_, k) => k).filter((k) => !removed.includes(k));
+    const acc = rung < 5 ? 0.8 : rung < 10 ? 0.58 : 0.42;
+    let lead = Math.random() < (rung < 5 ? 0.97 : rung < 10 ? 0.88 : 0.72) ? okIdx : live.filter((k) => k !== okIdx)[Math.floor(Math.random() * (live.length - 1))];
+    const pct = {};
+    let left = 100;
+    const mainPct = Math.round((acc + (Math.random() - 0.5) * 0.2) * 100);
+    live.forEach((k) => (pct[k] = 0));
+    pct[lead] = Math.min(Math.max(mainPct, 30), 92);
+    left -= pct[lead];
+    const others = live.filter((k) => k !== lead);
+    others.forEach((k, n) => { const share = n === others.length - 1 ? left : Math.round(Math.random() * left * 0.6); pct[k] = share; left -= share; });
+    return pct;
+  };
+  const expertSays = (it, rung) => {
+    const okIdx = it.opts.findIndex((o) => o.ok);
+    const sure = rung < 5 ? 0.92 : rung < 10 ? 0.8 : 0.66;
+    const right = Math.random() < sure;
+    const live = it.opts.map((_, k) => k).filter((k) => k !== okIdx);
+    const pick = right ? okIdx : live[Math.floor(Math.random() * live.length)];
+    const L = "ABCD"[pick];
+    const txt = rung < 5
+      ? [`Voilà un point que je connais bien : c'est la réponse ${L}.`, `Sans hésiter, la ${L}.`]
+      : rung < 10
+        ? [`Il me semble bien que c'est la ${L}, mais je ne le jurerais pas.`, `Mes manuscrits penchent pour la ${L}.`]
+        : [`Honnêtement, je ne suis pas certain… je dirais la ${L}.`, `Question redoutable. Mon instinct d'historien me souffle la ${L}.`];
+    return txt[Math.floor(Math.random() * txt.length)];
+  };
+
+  function useLifeline(kind) {
+    if (!T || T.rev || T.used[kind]) return;
+    const it = T.qs[T.i];
+    T.used[kind] = true;
+    sfx("tap");
+    if (kind === "fifty") {
+      const wrong = it.opts.map((o, k) => (o.ok ? -1 : k)).filter((k) => k >= 0);
+      T.removed = shuffle(wrong).slice(0, 2);
+      if (T.sel !== null && T.removed.includes(T.sel)) T.sel = null;
+      T.help = { kind: "fifty" };
+    } else if (kind === "pub") {
+      T.help = { kind: "pub", pct: crowdFor(it, T.removed, T.i) };
+    } else {
+      T.help = { kind: "expert", say: expertSays(it, T.i) };
+    }
+    refreshT();
+  }
+
+  function endTresor(kind) {
+    // kind : "wrong" | "stop" | "win"
+    const reached = T.i + (T.rev && T.good ? 1 : 0); // bonnes réponses données
+    const earn = kind === "win" ? LADDER[14] : kind === "stop" ? (reached > 0 ? LADDER[reached - 1] : 0) : safeEarn(reached);
+    const scope = T.scope;
+    const rec = (S.rec[scope] = S.rec[scope] || { rung: 0, earn: 0 });
+    const newRecord = earn > rec.earn;
+    rec.rung = Math.max(rec.rung, reached);
+    rec.earn = Math.max(rec.earn, earn);
+    const noHelp = !T.used.fifty && !T.used.pub && !T.used.expert;
+    S.stats.tGames = (S.stats.tGames || 0) + 1;
+    S.stats.tBest = Math.max(S.stats.tBest || 0, reached);
+    if (kind === "win" && noHelp) S.stats.tClean = 1;
+    if (scope === "all" && reached >= 10) S.stats.tAll10 = 1;
+    const xp = reached * 5 + (kind === "win" ? 100 : 0);
+    const rankBefore = rankIndex(S.xp);
+    S.xp += xp;
+    touchStreak();
+    const medals = checkMedals();
+    save();
+    TR = { kind, reached, earn, newRecord, scope, xp, medals, league: leagueOf(rec.earn), rankUp: rankIndex(S.xp) > rankBefore ? RANKS[rankIndex(S.xp)].name : null, lastQ: T.qs[Math.min(T.i, 14)], celebrated: false };
+    T = null;
+    go("tresult", {}, "replace");
+    if (window.HistoriaAds) window.HistoriaAds.quizFinished();
+  }
+
   /* ===== Navigation ===== */
   let view = { name: "home" };
   let Q = null;   // partie en cours
@@ -179,7 +369,8 @@
   window.addEventListener("popstate", (e) => {
     const st = e.state || { name: "home" };
     closeSheet();
-    if (st.name === "quiz" || st.name === "result") {
+    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult") {
+      T = null;
       view = { name: "home" };
       history.replaceState({ name: "home" }, "");
     } else {
@@ -195,6 +386,11 @@
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
+    if (view.name === "tresor") { $app.innerHTML = tresorMenu(); return animateBars(); }
+    if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
+    if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
+    if (view.name === "gallery") return ($app.innerHTML = galleryScreen());
+    if (view.name === "medals") return ($app.innerHTML = medalsScreen());
     if (view.name === "result" && R) { $app.innerHTML = resultScreen(); return celebrate(); }
     view = { name: "home" };
     $app.innerHTML = homeScreen();
@@ -274,6 +470,12 @@
         <span class="go">${doneToday ? UI.star(true) : UI.go}</span>
       </button>
 
+      <div class="tiles">
+        <button class="tile tile-tresor" data-act="tresor"><span class="tile-ico">${UI.seal}</span><span><b>Le Trésor du Royaume</b><small>15 questions · 3 jokers · jusqu'à 1 000 000 d'écus</small></span><span class="go">${UI.go}</span></button>
+        <button class="tile" data-act="gallery"><span class="tile-ico">${ICONS.helmet}</span><span><b>Personnages</b><small>${charsOwned()}/${charsTotal() || "—"} rencontrés</small></span></button>
+        <button class="tile" data-act="medals"><span class="tile-ico">${ICONS.crown}</span><span><b>Médailles</b><small>${MEDALS.filter((m) => S.medals[m.id]).length}/${MEDALS.length} obtenues</small></span></button>
+      </div>
+
       <h2 class="section">Les époques</h2>
       <ul class="eras">${eraCards}</ul>
 
@@ -331,6 +533,10 @@
   function lessonScreen(e, i) {
     const lv = e.levels[i];
     const L = lv.lesson;
+    const body = String(L.p).split("\n\n").map((b) => (b.startsWith("## ") ? `<h2 class="sc-h">${esc(b.slice(3))}</h2>` : `<p class="sc-text">${esc(b)}</p>`)).join("");
+    const fun = (L.fun || []).length
+      ? `<aside class="fun"><h3>Le saviez-vous ?</h3>${L.fun.map((f) => `<p>${esc(f)}</p>`).join("")}</aside>`
+      : "";
     return `
     <div class="screen lesson" style="--accent:${e.accent}">
       <div class="top">
@@ -343,8 +549,10 @@
           <span class="sc-meta"><span class="sc-era">${esc(e.title)}</span><span class="sc-date">${esc(L.d)}</span></span>
         </div>
         <h1 class="sc-title">${esc(L.t)}</h1>
+        ${L.hook ? `<p class="sc-hook">${esc(L.hook)}</p>` : ""}
         <div class="sc-rule">${UI.lisSmall}</div>
-        ${paras(L.p)}
+        <div class="sc-body">${body}</div>
+        ${fun}
       </article>
       <div class="stack">
         <button class="btn btn-gold" data-act="start" data-id="${e.id}" data-lv="${i}" ${unlocked(e, i) ? "" : "disabled"}>${unlocked(e, i) ? "Jouer ce niveau" : "Réussis le niveau précédent pour jouer"}</button>
@@ -567,6 +775,7 @@
     const n = Q.items.length;
     const stars = Q.mode === "level" ? scoreStars(Q.right) : (Q.right / n >= 0.9 ? 3 : Q.right / n >= 0.7 ? 2 : Q.right / n >= 0.5 ? 1 : 0);
     let bonus = 0, seal = null, firstClear = false, newStars = 0;
+    const ownedBefore = ownedKeys();
 
     if (Q.mode === "level") {
       const e = eraById(Q.eraId);
@@ -584,19 +793,20 @@
     }
     if (Q.mode === "daily" && S.daily !== today()) {
       S.daily = today();
+      S.stats.daily = (S.stats.daily || 0) + 1;
       bonus += CONFIG.xpDailyBonus;
     }
     S.xp += bonus;
     Q.xp += bonus;
-    if (S.streak.last !== today()) {
-      S.streak = { count: S.streak.last === yesterday() ? S.streak.count + 1 : 1, last: today() };
-    }
+    touchStreak();
+    const newChars = [...ownedKeys()].filter((k) => !ownedBefore.has(k)).map((k) => { const [id, i] = k.split(":"); return { e: eraById(id), k: Number(i) }; });
+    const newMedals = checkMedals();
     save();
 
     const e = Q.eraId ? eraById(Q.eraId) : null;
     const nextOpen = Q.mode === "level" && Q.lvl + 1 < e.levels.length && unlocked(e, Q.lvl + 1);
     R = {
-      mode: Q.mode, eraId: Q.eraId, lvl: Q.lvl, n, right: Q.right, stars, xp: Q.xp, missed: Q.missed, firstClear, newStars, seal,
+      mode: Q.mode, eraId: Q.eraId, lvl: Q.lvl, n, right: Q.right, stars, xp: Q.xp, missed: Q.missed, firstClear, newStars, seal, newChars, newMedals,
       pass: Q.mode === "level" ? stars >= 1 : true, nextOpen,
       lastLevel: Q.mode === "level" && Q.lvl + 1 >= e.levels.length,
       rankUp: rankIndex(S.xp) > Q.rankStart ? RANKS[rankIndex(S.xp)].name : null
@@ -610,10 +820,18 @@
   function celebrate() {
     if (!R || R.celebrated) return;
     R.celebrated = true;
-    if (R.seal || R.rankUp) { sfx("fanfare"); buzz([60, 40, 60, 40, 120]); Art.confetti(); }
+    if (R.seal || R.rankUp || (R.newChars && R.newChars.length)) { sfx("fanfare"); buzz([60, 40, 60, 40, 120]); Art.confetti(); }
     else if (R.stars === 3) { sfx("fanfare"); buzz([40, 30, 80]); Art.confetti(); }
     else if (R.pass) { sfx("star"); buzz(30); if (R.stars === 2) Art.confetti(["#e9cf8e", "#d8b565", "#f3ead2"]); }
     else sfx("lose");
+  }
+
+  function celebrateT() {
+    if (!TR || TR.celebrated) return;
+    TR.celebrated = true;
+    if (TR.kind === "win") { sfx("fanfare"); buzz([60, 40, 60, 40, 120]); Art.confetti(); }
+    else if (TR.medals.length || TR.rankUp || TR.newRecord) { sfx("star"); buzz(40); Art.confetti(["#e9cf8e", "#d8b565", "#f3ead2"]); }
+    else sfx(TR.kind === "stop" ? "star" : "lose");
   }
 
   function resultScreen() {
@@ -651,10 +869,179 @@
       </div>
       ${R.seal ? `<div class="seal-card"><span class="seal-ico">${UI.seal}</span><div><small>Sceau obtenu</small><b>${esc(R.seal.title)}</b><span>Tous les niveaux sont réussis · +${CONFIG.xpSeal} XP</span></div></div>` : ""}
       ${R.rankUp ? `<div class="rankup">Nouveau rang<b>${R.rankUp}</b></div>` : ""}
+      ${(R.newChars || []).map((n) => `<button class="char-card" data-act="gallery"><span class="cc-art">${cameo(n.e, n.k, false)}</span><span><small>Nouveau personnage${n.k === 4 ? " légendaire" : ""}</small><b>${esc(castOf(n.e)[n.k].n)}</b><span>${esc(castOf(n.e)[n.k].r)}</span></span></button>`).join("")}
+      ${(R.newMedals || []).length ? `<section class="newmedals"><h2>Médaille${R.newMedals.length > 1 ? "s" : ""} obtenue${R.newMedals.length > 1 ? "s" : ""}</h2>${R.newMedals.map((m) => `<div class="mrow t${m.tier}"><span class="mico">${medalIcon(m)}</span><span><b>${esc(m.name)}</b><small>${esc(m.desc)}</small></span></div>`).join("")}</section>` : ""}
       ${review}
       <div class="stack">${buttons}</div>
       ${adSlot()}
     </div>`;
+  }
+
+  /* ===== Écrans : Trésor, personnages, médailles ===== */
+  const topBar = (title) => `<div class="top"><button class="icon-btn" data-act="back" aria-label="Retour">${UI.back}</button><p class="lesson-crumb">${esc(title)}</p></div>`;
+
+  function tresorMenu() {
+    const all = S.rec.all || { rung: 0, earn: 0 };
+    const lg = leagueOf(all.earn);
+    const nextLg = LEAGUES[LEAGUES.findIndex((l) => l[1] === lg[1]) + 1];
+    const pct = nextLg ? Math.round(((all.earn - lg[0]) / (nextLg[0] - lg[0])) * 100) : 100;
+    const rows = playable.map((e) => {
+      const r = S.rec[e.id] || { rung: 0, earn: 0 };
+      return `<li><button class="tt" style="--accent:${e.accent}" data-act="tstart" data-scope="${e.id}">
+        <span class="medal">${ICONS[e.icon]}</span>
+        <span class="tt-text"><b>${esc(e.title)}</b><small>${r.earn ? `Record : ${fmtEcus(r.earn)} · ${leagueOf(r.earn)[1]}` : "Pas encore joué"}</small></span>
+        <span class="go">${UI.go}</span></button></li>`;
+    }).join("");
+    const ladder = LADDER.map((v, i) => `<li class="${SAFE.includes(i) ? "safe" : ""} ${i === 14 ? "top" : ""}"><span>${i + 1}</span><b>${fmtEcus(v)}</b>${SAFE.includes(i) ? "<em>palier</em>" : ""}</li>`).reverse().join("");
+    return `
+    <div class="screen">
+      ${topBar("Le Trésor du Royaume")}
+      <section class="tresor-hero">
+        <div class="coin">${UI.seal}</div>
+        <h1>Le Trésor du Royaume</h1>
+        <p>15 questions, de plus en plus ardues. Gagne jusqu'à <b>1 000 000 d'écus</b>. Deux paliers te protègent : 1 000 et 32 000 écus. Trois jokers : le 50/50, l'appel au public et l'appel à un historien.</p>
+      </section>
+      <section class="league">
+        <div class="league-head"><span class="league-badge">${esc(lg[1])}</span><span>Record : <b>${fmtEcus(all.earn)}</b></span></div>
+        <div class="bar"><i data-w="${pct}"></i></div>
+        <p class="league-next">${nextLg ? `Prochain titre : <b>${nextLg[1]}</b> à ${fmtEcus(nextLg[0])}` : "Tu es au sommet du royaume."}</p>
+      </section>
+      <button class="btn btn-gold" data-act="tstart" data-scope="all">Tous les thèmes</button>
+      <h2 class="section">Ou un seul thème</h2>
+      <ul class="tlist">${rows}</ul>
+      <h2 class="section">Les paliers</h2>
+      <ol class="ladder">${ladder}</ol>
+      <p class="mix-note">Un classement en ligne entre joueurs viendra plus tard. Pour l'instant, bats tes propres records et monte dans les titres.</p>
+    </div>`;
+  }
+
+  const refreshT = () => { const el = document.getElementById("tgame"); if (el) el.innerHTML = tgameInner(); };
+
+  function tgameScreen() { return `<div class="screen tscreen" id="tgame">${tgameInner()}</div>`; }
+
+  function tgameInner() {
+    const t = T;
+    const it = t.qs[t.i];
+    const e = t.scope === "all" ? null : eraById(t.scope);
+    const safe = t.i > 9 ? LADDER[9] : t.i > 4 ? LADDER[4] : 0;
+    const life = (k, label, ico) => `<button class="life ${t.used[k] ? "used" : ""}" data-act="life" data-k="${k}" ${t.used[k] || t.rev ? "disabled" : ""} aria-label="${label}${t.used[k] ? " (utilisé)" : ""}">${ico}<span>${label}</span></button>`;
+    const L = "ABCD";
+    const opts = it.opts.map((o, k) => {
+      const gone = t.removed.includes(k);
+      let cls = "";
+      if (t.rev) cls = o.ok ? "correct" : k === t.sel ? "wrong" : "dim";
+      else if (k === t.sel) cls = "chosen";
+      return `<li><button class="opt ${cls} ${gone ? "gone" : ""}" data-act="tpick" data-i="${k}" ${t.rev || gone ? "disabled" : ""}><span class="letter">${L[k]}</span><span>${gone ? "" : esc(o.t)}</span>${t.rev ? (o.ok ? UI.check : k === t.sel ? UI.cross : UI.check) : UI.check}</button></li>`;
+    }).join("");
+    let help = "";
+    if (t.help && t.help.kind === "pub") {
+      help = `<div class="help"><b>Le peuple de la cité a voté</b><div class="crowd">${it.opts.map((o, k) => (t.removed.includes(k) ? "" : `<div class="cb"><i style="height:${t.help.pct[k] || 0}%"></i><span>${t.help.pct[k] || 0}%</span><em>${L[k]}</em></div>`)).join("")}</div></div>`;
+    } else if (t.help && t.help.kind === "expert") {
+      help = `<div class="help"><b>Frère Aubry, chroniqueur</b><p>« ${esc(t.help.say)} »</p></div>`;
+    } else if (t.help && t.help.kind === "fifty") {
+      help = `<div class="help"><b>Deux mauvaises réponses ont disparu.</b></div>`;
+    }
+    let foot = "";
+    if (t.rev) {
+      const last = t.i === 14;
+      foot = `<div class="feedback ${t.good ? "good" : "bad"}" id="fb"><h3>${t.good ? (last ? "Le Trésor est à toi !" : "Bonne réponse !") : "Mauvaise réponse"}</h3>${t.good ? "" : `<p>La bonne réponse : <b>${esc(it.ans)}</b></p>`}${it.e ? `<p>${esc(it.e)}</p>` : ""}<button class="btn btn-gold" data-act="tnext">${t.good ? (last ? "Récupérer mon trésor" : "Question suivante") : "Voir mon bilan"}</button></div>`;
+    } else {
+      foot = `<button class="btn btn-gold" data-act="tvalid" ${t.sel === null ? "disabled" : ""}>Valider ma réponse</button>
+        ${t.i > 0 ? `<button class="btn btn-line" data-act="tstop">Je m'arrête · garder ${fmtEcus(LADDER[t.i - 1])}</button>` : ""}`;
+    }
+    return `
+      <div class="top">
+        <button class="icon-btn" data-act="tquit" aria-label="Abandonner">${UI.close}</button>
+        <div class="prize"><small>Question ${t.i + 1} sur 15</small><b>${fmtEcus(LADDER[t.i])}</b></div>
+        <span class="safe-chip" title="Palier garanti">${UI.lock}${safe ? fmtEcus(safe) : "Aucun palier"}</span>
+      </div>
+      <div class="lives">${life("fifty", "50/50", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6h6M5 18h6M14 6h5M14 18h5"/><path d="M12 3v18" stroke-dasharray="2 3"/></svg>')}
+        ${life("pub", "Public", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20v-6M10 20V8M15 20v-9M20 20V4"/></svg>')}
+        ${life("expert", "Historien", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.500 3.500-7 8-7s8 2.500 8 7"/></svg>')}</div>
+      <section class="q-card" ${e ? `style="--accent:${e.accent}"` : ""}>
+        <p class="q-era">${e ? esc(e.title) : "Tous les thèmes"}</p>
+        <h1 class="q-text" style="font-weight:400">${esc(it.q)}</h1>
+      </section>
+      ${help}
+      <ul class="options">${opts}</ul>
+      <div class="tfoot">${foot}</div>`;
+  }
+
+  function tresultScreen() {
+    const r = TR;
+    const e = r.scope === "all" ? null : eraById(r.scope);
+    const head = r.kind === "win" ? "Le Trésor du Royaume est à toi !" : r.kind === "stop" ? "Sage décision, tu repars avec ton or." : "Raté… mais ton palier te protège.";
+    const medals = r.medals.length ? `<section class="newmedals"><h2>Nouvelle${r.medals.length > 1 ? "s" : ""} médaille${r.medals.length > 1 ? "s" : ""}</h2>${r.medals.map((m) => `<div class="mrow t${m.tier}"><span class="mico">${medalIcon(m)}</span><span><b>${esc(m.name)}</b><small>${esc(m.desc)}</small></span></div>`).join("")}</section>` : "";
+    return `
+    <div class="screen result">
+      <p class="res-era">${e ? esc(e.title) : "Tous les thèmes"}</p>
+      <div class="coin big">${UI.seal}</div>
+      <p class="score tscore">${fmtEcus(r.earn)}</p>
+      <p class="verdict">${head}</p>
+      <div class="gains">
+        <span class="chip">${r.reached}/15 bonnes réponses</span>
+        <span class="chip">${esc(r.league[1])}</span>
+        ${r.xp ? `<span class="chip">+${r.xp} XP</span>` : ""}
+        ${r.newRecord ? '<span class="chip gold">Nouveau record !</span>' : ""}
+      </div>
+      ${r.rankUp ? `<div class="rankup">Nouveau rang<b>${r.rankUp}</b></div>` : ""}
+      ${medals}
+      <div class="stack">
+        <button class="btn btn-gold" data-act="tstart" data-scope="${r.scope}">Rejouer</button>
+        <button class="btn btn-line" data-act="tresor">Menu du Trésor</button>
+        <button class="btn btn-line" data-act="home">Retour aux époques</button>
+      </div>
+      ${adSlot()}
+    </div>`;
+  }
+
+  function galleryScreen() {
+    const sections = playable.map((e) => {
+      const cast = castOf(e);
+      if (!cast.length) return "";
+      const n = cast.filter((_, k) => charUnlocked(e, k)).length;
+      return `<section class="gal-era" style="--accent:${e.accent}">
+        <h2><span>${esc(e.title)}</span><small>${n}/${cast.length}</small></h2>
+        <ul class="gal">${cast.map((c, k) => {
+          const open = charUnlocked(e, k);
+          return `<li><button class="gal-card ${open ? "" : "locked"}" data-act="char" data-id="${e.id}" data-k="${k}" aria-label="${open ? esc(c.n) : "Personnage verrouillé"}">${cameo(e, k, !open)}<b>${open ? esc(c.n) : "???"}</b></button></li>`;
+        }).join("")}</ul></section>`;
+    }).join("");
+    return `<div class="screen">${topBar("Personnages")}
+      <p class="gal-intro">${charsOwned()} sur ${charsTotal()} personnages. Réussis les niveaux pairs (2, 4, 6, 8 et 10) de chaque époque pour les rencontrer.</p>
+      ${sections || '<p class="mix-note">Les personnages arrivent bientôt.</p>'}</div>`;
+  }
+
+  function openChar(id, k) {
+    const e = eraById(id);
+    const c = castOf(e)[k];
+    if (!c) return;
+    const open = charUnlocked(e, k);
+    const o = document.createElement("div");
+    o.id = "overlay";
+    o.className = "overlay";
+    o.innerHTML = `<div class="sheet charsheet" style="--accent:${e.accent}" role="dialog" aria-modal="true" aria-label="${open ? esc(c.n) : "Personnage verrouillé"}">
+      <div class="cs-head">${cameo(e, k, !open)}
+        <div><small>${esc(e.title)}${k === 4 ? " · légendaire" : ""}</small><h2>${open ? esc(c.n) : "Personnage mystère"}</h2><p>${open ? `${esc(c.r)} · ${esc(c.d)}` : `Réussis le niveau ${2 * k + 2} de l'époque « ${esc(e.title)} » pour le rencontrer.`}</p></div></div>
+      ${open ? `<p class="cs-bio">${esc(c.b)}</p>` : ""}
+      <div class="stack"><button class="btn btn-line" data-act="close-sheet">Fermer</button></div></div>`;
+    document.body.appendChild(o);
+    o.addEventListener("click", (ev) => { if (ev.target === o) closeSheet(); });
+  }
+
+  function medalsScreen() {
+    const got = MEDALS.filter((m) => S.medals[m.id]).length;
+    const rows = MEDALS.map((m) => {
+      const has = !!S.medals[m.id];
+      const mx = medalMax(m);
+      const cur = Math.min(m.cur(), mx);
+      return `<li class="mrow t${m.tier} ${has ? "" : "off"}"><span class="mico">${has ? medalIcon(m) : UI.lock}</span>
+        <span class="mtext"><b>${esc(m.name)}</b><small>${esc(m.desc)}</small>${has ? "" : `<span class="bar"><i style="width:${Math.round((cur / mx) * 100)}%"></i></span>`}</span>
+        <span class="mprog">${has ? "✓" : `${cur}/${mx}`}</span></li>`;
+    }).join("");
+    return `<div class="screen">${topBar("Médailles")}
+      <p class="gal-intro">${got} médailles sur ${MEDALS.length}. Joue chaque jour, termine des époques, tente le Trésor du Royaume.</p>
+      <ul class="medals">${rows}</ul></div>`;
   }
 
   /* ===== Fenêtres ===== */
@@ -706,6 +1093,35 @@
       case "start": launch(eraById(el.dataset.id), Number(el.dataset.lv), view.name === "lesson"); break;
       case "replay": launch(eraById(R.eraId), R.lvl, true); break;
       case "next-level": launch(eraById(R.eraId), R.lvl + 1, true); break;
+      case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
+      case "tstart": startTresor(el.dataset.scope); break;
+      case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
+      case "medals": go("medals"); break;
+      case "char": openChar(el.dataset.id, Number(el.dataset.k)); break;
+      case "life": useLifeline(el.dataset.k); break;
+      case "tpick": if (T && !T.rev) { T.sel = Number(el.dataset.i); sfx("tap"); refreshT(); } break;
+      case "tvalid": {
+        if (!T || T.rev || T.sel === null) break;
+        T.rev = true;
+        T.good = T.qs[T.i].opts[T.sel].ok;
+        sfx(T.good ? "good" : "bad");
+        buzz(T.good ? 14 : [30, 50, 30]);
+        refreshT();
+        const fb = document.getElementById("fb");
+        if (fb) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        break;
+      }
+      case "tnext": {
+        if (!T || !T.rev) break;
+        if (!T.good) return endTresor("wrong");
+        if (T.i === 14) return endTresor("win");
+        T.i++; T.sel = null; T.rev = false; T.help = null; T.removed = [];
+        refreshT();
+        window.scrollTo(0, 0);
+        break;
+      }
+      case "tstop": if (T && !T.rev && T.i > 0 && confirm(`Partir avec ${fmtEcus(LADDER[T.i - 1])} ?`)) endTresor("stop"); break;
+      case "tquit": if (confirm("Abandonner la partie ? Tu garderas ton dernier palier.")) { if (T && T.i > 0) endTresor("wrong"); else { T = null; back(); } } break;
       case "daily": {
         if (S.daily === today()) break;
         const pool = [];
