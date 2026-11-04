@@ -223,6 +223,9 @@
     { id: "t5", name: "Coffre de bronze", desc: "Atteins le palier 1 000 écus.", icon: "lis", tier: 1, cur: () => S.stats.tBest || 0, max: 5 },
     { id: "t10", name: "Coffre d'argent", desc: "Atteins le palier 32 000 écus.", icon: "lis", tier: 2, cur: () => S.stats.tBest || 0, max: 10 },
     { id: "t15", name: "Roi du Trésor", desc: "Gagne 1 000 000 d'écus.", icon: "crown", tier: 3, cur: () => S.stats.tBest || 0, max: 15 },
+    { id: "l1", name: "Au-delà du Trésor", desc: "Réponds à une question de la Légende.", icon: "lis", tier: 2, cur: () => S.stats.tBest || 0, max: 16 },
+    { id: "l10", name: "Légende", desc: "Réponds à 10 questions de la Légende.", icon: "crown", tier: 3, cur: () => S.stats.tBest || 0, max: 25 },
+    { id: "l30", name: "Immortel", desc: "Réponds à 30 questions de la Légende.", icon: "crown", tier: 3, cur: () => S.stats.tBest || 0, max: 45 },
     { id: "tn", name: "Sans filet", desc: "Gagne le Trésor sans aucun joker.", icon: "jerusalem", tier: 3, cur: () => S.stats.tClean || 0, max: 1 },
     { id: "ta", name: "Esprit universel", desc: "Atteins 32 000 écus en « Tous les thèmes ».", icon: "jerusalem", tier: 2, cur: () => S.stats.tAll10 || 0, max: 1 },
     { id: "r2", name: "Chevalier", desc: "Atteins le rang de Chevalier.", icon: "sword", tier: 1, cur: () => rankIndex(S.xp), max: 2 },
@@ -246,10 +249,35 @@
   /* ===== Le Trésor du Royaume (quiz à paliers) ===== */
   const LADDER = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
   const SAFE = [4, 9]; // paliers garantis : après la question 5 et la question 10
-  const LEAGUES = [[0, "Manant"], [100, "Artisan"], [1000, "Bourgeois"], [8000, "Chevalier"], [32000, "Baron"], [125000, "Comte"], [500000, "Duc"], [1000000, "Roi"]];
+  const LEAGUES = [[0, "Manant"], [100, "Artisan"], [1000, "Bourgeois"], [8000, "Chevalier"], [32000, "Baron"], [125000, "Comte"], [500000, "Duc"], [1000000, "Roi"], [3000000, "Empereur"], [10000000, "Légende vivante"]];
+  // Au-delà de la 15e question : la Légende. Chaque question vaut 500 000 écus de plus, avec un palier tous les 5 pas.
+  const prize = (i) => (i < 15 ? LADDER[i] : LADDER[14] + (i - 14) * 500000);
   const fmtEcus = (n) => `${n.toLocaleString("fr-FR").replace(/ /g, " ")} écu${n > 1 ? "s" : ""}`;
   const leagueOf = (earn) => LEAGUES.reduce((a, l) => (earn >= l[0] ? l : a), LEAGUES[0]);
-  const safeEarn = (reached) => (reached > SAFE[1] ? LADDER[SAFE[1]] : reached > SAFE[0] ? LADDER[SAFE[0]] : 0); // reached = nb de bonnes réponses
+  const safeEarn = (reached) => {
+    if (reached >= 15) { const g = Math.floor((reached - 15) / 5) * 5; return g > 0 ? prize(14 + g) : LADDER[SAFE[1]]; }
+    return reached > SAFE[1] ? LADDER[SAFE[1]] : reached > SAFE[0] ? LADDER[SAFE[0]] : 0; // reached = nb de bonnes réponses
+  };
+  const legendN = (i) => i - 14; // numéro de la question de Légende (1, 2, 3…)
+
+  // Question supplémentaire pour la Légende : parmi les plus difficiles, sans répéter.
+  function nextLegendQ(t) {
+    const eras = t.scope === "all" ? playable : playable.filter((e) => e.id === t.scope);
+    const build = (minLevel) => {
+      const pool = [];
+      eras.forEach((e) => e.levels.forEach((lv, i) => {
+        if (i < minLevel) return;
+        lv.items.forEach((d, k) => { if (d.type === "qcm" && !t.seen.has(d.q)) pool.push(prep("qcm", d, `${e.id}:${i}:${k}`, e.title, lv.title)); });
+      }));
+      return pool;
+    };
+    let pool = build(5);
+    if (!pool.length) pool = build(0);
+    if (!pool.length) { t.seen.clear(); pool = build(5); }
+    const it = shuffle(pool)[0];
+    t.seen.add(it.q);
+    return it;
+  }
   const TIERS = [[0, 2], [3, 6], [7, 9]]; // niveaux utilisés pour les questions 1-5, 6-10, 11-15
 
   function tresorQuestions(scope) {
@@ -273,7 +301,7 @@
   function startTresor(scope) {
     const qs = tresorQuestions(scope);
     if (!qs) return;
-    T = { scope, qs, i: 0, sel: null, rev: false, help: null, removed: [], used: {} };
+    T = { scope, qs, i: 0, sel: null, rev: false, help: null, removed: [], used: {}, seen: new Set(qs.map((q) => q.q)) };
     sfx("tap");
     go("tgame", {}, "push");
   }
@@ -329,7 +357,7 @@
   function endTresor(kind) {
     // kind : "wrong" | "stop" | "win"
     const reached = T.i + (T.rev && T.good ? 1 : 0); // bonnes réponses données
-    const earn = kind === "win" ? LADDER[14] : kind === "stop" ? (reached > 0 ? LADDER[reached - 1] : 0) : safeEarn(reached);
+    const earn = kind === "win" ? LADDER[14] : kind === "stop" ? (reached > 0 ? prize(reached - 1) : 0) : safeEarn(reached);
     const scope = T.scope;
     const rec = (S.rec[scope] = S.rec[scope] || { rung: 0, earn: 0 });
     const newRecord = earn > rec.earn;
@@ -338,9 +366,10 @@
     const noHelp = !T.used.fifty && !T.used.pub && !T.used.expert;
     S.stats.tGames = (S.stats.tGames || 0) + 1;
     S.stats.tBest = Math.max(S.stats.tBest || 0, reached);
+    if (reached > 15) rec.legend = Math.max(rec.legend || 0, reached - 15);
     if (kind === "win" && noHelp) S.stats.tClean = 1;
     if (scope === "all" && reached >= 10) S.stats.tAll10 = 1;
-    const xp = reached * 5 + (kind === "win" ? 100 : 0);
+    const xp = Math.min(reached, 15) * 5 + (reached >= 15 ? 100 : 0) + Math.max(0, reached - 15) * 10;
     const rankBefore = rankIndex(S.xp);
     S.xp += xp;
     touchStreak();
@@ -380,20 +409,40 @@
   });
 
   /* ===== Écrans ===== */
+  const TABS = [
+    { v: "home", label: "Époques", ico: () => ICONS.book },
+    { v: "tresor", label: "Trésor", ico: () => ICONS.seal },
+    { v: "gallery", label: "Personnages", ico: () => ICONS.helmet },
+    { v: "medals", label: "Médailles", ico: () => ICONS.crown }
+  ];
+  const tabBar = (active) => `<nav class="tabbar" aria-label="Navigation">${TABS.map((t) => `<button class="tab ${t.v === active ? "on" : ""}" data-act="tab" data-v="${t.v}" ${t.v === active ? 'aria-current="page"' : ""}><span class="tab-ico">${t.ico()}</span><span>${t.label}</span></button>`).join("")}</nav>`;
+  const withTabs = (html, active) => { document.body.classList.add("has-tabs"); return html + tabBar(active); };
+
+  // Ambiance : la couleur de l'époque teinte tout l'écran.
+  const setTint = () => {
+    const eid = view.name === "era" || view.name === "lesson" ? view.id : view.name === "quiz" && Q && Q.eraId ? Q.eraId : view.name === "result" && R && R.eraId ? R.eraId : view.name === "tgame" && T && T.scope !== "all" ? T.scope : null;
+    const e = eid ? eraById(eid) : null;
+    document.documentElement.style.setProperty("--tint", e ? e.accent : "#3456b2");
+    document.documentElement.dataset.era = e ? e.scene : view.name === "tgame" || view.name === "tresor" || view.name === "tresult" ? "tresor" : "";
+  };
+
   const render = () => {
     window.scrollTo(0, 0);
+    document.body.classList.remove("has-tabs");
+    setTint();
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
-    if (view.name === "tresor") { $app.innerHTML = tresorMenu(); return animateBars(); }
+    if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
     if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
-    if (view.name === "gallery") return ($app.innerHTML = galleryScreen());
-    if (view.name === "medals") return ($app.innerHTML = medalsScreen());
+    if (view.name === "gallery") return ($app.innerHTML = withTabs(galleryScreen(), "gallery"));
+    if (view.name === "medals") return ($app.innerHTML = withTabs(medalsScreen(), "medals"));
     if (view.name === "result" && R) { $app.innerHTML = resultScreen(); return celebrate(); }
     view = { name: "home" };
-    $app.innerHTML = homeScreen();
+    setTint();
+    $app.innerHTML = withTabs(homeScreen(), "home");
     animateBars();
   };
 
@@ -470,12 +519,6 @@
         <span class="go">${doneToday ? UI.star(true) : UI.go}</span>
       </button>
 
-      <div class="tiles">
-        <button class="tile tile-tresor" data-act="tresor"><span class="tile-ico">${UI.seal}</span><span><b>Le Trésor du Royaume</b><small>15 questions · 3 jokers · jusqu'à 1 000 000 d'écus</small></span><span class="go">${UI.go}</span></button>
-        <button class="tile" data-act="gallery"><span class="tile-ico">${ICONS.helmet}</span><span><b>Personnages</b><small>${charsOwned()}/${charsTotal() || "—"} rencontrés</small></span></button>
-        <button class="tile" data-act="medals"><span class="tile-ico">${ICONS.crown}</span><span><b>Médailles</b><small>${MEDALS.filter((m) => S.medals[m.id]).length}/${MEDALS.length} obtenues</small></span></button>
-      </div>
-
       <h2 class="section">Les époques</h2>
       <ul class="eras">${eraCards}</ul>
 
@@ -543,6 +586,7 @@
         <button class="icon-btn" data-act="back" aria-label="Fermer la fiche">${UI.close}</button>
         <p class="lesson-crumb">Niveau ${i + 1} · ${esc(lv.title)}</p>
       </div>
+      <figure class="illum" aria-hidden="true">${Art.scene(e.scene, e.accent)}<figcaption>${esc(e.title)} · ${esc(L.d)}</figcaption></figure>
       <article class="scroll-card">
         <div class="sc-head">
           <span class="sc-medal">${ICONS[e.icon]}</span>
@@ -574,6 +618,7 @@
     const segs = Q.items.map((_, k) => `<i class="${k < Q.i ? "done" : k === Q.i ? "now" : ""}"></i>`).join("");
     return `
     <div class="screen" ${e ? `style="--accent:${e.accent}"` : ""}>
+      ${e ? `<div class="decor" aria-hidden="true">${Art.scene(e.scene, e.accent)}</div>` : ""}
       <div class="top">
         <button class="icon-btn" data-act="quit" aria-label="Quitter la partie">${UI.close}</button>
         <div class="progress" aria-hidden="true">${segs}</div>
@@ -856,6 +901,7 @@
     }
     return `
     <div class="screen result" ${e ? `style="--accent:${e.accent}"` : ""}>
+      ${e ? `<div class="decor" aria-hidden="true">${Art.scene(e.scene, e.accent)}</div>` : ""}
       ${e ? `<p class="res-era">${esc(e.title)}${R.mode === "level" ? ` · Niveau ${R.lvl + 1}` : ""}</p>` : ""}
       <div class="big-stars" role="img" aria-label="${R.stars} étoile${R.stars > 1 ? "s" : ""} sur 3">${[0, 1, 2].map((i) => UI.star(i < R.stars)).join("")}</div>
       <p class="score">${R.right}<small>/${R.n}</small></p>
@@ -878,7 +924,7 @@
   }
 
   /* ===== Écrans : Trésor, personnages, médailles ===== */
-  const topBar = (title) => `<div class="top"><button class="icon-btn" data-act="back" aria-label="Retour">${UI.back}</button><p class="lesson-crumb">${esc(title)}</p></div>`;
+  const topBar = (title) => `<div class="top"><h1 class="page-title">${esc(title)}</h1></div>`;
 
   function tresorMenu() {
     const all = S.rec.all || { rung: 0, earn: 0 };
@@ -889,7 +935,7 @@
       const r = S.rec[e.id] || { rung: 0, earn: 0 };
       return `<li><button class="tt" style="--accent:${e.accent}" data-act="tstart" data-scope="${e.id}">
         <span class="medal">${ICONS[e.icon]}</span>
-        <span class="tt-text"><b>${esc(e.title)}</b><small>${r.earn ? `Record : ${fmtEcus(r.earn)} · ${leagueOf(r.earn)[1]}` : "Pas encore joué"}</small></span>
+        <span class="tt-text"><b>${esc(e.title)}</b><small>${r.earn ? `Record : ${fmtEcus(r.earn)} · ${leagueOf(r.earn)[1]}${r.legend ? ` · Légende n°${r.legend}` : ""}` : "Pas encore joué"}</small></span>
         <span class="go">${UI.go}</span></button></li>`;
     }).join("");
     const ladder = LADDER.map((v, i) => `<li class="${SAFE.includes(i) ? "safe" : ""} ${i === 14 ? "top" : ""}"><span>${i + 1}</span><b>${fmtEcus(v)}</b>${SAFE.includes(i) ? "<em>palier</em>" : ""}</li>`).reverse().join("");
@@ -899,10 +945,10 @@
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
-        <p>15 questions, de plus en plus ardues. Gagne jusqu'à <b>1 000 000 d'écus</b>. Deux paliers te protègent : 1 000 et 32 000 écus. Trois jokers : le 50/50, l'appel au public et l'appel à un historien.</p>
+        <p>15 questions, de plus en plus ardues. Gagne jusqu'à <b>1 000 000 d'écus</b>. Deux paliers te protègent : 1 000 et 32 000 écus. Trois jokers : le 50/50, l'appel au public et l'appel à un historien. Après le million, la <b>Légende</b> continue sans limite.</p>
       </section>
       <section class="league">
-        <div class="league-head"><span class="league-badge">${esc(lg[1])}</span><span>Record : <b>${fmtEcus(all.earn)}</b></span></div>
+        <div class="league-head"><span class="league-badge">${esc(lg[1])}</span><span>Record : <b>${fmtEcus(all.earn)}</b>${all.legend ? ` · Légende n°${all.legend}` : ""}</span></div>
         <div class="bar"><i data-w="${pct}"></i></div>
         <p class="league-next">${nextLg ? `Prochain titre : <b>${nextLg[1]}</b> à ${fmtEcus(nextLg[0])}` : "Tu es au sommet du royaume."}</p>
       </section>
@@ -915,15 +961,16 @@
     </div>`;
   }
 
-  const refreshT = () => { const el = document.getElementById("tgame"); if (el) el.innerHTML = tgameInner(); };
+  const refreshT = () => { const el = document.getElementById("tgame-body"); if (el) el.innerHTML = tgameInner(); };
 
-  function tgameScreen() { return `<div class="screen tscreen" id="tgame">${tgameInner()}</div>`; }
+  function tgameScreen() { return `<div class="screen tscreen" id="tgame"><div class="decor hall" aria-hidden="true">${Art.scene(T.scope === "all" ? "chevaliers" : eraById(T.scope).scene, T.scope === "all" ? "#d8b565" : eraById(T.scope).accent)}</div><div id="tgame-body">${tgameInner()}</div></div>`; }
 
   function tgameInner() {
     const t = T;
     const it = t.qs[t.i];
     const e = t.scope === "all" ? null : eraById(t.scope);
-    const safe = t.i > 9 ? LADDER[9] : t.i > 4 ? LADDER[4] : 0;
+    const safe = safeEarn(t.i);
+    const inLegend = t.i >= 15;
     const life = (k, label, ico) => `<button class="life ${t.used[k] ? "used" : ""}" data-act="life" data-k="${k}" ${t.used[k] || t.rev ? "disabled" : ""} aria-label="${label}${t.used[k] ? " (utilisé)" : ""}">${ico}<span>${label}</span></button>`;
     const L = "ABCD";
     const opts = it.opts.map((o, k) => {
@@ -944,22 +991,27 @@
     let foot = "";
     if (t.rev) {
       const last = t.i === 14;
-      foot = `<div class="feedback ${t.good ? "good" : "bad"}" id="fb"><h3>${t.good ? (last ? "Le Trésor est à toi !" : "Bonne réponse !") : "Mauvaise réponse"}</h3>${t.good ? "" : `<p>La bonne réponse : <b>${esc(it.ans)}</b></p>`}${it.e ? `<p>${esc(it.e)}</p>` : ""}<button class="btn btn-gold" data-act="tnext">${t.good ? (last ? "Récupérer mon trésor" : "Question suivante") : "Voir mon bilan"}</button></div>`;
+      const buttons = !t.good
+        ? '<button class="btn btn-gold" data-act="tnext">Voir mon bilan</button>'
+        : last
+          ? `<button class="btn btn-gold" data-act="tnext">Récupérer 1 000 000 d'écus</button><button class="btn btn-line" data-act="tlegend">Continuer vers la Légende · risque de tout perdre sauf ${fmtEcus(LADDER[SAFE[1]])}</button>`
+          : '<button class="btn btn-gold" data-act="tnext">Question suivante</button>';
+      foot = `<div class="feedback ${t.good ? "good" : "bad"}" id="fb"><h3>${t.good ? (last ? "Le Trésor est à toi !" : "Bonne réponse !") : "Mauvaise réponse"}</h3>${t.good ? "" : `<p>La bonne réponse : <b>${esc(it.ans)}</b></p>`}${it.e ? `<p>${esc(it.e)}</p>` : ""}${buttons}</div>`;
     } else {
       foot = `<button class="btn btn-gold" data-act="tvalid" ${t.sel === null ? "disabled" : ""}>Valider ma réponse</button>
-        ${t.i > 0 ? `<button class="btn btn-line" data-act="tstop">Je m'arrête · garder ${fmtEcus(LADDER[t.i - 1])}</button>` : ""}`;
+        ${t.i > 0 ? `<button class="btn btn-line" data-act="tstop">Je m'arrête · garder ${fmtEcus(prize(t.i - 1))}</button>` : ""}`;
     }
     return `
       <div class="top">
         <button class="icon-btn" data-act="tquit" aria-label="Abandonner">${UI.close}</button>
-        <div class="prize"><small>Question ${t.i + 1} sur 15</small><b>${fmtEcus(LADDER[t.i])}</b></div>
+        <div class="prize"><small>${inLegend ? `Légende n°${legendN(t.i)}` : `Question ${t.i + 1} sur 15`}</small><b>${fmtEcus(prize(t.i))}</b></div>
         <span class="safe-chip" title="Palier garanti">${UI.lock}${safe ? fmtEcus(safe) : "Aucun palier"}</span>
       </div>
       <div class="lives">${life("fifty", "50/50", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 6h6M5 18h6M14 6h5M14 18h5"/><path d="M12 3v18" stroke-dasharray="2 3"/></svg>')}
         ${life("pub", "Public", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20v-6M10 20V8M15 20v-9M20 20V4"/></svg>')}
         ${life("expert", "Historien", '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.500 3.500-7 8-7s8 2.500 8 7"/></svg>')}</div>
       <section class="q-card" ${e ? `style="--accent:${e.accent}"` : ""}>
-        <p class="q-era">${e ? esc(e.title) : "Tous les thèmes"}</p>
+        <p class="q-era">${inLegend ? "La Légende · " : ""}${e ? esc(e.title) : "Tous les thèmes"}</p>
         <h1 class="q-text" style="font-weight:400">${esc(it.q)}</h1>
       </section>
       ${help}
@@ -970,7 +1022,7 @@
   function tresultScreen() {
     const r = TR;
     const e = r.scope === "all" ? null : eraById(r.scope);
-    const head = r.kind === "win" ? "Le Trésor du Royaume est à toi !" : r.kind === "stop" ? "Sage décision, tu repars avec ton or." : "Raté… mais ton palier te protège.";
+    const head = r.reached > 15 ? (r.kind === "stop" ? `Légende n°${r.reached - 15} : tu repars couvert de gloire !` : `Tombé à la Légende n°${r.reached - 14}… mais ton palier te protège.`) : r.kind === "win" ? "Le Trésor du Royaume est à toi !" : r.kind === "stop" ? "Sage décision, tu repars avec ton or." : "Raté… mais ton palier te protège.";
     const medals = r.medals.length ? `<section class="newmedals"><h2>Nouvelle${r.medals.length > 1 ? "s" : ""} médaille${r.medals.length > 1 ? "s" : ""}</h2>${r.medals.map((m) => `<div class="mrow t${m.tier}"><span class="mico">${medalIcon(m)}</span><span><b>${esc(m.name)}</b><small>${esc(m.desc)}</small></span></div>`).join("")}</section>` : "";
     return `
     <div class="screen result">
@@ -979,7 +1031,7 @@
       <p class="score tscore">${fmtEcus(r.earn)}</p>
       <p class="verdict">${head}</p>
       <div class="gains">
-        <span class="chip">${r.reached}/15 bonnes réponses</span>
+        <span class="chip">${r.reached > 15 ? `Légende n°${r.reached - 15}` : `${r.reached}/15 bonnes réponses`}</span>
         <span class="chip">${esc(r.league[1])}</span>
         ${r.xp ? `<span class="chip">+${r.xp} XP</span>` : ""}
         ${r.newRecord ? '<span class="chip gold">Nouveau record !</span>' : ""}
@@ -1093,6 +1145,7 @@
       case "start": launch(eraById(el.dataset.id), Number(el.dataset.lv), view.name === "lesson"); break;
       case "replay": launch(eraById(R.eraId), R.lvl, true); break;
       case "next-level": launch(eraById(R.eraId), R.lvl + 1, true); break;
+      case "tab": { const v = el.dataset.v; if (v !== view.name) go(v, {}, "replace"); sfx("tap"); break; }
       case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
@@ -1116,11 +1169,21 @@
         if (!T.good) return endTresor("wrong");
         if (T.i === 14) return endTresor("win");
         T.i++; T.sel = null; T.rev = false; T.help = null; T.removed = [];
+        if (T.i >= T.qs.length) T.qs.push(nextLegendQ(T));
         refreshT();
         window.scrollTo(0, 0);
         break;
       }
-      case "tstop": if (T && !T.rev && T.i > 0 && confirm(`Partir avec ${fmtEcus(LADDER[T.i - 1])} ?`)) endTresor("stop"); break;
+      case "tlegend": {
+        if (!T || !T.rev || !T.good || T.i !== 14) break;
+        T.i++; T.sel = null; T.rev = false; T.help = null; T.removed = []; T.used = {};
+        T.qs.push(nextLegendQ(T));
+        sfx("fanfare"); buzz([40, 30, 80]); Art.confetti();
+        refreshT();
+        window.scrollTo(0, 0);
+        break;
+      }
+      case "tstop": if (T && !T.rev && T.i > 0 && confirm(`Partir avec ${fmtEcus(prize(T.i - 1))} ?`)) endTresor("stop"); break;
       case "tquit": if (confirm("Abandonner la partie ? Tu garderas ton dernier palier.")) { if (T && T.i > 0) endTresor("wrong"); else { T = null; back(); } } break;
       case "daily": {
         if (S.daily === today()) break;

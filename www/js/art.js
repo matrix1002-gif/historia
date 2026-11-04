@@ -118,7 +118,9 @@
         <linearGradient id="gr${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1838"/><stop offset="1" stop-color="#070d22"/></linearGradient>
       </defs>
       <rect width="360" height="160" fill="url(#sk${n})"/>
-      <g fill="#f3ead2" fill-opacity=".55"><circle cx="30" cy="22" r="1.2"/><circle cx="90" cy="14" r="1"/><circle cx="150" cy="30" r="1.2"/><circle cx="318" cy="18" r="1.2"/><circle cx="340" cy="52" r="1"/><circle cx="214" cy="14" r="1"/></g>
+      <g class="cloud c1" fill="#f3ead2" fill-opacity=".13"><ellipse cx="70" cy="40" rx="30" ry="6"/><ellipse cx="92" cy="35" rx="20" ry="5"/></g>
+      <g class="cloud c2" fill="#f3ead2" fill-opacity=".1"><ellipse cx="250" cy="28" rx="34" ry="6"/><ellipse cx="228" cy="33" rx="18" ry="4"/></g>
+      <g class="twinkle" fill="#f3ead2" fill-opacity=".55"><circle cx="30" cy="22" r="1.2"/><circle cx="90" cy="14" r="1"/><circle cx="150" cy="30" r="1.2"/><circle cx="318" cy="18" r="1.2"/><circle cx="340" cy="52" r="1"/><circle cx="214" cy="14" r="1"/></g>
       <path d="M0 118c40-22 80-26 120-10s80 16 120-4 80-12 120 4v52H0z" fill="#0b1430" fill-opacity=".35"/>
       ${motif}
       <path d="M0 140c60-8 120-8 180 0s120 6 180-2v22H0z" fill="url(#gr${n})"/>

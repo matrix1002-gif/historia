@@ -1,5 +1,5 @@
 /* Service worker : permet de jouer hors ligne. Changer CACHE à chaque mise à jour du contenu. */
-const CACHE = "historia-v4";
+const CACHE = "historia-v5";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./privacy.html",
   "./css/style.css", "./js/eras.js", "./js/art.js", "./js/ads.js", "./js/app.js",
