@@ -437,7 +437,7 @@
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
-    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame"));
+    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame"), view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));

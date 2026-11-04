@@ -193,21 +193,41 @@
   }
 
 
-  /* ===== Musique d'ambiance (synthèse WebAudio, aucun fichier) ===== */
-  const Music = (() => {
-    const BEAT = 0.9; // secondes
-    const CHORDS = [
-      [146.83, 174.61, 220], [116.54, 146.83, 174.61], [130.81, 164.81, 196], [110, 130.81, 164.81],
-      [146.83, 174.61, 220], [98, 116.54, 146.83], [130.81, 164.81, 196], [146.83, 174.61, 220]
-    ];
-    const MEL = [261.63, 293.66, 329.63, 349.23, 392, 440, 523.25, 587.33];
-    let on = false, master = null, drone = [], echo = null, timer = null, nextT = 0, step = 0, chord = 0;
+  /* ===== Musique d'ambiance : une ambiance par thème (synthèse WebAudio, aucun fichier) ===== */
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const Z = Array(16).fill(0);
+  const pat = (obj) => { const a = Z.slice(); Object.keys(obj).forEach((k) => (a[k] = obj[k])); return a; };
+  const THEMES = {
+    // Moines : la mélodie d'origine
+    moines: { beat: 0.9, chords: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 48, 52], [50, 53, 57], [43, 46, 50], [48, 52, 55], [50, 53, 57]], mel: [60, 62, 64, 65, 67, 69, 72, 74], pad: ["triangle", 900, 0.05], drone: [[38, 0.07], [45, 0.04]], k: pat({ 0: 0.2, 4: 0.09, 8: 0.09, 12: 0.09 }), t: Z, pl: { type: "triangle", decay: 1.4, vol: 0.07, p: [0.5, 0.18], chord: 0.65 } },
+    // Gaulois : flûte et bodhrán, mode mixolydien
+    gaule: { beat: 0.6, chords: [[50, 54, 57], [48, 52, 55], [43, 47, 50], [50, 54, 57], [45, 49, 52], [48, 52, 55], [43, 47, 50], [50, 54, 57]], mel: [62, 64, 66, 69, 71, 74, 76, 78], pad: ["sine", 700, 0.045], drone: [[38, 0.08], [45, 0.05]], k: pat({ 0: 0.16, 3: 0.1, 6: 0.12, 8: 0.14, 11: 0.1, 14: 0.08 }), t: Z, pl: { type: "triangle", decay: 0.9, vol: 0.065, p: [0.62, 0.3], chord: 0.4, vib: 1 } },
+    // Évangélisation : chant, quintes ouvertes, grande réverbération
+    evangelisation: { beat: 1.15, chords: [[50, 57, 62], [48, 55, 60], [46, 53, 58], [45, 52, 57], [50, 57, 62], [43, 50, 55], [45, 52, 57], [50, 57, 62]], mel: [62, 64, 65, 67, 69, 72, 74], pad: ["sine", 1100, 0.06], drone: [[38, 0.06]], k: Z, t: Z, pl: { type: "sine", decay: 3, vol: 0.06, p: [0.3, 0.05], chord: 0.5, voice: 1 }, fb: 0.5 },
+    // Carolingiens : cuivres lents, marche solennelle
+    carolingiens: { beat: 1.0, chords: [[48, 52, 55], [43, 47, 50], [45, 48, 52], [41, 45, 48], [48, 52, 55], [43, 47, 50], [41, 45, 48], [48, 52, 55]], mel: [60, 62, 64, 67, 69, 72, 74, 76], pad: ["sawtooth", 650, 0.03], drone: [[36, 0.07], [43, 0.04]], k: pat({ 0: 0.22, 8: 0.16 }), t: Z, pl: { type: "triangle", decay: 1.6, vol: 0.06, p: [0.4, 0.1], chord: 0.8 } },
+    // Chevaliers : luth héroïque, arpèges
+    chevaliers: { beat: 0.65, chords: [[43, 47, 50], [41, 45, 48], [48, 52, 55], [50, 54, 57], [43, 47, 50], [40, 43, 47], [48, 52, 55], [50, 54, 57]], mel: [67, 69, 71, 72, 74, 76, 79], pad: ["sine", 800, 0.03], drone: [[31, 0.06]], k: pat({ 0: 0.12, 8: 0.1 }), t: pat({ 4: 0.04, 12: 0.04 }), pl: { type: "triangle", decay: 0.75, vol: 0.075, p: [0.85, 0.5], chord: 1, arp: 1 } },
+    // Croisades : gamme orientale (hijaz), luth oriental et darbouka
+    croisades: { beat: 0.55, chords: [[50, 54, 57], [51, 55, 58], [50, 54, 57], [48, 51, 55], [50, 54, 57], [51, 55, 58], [48, 51, 55], [50, 54, 57]], mel: [62, 63, 66, 67, 69, 70, 72, 74, 75, 78], pad: ["sawtooth", 520, 0.022], drone: [[38, 0.09], [45, 0.05]], k: pat({ 0: 0.18, 6: 0.14, 8: 0.18, 14: 0.12 }), t: pat({ 2: 0.1, 4: 0.1, 10: 0.1, 12: 0.1, 15: 0.07 }), pl: { type: "sawtooth", cut: 2400, decay: 0.7, vol: 0.05, p: [0.7, 0.45], chord: 0.2, slide: 1 } },
+    // Capétiens : orgue gothique et harpe
+    capetiens: { beat: 1.0, chords: [[45, 48, 52], [41, 45, 48], [43, 47, 50], [40, 43, 47], [45, 48, 52], [38, 41, 45], [40, 44, 47], [45, 48, 52]], mel: [64, 67, 69, 71, 72, 74, 76, 79], pad: ["sawtooth", 480, 0.03], drone: [[33, 0.08], [40, 0.05]], k: pat({ 0: 0.15 }), t: Z, pl: { type: "sine", decay: 1.8, vol: 0.075, p: [0.45, 0.12], chord: 0.4 }, fb: 0.45 },
+    // Renaissance : luth et danse (pavane)
+    renaissance: { beat: 0.75, chords: [[41, 45, 48], [46, 50, 53], [48, 52, 55], [41, 45, 48], [38, 41, 45], [46, 50, 53], [48, 52, 55], [41, 45, 48]], mel: [65, 67, 69, 70, 72, 74, 77], pad: ["sine", 900, 0.03], drone: [], k: Z, t: pat({ 4: 0.035, 12: 0.035 }), pl: { type: "square", cut: 2000, decay: 0.55, vol: 0.07, p: [0.75, 0.55], chord: 1, arp: 1 } },
+    // Grand Siècle : clavecin baroque et cordes
+    "grand-siecle": { beat: 0.6, chords: [[50, 54, 57], [45, 49, 52], [47, 50, 54], [43, 47, 50], [50, 54, 57], [40, 43, 47], [45, 49, 52], [50, 54, 57]], mel: [66, 69, 71, 73, 74, 76, 78, 81], pad: ["sawtooth", 1100, 0.018], drone: [], k: Z, t: Z, pl: { type: "sawtooth", cut: 2600, decay: 0.45, vol: 0.07, p: [0.9, 0.7], chord: 1, arp: 1 } },
+    // Révolution : tambours de marche, tension
+    revolution: { beat: 0.5, chords: [[45, 48, 52], [40, 44, 47], [45, 48, 52], [41, 45, 48], [40, 44, 47], [45, 48, 52], [38, 41, 45], [40, 44, 47]], mel: [69, 71, 72, 74, 76, 77, 80], pad: ["sawtooth", 500, 0.022], drone: [[33, 0.09]], k: pat({ 0: 0.2, 8: 0.2 }), t: pat({ 0: 0.12, 2: 0.07, 3: 0.07, 4: 0.12, 6: 0.07, 8: 0.12, 10: 0.07, 11: 0.07, 12: 0.12, 14: 0.07, 15: 0.09 }), pl: { type: "sawtooth", cut: 1500, decay: 0.5, vol: 0.04, p: [0.3, 0.1], chord: 0.5 } },
+    // Empire : épopée, timbales et cuivres
+    empire: { beat: 0.7, chords: [[50, 53, 57], [46, 50, 53], [53, 57, 60], [48, 52, 55], [50, 53, 57], [46, 50, 53], [45, 49, 52], [50, 53, 57]], mel: [62, 65, 69, 72, 74, 77, 81], pad: ["sawtooth", 800, 0.035], drone: [[26, 0.08], [38, 0.05]], k: pat({ 0: 0.24, 4: 0.12, 8: 0.18, 12: 0.12 }), t: pat({ 4: 0.07, 12: 0.07 }), pl: { type: "triangle", decay: 1.1, vol: 0.06, p: [0.35, 0.12], chord: 0.9 } },
+    // Trésor (tous thèmes) : pulsation de suspense
+    tresor: { beat: 0.8, chords: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52], [50, 53, 57], [43, 46, 50], [48, 52, 55], [45, 49, 52]], mel: [62, 65, 69, 72, 74, 77], pad: ["triangle", 700, 0.04], drone: [[38, 0.08]], k: pat({ 0: 0.2, 3: 0.12, 8: 0.14, 11: 0.1 }), t: pat({ 4: 0.03, 12: 0.03 }), pl: { type: "triangle", decay: 1.2, vol: 0.065, p: [0.35, 0.15], chord: 0.8 }, bass: 1 }
+  };
 
-    function ensure() {
-      if (!AC) return null;
-      if (!ctx) ctx = new AC();
-      return ctx;
-    }
+  const Music = (() => {
+    let on = false, theme = "", cfg = null, master = null, drone = [], echo = null, timer = null, nextT = 0, step = 0, chord = 0, noiseBuf = null;
+
+    function ensure() { if (!AC) return null; if (!ctx) ctx = new AC(); return ctx; }
     const osc = (type, f, t0, t1, gain, dest, detune = 0) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.type = type; o.frequency.value = f; o.detune.value = detune;
@@ -218,14 +238,19 @@
       o.connect(g).connect(dest);
       o.start(t0); o.stop(t1 + 0.1);
     };
-    function pluck(f, t, vol) {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = "triangle"; o.frequency.value = f;
+    function pluck(f, t) {
+      const p = cfg.pl, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = p.type; o.frequency.value = f;
+      if (p.slide) { o.frequency.setValueAtTime(f * 0.94, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.07); }
+      if (p.vib) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = 5.2; lg.gain.value = f * 0.006; l.connect(lg).connect(o.frequency); l.start(t); l.stop(t + p.decay + 0.2); }
+      const att = p.voice ? 0.5 : 0.02;
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
-      o.connect(g); g.connect(master); g.connect(echo);
-      o.start(t); o.stop(t + 1.5);
+      g.gain.exponentialRampToValueAtTime(p.vol, t + att);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + p.decay + att);
+      let out = g;
+      if (p.cut) { const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = p.cut; g.connect(lp); out = lp; }
+      o.connect(g); out.connect(master); out.connect(echo);
+      o.start(t); o.stop(t + p.decay + att + 0.1);
     }
     function drum(t, vol) {
       const o = ctx.createOscillator(), g = ctx.createGain();
@@ -233,48 +258,61 @@
       g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
       o.connect(g).connect(master); o.start(t); o.stop(t + 0.55);
     }
+    function tek(t, vol) {
+      if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+      const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      src.buffer = noiseBuf; f.type = "bandpass"; f.frequency.value = 3200; f.Q.value = 0.8;
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      src.connect(f).connect(g).connect(master); src.start(t); src.stop(t + 0.15);
+    }
     function schedule() {
-      if (!on || !ctx) return;
+      if (!on || !ctx || !cfg) return;
+      const B = cfg.beat;
       while (nextT < ctx.currentTime + 0.8) {
         const t = nextT, k = step % 16;
         if (k === 0) {
-          const c = CHORDS[chord % CHORDS.length];
-          const len = BEAT * 8;
-          const pad = ctx.createBiquadFilter(); pad.type = "lowpass"; pad.frequency.value = 900; pad.connect(master);
-          c.forEach((f, i) => { osc("triangle", f, t, t + len + 1.5, 0.05, pad, -6 + i * 6); osc("sine", f * 2, t, t + len + 1.5, 0.012, pad); });
+          const c = cfg.chords[chord % cfg.chords.length];
+          const len = B * 8;
+          const pad = ctx.createBiquadFilter(); pad.type = "lowpass"; pad.frequency.value = cfg.pad[1]; pad.connect(master);
+          c.forEach((m, i) => { osc(cfg.pad[0], mtof(m), t, t + len + 1.5, cfg.pad[2], pad, -6 + i * 6); osc("sine", mtof(m) * 2, t, t + len + 1.5, cfg.pad[2] * 0.25, pad); });
           chord++;
         }
-        if (k % 4 === 0) drum(t, k === 0 ? 0.2 : 0.09);
-        const strong = k % 2 === 0;
-        if (Math.random() < (strong ? 0.5 : 0.18)) {
-          const tones = CHORDS[(chord - 1 + CHORDS.length) % CHORDS.length].map((f) => f * 2);
-          const pool = Math.random() < 0.65 ? tones : MEL;
-          pluck(pool[Math.floor(Math.random() * pool.length)], t, 0.07);
+        if (cfg.k[k]) drum(t, cfg.k[k]);
+        if (cfg.t[k]) tek(t, cfg.t[k]);
+        if (cfg.bass && k % 2 === 0) { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = mtof(cfg.chords[(chord - 1 + 8) % 8][0] - 12); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.1, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + B * 0.9); o.connect(g).connect(master); o.start(t); o.stop(t + B); }
+        const pl = cfg.pl, strong = k % 2 === 0;
+        if (Math.random() < (strong ? pl.p[0] : pl.p[1])) {
+          const tones = cfg.chords[(chord - 1 + 8) % 8].map((m) => mtof(m + 12));
+          let f;
+          if (pl.arp) f = tones[(k / 2 | 0) % 3] * (k % 8 >= 4 ? 2 : 1);
+          else f = Math.random() < pl.chord ? tones[Math.floor(Math.random() * 3)] : mtof(cfg.mel[Math.floor(Math.random() * cfg.mel.length)]);
+          pluck(f, t);
         }
-        step++; nextT += BEAT / 2;
+        step++; nextT += B / 2;
       }
     }
-    function start() {
+    function start(id) {
       if (on || !ensure()) return;
+      cfg = THEMES[id] || THEMES.moines; theme = id;
       try {
         if (ctx.state === "suspended") ctx.resume();
         on = true;
         master = ctx.createGain(); master.gain.setValueAtTime(0.0001, ctx.currentTime);
         master.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 3);
         master.connect(ctx.destination);
-        echo = ctx.createDelay(1); echo.delayTime.value = BEAT * 0.75;
-        const fb = ctx.createGain(); fb.gain.value = 0.38;
+        echo = ctx.createDelay(1); echo.delayTime.value = cfg.beat * 0.75;
+        const fb = ctx.createGain(); fb.gain.value = cfg.fb || 0.38;
         const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
         echo.connect(lp); lp.connect(fb); fb.connect(echo); lp.connect(master);
         const dl = ctx.createBiquadFilter(); dl.type = "lowpass"; dl.frequency.value = 420; dl.connect(master);
-        drone = [[73.42, 0.07], [110, 0.04]].map(([f, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.value = v; o.connect(g).connect(dl); o.start(); return o; });
+        drone = cfg.drone.map(([m, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = mtof(m); g.gain.value = v; o.connect(g).connect(dl); o.start(); return o; });
         step = 0; chord = 0; nextT = ctx.currentTime + 0.2;
         timer = setInterval(schedule, 200); schedule();
       } catch (e) { on = false; }
     }
     function stop() {
       if (!on) return;
-      on = false; clearInterval(timer);
+      on = false; clearInterval(timer); theme = "";
       const m = master, d = drone;
       try {
         m.gain.cancelScheduledValues(ctx.currentTime);
@@ -288,7 +326,7 @@
       if (!ctx) return;
       if (document.hidden) { try { ctx.suspend(); } catch (e) {} } else if (on) { try { ctx.resume(); } catch (e) {} }
     });
-    return { sync: (wanted) => (wanted ? start() : stop()) };
+    return { sync: (wanted, id) => { if (!wanted) return stop(); if (on && theme !== id) stop(); start(id); }, themes: () => Object.keys(THEMES) };
   })();
 
   window.HistoriaArt = Object.assign(window.HistoriaArt || {}, { scene, ICONS_EXTRA, play, confetti, music: Music });
