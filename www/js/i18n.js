@@ -17,7 +17,7 @@
 
   // Chargement du contenu dans la bonne langue (les scripts s'exécutent dans l'ordre).
   var dir = lang === "en" ? "js/eras/en/" : "js/eras/";
-  var EN_READY = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers"]; // époques déjà traduites en anglais
+  var EN_READY = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades"]; // époques déjà traduites en anglais
   IDS.forEach(function (id) { if (lang === "en" && EN_READY.indexOf(id) < 0) return; document.write('<script src="' + dir + id + '.js" onerror="void 0"><\/script>'); });
 
   if (lang !== "en") return;
