@@ -148,14 +148,26 @@
       }
     }
   }
+  /* La réponse d'une question facile (et un mot de la question) doivent figurer dans la fiche du chapitre. */
+  const LESSON_NORM = new WeakMap();
+  const normTxt = (t) => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’']/g, " ").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const STOPW = new Set("le la les l un une des du de d au aux et en a the of ou an in on to is was".split(" "));
+  const keyWords = (t) => normTxt(t).split(" ").filter((w) => w && !STOPW.has(w));
+  const inLesson = (x, lv) => {
+    let txt = LESSON_NORM.get(lv);
+    if (!txt) { txt = " " + normTxt(JSON.stringify(lv.lesson) + " " + JSON.stringify(lv.items)) + " "; LESSON_NORM.set(lv, txt); }
+    const a = keyWords(x.d.c);
+    if (!a.length || !a.every((w) => txt.includes(w))) return false;
+    return keyWords(x.d.q).some((w) => w.length >= 5 && txt.includes(w));
+  };
   const levelItems = (e, i) => {
     const lv = e.levels[i];
     const items = shuffle(lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title)));
     // Pour varier d'une partie à l'autre : jusqu'à 6 questions de la fiche sont remplacées par des questions simples de la même époque.
     try {
-      const hand = easyList().filter((x) => x.era === e.id && !isGen(x));
-      // d'abord les questions de ce chapitre, puis celles des chapitres voisins, puis le reste de l'époque
-      const near = shuffle(hand.filter((x) => x.lv === i)).concat(shuffle(hand.filter((x) => x.lv !== undefined && x.lv !== i && Math.abs(x.lv - i) <= 1)), shuffle(hand.filter((x) => x.lv === undefined)));
+      // Seules les questions dont la réponse se trouve dans la fiche (le cours) de ce chapitre peuvent être ajoutées.
+      const hand = easyList().filter((x) => x.era === e.id && !isGen(x) && inLesson(x, lv));
+      const near = shuffle(hand.filter((x) => x.lv === i)).concat(shuffle(hand.filter((x) => x.lv !== i)));
       const swap = near.slice(0, 6);
       const slots = shuffle(items.map((it, k) => (it.type === "qcm" ? k : -1)).filter((k) => k >= 0)).slice(0, swap.length);
       slots.forEach((k, n) => { items[k] = prep("qcm", swap[n].d, swap[n].key, e.title, lv.title); });

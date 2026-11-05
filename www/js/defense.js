@@ -27,15 +27,30 @@
     var best = 0;
 
     function reset() {
-      st = { y: 250, vy: 0, score: 0, over: false, started: false, scroll: 0, pipes: [], next: 330, parts: [], banner: null, shake: 0, flash: 0, endT: 0, rot: 0, flap: 0 };
+      st = { y: Math.round(GY * 0.5), vy: 0, score: 0, over: false, started: false, scroll: 0, pipes: [], next: 330, parts: [], banner: null, shake: 0, flash: 0, endT: 0, rot: 0, flap: 0 };
+      st.lastC = Math.round(GY * 0.5);
       addPipe(W + 120);
     }
     function addPipe(x) {
       var s = stageOf(st.score);
       var gap = Math.max(108, 172 - st.score * 0.55);
-      var top = 70 + Math.random() * (GY - 70 - gap - 70);
-      var amp = st.score < 25 ? 0 : Math.min(70, 14 + (st.score - 25) * 0.6);
-      st.pipes.push({ x: x, base: top, top: top, gap: gap, passed: false, st: s, flag: Math.random() < 0.5, amp: amp, ph: Math.random() * 6.28, fq: 1.2 + Math.min(st.score, 200) * 0.012 });
+      var speed = 118 + Math.min(st.score, 260) * 0.95;
+      var space = Math.max(165, 205 - st.score * 0.2);
+      var T = space / speed; // secondes entre deux portes
+      var fq = 1.2 + Math.min(st.score, 200) * 0.012;
+      var amp = st.score < 25 ? 0 : Math.min(70, 14 + (st.score - 25) * 0.6, 80 / fq);
+      var lo = 66 + gap / 2 + amp, hi = GY - 66 - gap / 2 - amp;
+      var c = lo + Math.random() * Math.max(0, hi - lo);
+      if (st.lastC != null) {
+        // la porte suivante doit rester atteignable : on borne le décalage vertical selon le temps disponible
+        var up = 70 * T, down = 150 * T;
+        var lim = Math.max(28, Math.min(150, T * 100));
+        c = Math.max(st.lastC - Math.min(up, lim) , Math.min(st.lastC + Math.min(down, lim), c));
+        c = Math.max(lo, Math.min(hi, c));
+      }
+      st.lastC = c;
+      var top = c - gap / 2;
+      st.pipes.push({ x: x, base: top, top: top, gap: gap, passed: false, st: s, amp: amp, ph: Math.random() * 6.28, fq: fq });
     }
     function flap() {
       if (dead) return;
@@ -89,7 +104,7 @@
         return;
       }
       var speed = 118 + Math.min(st.score, 260) * 0.95;
-      if (!st.started) { st.y = 250 + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
+      if (!st.started) { st.y = Math.round(GY * 0.5) + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
       st.vy += 15 * dt * 1.0; if (st.vy > 9) st.vy = 9;
       st.y += st.vy * 60 * dt * 0.62;
       st.rot = Math.max(-0.45, Math.min(0.7, st.vy * 0.07));
