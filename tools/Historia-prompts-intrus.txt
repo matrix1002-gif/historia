@@ -1,0 +1,23 @@
+PROMPTS « TROUVE LES INTRUS » — à coller dans l'IA d'images (une image par scène, format 16:10 ou 3:2, paysage).
+Astuce : demande l'intrus dans le prompt, puis, s'il est mal placé ou trop visible, retouche l'image avec « ajoute un petit smartphone… ».
+Style : peinture à l'huile du XVIe siècle façon Bruegel l'Ancien, très détaillée, foule dense, couleurs chaudes.
+
+1. FÊTE DE VILLAGE
+"Grande peinture à l'huile dans le style de Pieter Bruegel l'Ancien : une fête de village médiévale, des dizaines de paysans qui dansent, mangent et boivent autour de longues tables, taverne, chiens, enfants, musiciens avec cornemuses, détails minuscules partout, lumière d'été. Cachée discrètement dans la foule, une petite canette de soda rouge posée sur un banc, une paysanne qui regarde un smartphone, et un homme avec des lunettes de soleil. Les objets modernes sont petits et bien camouflés."
+
+2. SIÈGE DU CHÂTEAU
+"Peinture historique du XVe siècle, siège d'un château fort, armées, tentes, catapultes, chevaliers en armure, drapeaux, fumée, ciel dramatique, grand format très détaillé. Discrètement cachés : un cône de chantier orange au pied d'une tente, un avion de ligne minuscule dans le ciel, un soldat qui prend une photo avec un appareil photo moderne."
+
+3. MARCHÉ MÉDIÉVAL
+"Peinture à l'huile d'un grand marché médiéval sur la place d'une ville, étals de fruits, de poissons et d'étoffes, marchands, enfants, charrettes, cathédrale en arrière-plan, style des manuscrits enluminés et de Bruegel, foule dense. Cachés et petits : un panneau de signalisation STOP accroché à une maison, un marchand qui tient un sac plastique, une bouteille d'eau en plastique sur un étal."
+
+4. SCRIPTORIUM DE L'ABBAYE
+"Peinture à l'huile d'un scriptorium d'abbaye, une douzaine de moines copistes à leurs pupitres, parchemins, encriers, bibliothèque, vitraux, lumière dorée, très détaillé. Cachés : un ordinateur portable ouvert sur un pupitre au fond, une ampoule électrique suspendue parmi les chandeliers, un moine avec un casque audio."
+
+5. COURONNEMENT À LA CATHÉDRALE
+"Peinture de style Renaissance : le sacre d'un roi dans une cathédrale gothique, foule de nobles, évêques, soldats, tapis rouge, vitraux, étendards, grande profondeur. Cachés : une télécommande de télévision posée sur un banc, une montre-bracelet au poignet d'un noble, un drone minuscule au plafond."
+
+6. PORT ET NAVIRES (grandes découvertes)
+"Peinture à l'huile d'un port du XVIe siècle, caravelles, dockers qui chargent des tonneaux, marchands, mouettes, entrepôts, foule dense, lumière du matin. Cachés : une bouée de piscine gonflable, un skateboard appuyé contre un mur, un panneau 'WIFI'."
+
+Où générer gratuitement : Gemini (ImageFX / « Créer une image »), Microsoft Designer / Bing Image Creator (Copilot), Leonardo.ai (quota quotidien gratuit), Ideogram (quota gratuit). Les IA placent mal les petits objets précis : génère la peinture, puis ajoute chaque intrus par retouche (« ajoute… dans le même style »).

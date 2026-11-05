@@ -282,10 +282,73 @@
 
   // Questions de culture générale, faciles : on peut y répondre sans avoir lu les fiches.
   let EASY_LIST = null;
+  const easyEra = (y) => (y <= 475 ? "gaule" : y <= 750 ? "evangelisation" : y <= 986 ? "carolingiens" : y <= 1095 ? "moines" : y <= 1291 ? "croisades" : y <= 1328 ? "capetiens" : y <= 1453 ? "chevaliers" : y <= 1588 ? "renaissance" : y <= 1714 ? "grand-siecle" : y <= 1799 ? "revolution" : "empire");
+  const centTxt = (c, bc) => (EN ? `${c}${c % 10 === 1 && c !== 11 ? "st" : c % 10 === 2 && c !== 12 ? "nd" : c % 10 === 3 && c !== 13 ? "rd" : "th"} century${bc ? " BC" : ""}` : `${toRoman(c)}${c === 1 ? "er" : "e"} siècle${bc ? " av. J.-C." : ""}`);
+  const periodOf = (y) => (y < 477 ? 0 : y < 1492 ? 1 : y < 1789 ? 2 : 3);
+  const PERIODS = () => [L2("Antiquité", "Antiquity"), L2("Moyen Âge", "Middle Ages"), L2("Temps modernes", "Early modern era"), L2("Époque contemporaine", "Modern era")];
+  /* Questions fabriquées à partir des personnages et événements du jour : plus de 1 800 questions supplémentaires. */
+  function genEasy() {
+    const maps = dailyMaps();
+    const F = Object.keys(maps.f).sort().map((k) => ({ k, t: maps.f[k][0], name: maps.f[k][1], y: Number(maps.f[k][2]), text: maps.f[k][3] || "", more: maps.m[k] || "" })).filter((f) => f.name && !isNaN(f.y));
+    const S2 = Object.keys(maps.s).sort().map((k) => ({ k, name: maps.s[k][0] })).filter((x) => x.name);
+    let seed = 7;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+    const pick = (arr, n, bad) => { const pool = arr.filter((x) => !bad(x)); const out = []; const used = new Set(); let g = 0; while (out.length < n && g++ < 400) { const x = pool[Math.floor(rnd() * pool.length)]; const id = typeof x === "string" ? x : x.name; if (!used.has(id)) { used.add(id); out.push(x); } } return out; };
+    const leaks = (f, txt) => { const low = txt.toLowerCase(); return f.name.toLowerCase().split(/[\s'’«»,.()-]+/).some((w) => w.length >= 5 && low.includes(w)); };
+    const out = [];
+    const add = (f, q, c, w, e, tag) => { if (w.length === 3 && new Set([c, ...w]).size === 4) out.push({ era: easyEra(f.y), d: { q, c, w, e }, key: `easy:${tag}:${f.k}` }); };
+    const when = (f) => { const y = fmtYear(f.y); return f.t === "n" ? L2(`né en ${y}`, `born in ${y}`) : f.t === "m" ? L2(`mort en ${y}`, `died in ${y}`) : L2(`en ${y}`, `in ${y}`); };
+    const info = (f) => `${f.name} (${when(f)}). ${f.text}`;
+    const same = (f) => (g) => g.k === f.k || g.name === f.name || (f.t === "e") !== (g.t === "e");
+    F.forEach((f) => {
+      const isEv = f.t === "e";
+      const who = isEv ? L2("De quel événement s'agit-il ?", "Which event is this?") : L2("De quel personnage s'agit-il ?", "Which historical figure is this?");
+      // A et D : retrouver le nom à partir d'un indice
+      [["a", f.text], ["d", f.more]].forEach(([tag, txt]) => {
+        if (!txt || leaks(f, txt)) return;
+        add(f, `${who} « ${txt} »`, f.name, pick(F, 3, same(f)).map((x) => x.name), info(f), tag);
+      });
+      // B : le siècle
+      const bc = f.y < 0, c = Math.ceil(Math.abs(f.y) / 100);
+      const cs = new Set([c]); const around = [c - 2, c - 1, c + 1, c + 2, c + 3, c - 3].filter((v) => v >= 1 && (bc || v <= 21)); 
+      while (cs.size < 4 && around.length) cs.add(around.splice(Math.floor(rnd() * around.length), 1)[0]);
+      if (cs.size === 4) {
+        const qq = f.t === "n" ? L2(`Dans quel siècle est né ${f.name} ?`, `In which century was ${f.name} born?`) : f.t === "m" ? L2(`Dans quel siècle est mort ${f.name} ?`, `In which century did ${f.name} die?`) : L2(`Dans quel siècle se situe « ${f.name} » ?`, `In which century did “${f.name}” take place?`);
+        add(f, qq, centTxt(c, bc), [...cs].filter((v) => v !== c).map((v) => centTxt(v, bc)), info(f), "b");
+      }
+      // C : la période
+      const yy = Math.abs(f.y - 476) <= 6 || Math.abs(f.y - 1492) <= 3 || Math.abs(f.y - 1789) <= 3;
+      if (!yy) {
+        const P = PERIODS(), pi = periodOf(f.y);
+        const qq = f.t === "n" ? L2(`À quelle période appartient la naissance de ${f.name} ?`, `Which period does the birth of ${f.name} belong to?`) : f.t === "m" ? L2(`À quelle période meurt ${f.name} ?`, `In which period did ${f.name} die?`) : L2(`À quelle période appartient « ${f.name} » ?`, `Which period does “${f.name}” belong to?`);
+        add(f, qq, P[pi], P.filter((_, i) => i !== pi), info(f), "c");
+      }
+      // G : lequel a vécu à telle époque ?
+      if (!isEv && !yy) {
+        const cl = (g) => Math.ceil(Math.abs(g.y) / 100) * (g.y < 0 ? -1 : 1);
+        const ws = pick(F, 3, (g) => g.t === "e" || g.name === f.name || Math.abs(cl(g) - cl(f)) < 2);
+        const ct = centTxt(c, bc);
+        add(f, f.t === "n" ? L2(`Lequel de ces personnages est né au ${ct} ?`, `Which of these figures was born in the ${ct}?`) : L2(`Lequel de ces personnages est mort au ${ct} ?`, `Which of these figures died in the ${ct}?`), f.name, ws.map((g) => g.name), info(f), "g");
+      }
+      // E : l'année
+      const ys = pick(F, 3, (g) => (g.t === "e") !== isEv || g.y === f.y || Math.abs(g.y - f.y) < 8);
+      const qy = f.t === "n" ? L2(`En quelle année est né ${f.name} ?`, `In which year was ${f.name} born?`) : f.t === "m" ? L2(`En quelle année est mort ${f.name} ?`, `In which year did ${f.name} die?`) : L2(`En quelle année a lieu « ${f.name} » ?`, `In which year did “${f.name}” happen?`);
+      add(f, qy, fmtYear(f.y), ys.map((g) => fmtYear(g.y)), info(f), "e");
+    });
+    // F : le saint du jour
+    S2.forEach((x) => {
+      const [mm, dd] = x.k.split("-").map(Number);
+      const dt = EN ? `${MONTHS[mm - 1]} ${dd}` : `${dd === 1 ? "1er" : dd} ${MONTHS[mm - 1]}`;
+      const w = pick(S2, 3, (g) => g.name === x.name);
+      if (w.length === 3 && new Set([x.name, ...w.map((g) => g.name)]).size === 4) out.push({ era: "moines", d: { q: L2(`Quel saint fête-t-on le ${dt} ?`, `Which saint is celebrated on ${dt}?`), c: x.name, w: w.map((g) => g.name), e: L2(`Le ${dt}, on fête ${x.name}.`, `On ${dt}, the church celebrates ${x.name}.`) }, key: `easy:f:${x.k}` });
+    });
+    return out;
+  }
   const easyList = () => {
     if (EASY_LIST) return EASY_LIST;
     EASY_LIST = String(window.HISTORIA_EASY || "").split("\n").map((l) => l.split("|")).filter((p) => p.length === 7 && eraById(p[0]))
       .map((p, i) => ({ era: p[0], d: { q: p[1], c: p[2], w: [p[3], p[4], p[5]], e: p[6] }, key: `easy:${p[0]}:${i}` }));
+    try { EASY_LIST = EASY_LIST.concat(genEasy().filter((x) => eraById(x.era))); } catch (err) { /* les questions faites à la main suffisent */ }
     return EASY_LIST;
   };
   const easyPool = (scope) => easyList().filter((x) => !scope || scope === "all" || x.era === scope)
@@ -809,8 +872,9 @@
     const H = window.HistoriaIntrus;
     const sc = H.scenes[IN.i];
     const b = svg.getBoundingClientRect();
-    const x = ((ev.clientX - b.left) / b.width) * H.W;
-    const y = ((ev.clientY - b.top) / b.height) * H.H;
+    const SW = sc.w || H.W, SH = sc.h || H.H;
+    const x = ((ev.clientX - b.left) / b.width) * SW;
+    const y = ((ev.clientY - b.top) / b.height) * SH;
     let hit = -1, best = 1e9;
     sc.intruders.forEach((o, k) => {
       if (IN.found.includes(k)) return;
@@ -853,12 +917,12 @@
     const sc = H.scenes[IN.i];
     const total = sc.intruders.length;
     const rings = IN.found.map((k) => { const o = sc.intruders[k]; return `<circle class="in-ring" cx="${o.x}" cy="${o.y}" r="${o.r}"/>`; }).join("");
-    const hint = IN.hint !== null ? (() => { const o = sc.intruders[IN.hint]; return `<circle class="in-hint" cx="${o.x}" cy="${o.y}" r="${o.r + 26}"/>`; })() : "";
+    const hint = IN.hint !== null ? (() => { const o = sc.intruders[IN.hint]; return `<circle class="in-hint" cx="${o.x}" cy="${o.y}" r="${Math.round(o.r * 2.2)}"/>`; })() : "";
     const flash = IN.flash ? `<g class="in-miss" transform="translate(${IN.flash.x} ${IN.flash.y})"><path d="M-7-7l14 14M7-7l-14 14"/></g>` : "";
     const top = `<div class="top"><button class="icon-btn" data-act="inquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title mz-title">${L2("Trouve les intrus", "Spot the Intruders")}</h1></div>`;
     const dots = sc.intruders.map((o, k) => `<span class="in-dot ${IN.found.includes(k) ? "on" : ""}"></span>`).join("");
     const hud = `<div class="in-hud"><span class="in-scene">${esc(tx(sc.title))}</span><span class="in-count" aria-live="polite">${dots}<b>${IN.found.length}/${total}</b></span></div>`;
-    const svg = `<svg class="in-svg" data-act="inclick" viewBox="0 0 ${H.W} ${H.H}" role="img" aria-label="${esc(tx(sc.title))}">${sc.draw()}${rings}${hint}${flash}</svg>`;
+    const svg = `<svg class="in-svg" data-act="inclick" viewBox="0 0 ${sc.w || H.W} ${sc.h || H.H}" role="img" aria-label="${esc(tx(sc.title))}">${sc.draw ? sc.draw() : `<image href="${esc(sc.img)}" width="${sc.w}" height="${sc.h}" preserveAspectRatio="xMidYMid slice"/>`}${rings}${hint}${flash}</svg>`;
     let body;
     if (IN.done && IN.pop === null) {
       const stars = IN.miss === 0 && !IN.hints ? 3 : IN.miss <= 3 ? 2 : 1;

@@ -154,3 +154,5 @@
 
   root.HistoriaIntrus = { scenes: SCENES, W: 400, H: 300 };
 })(typeof window !== "undefined" ? window : globalThis);
+
+/* Scènes en vraies images (peintures) : ajoutées par js/intrus-images.js, voir tools/README-intrus.md. */

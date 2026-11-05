@@ -965,7 +965,7 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .in-dot.on { background: #2e9e4f; border-color: #1f7a3a; }
 .in-frame { border: 3px solid var(--gold-500); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 14px rgba(60, 40, 10, 0.35); background: #000; line-height: 0; }
 .in-svg { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-.in-ring { fill: rgba(46, 158, 79, 0.18); stroke: #22c55e; stroke-width: 3.5; animation: in-pop 0.45s ease-out; transform-box: fill-box; transform-origin: center; }
+.in-ring { fill: rgba(46, 158, 79, 0.18); stroke: #22c55e; stroke-width: 3.5; vector-effect: non-scaling-stroke; animation: in-pop 0.45s ease-out; transform-box: fill-box; transform-origin: center; }
 .in-hint { fill: none; stroke: #fff; stroke-width: 2.5; stroke-dasharray: 6 5; animation: in-spin 1.2s ease-in-out infinite alternate; }
 .in-miss path { stroke: #d62828; stroke-width: 3.5; stroke-linecap: round; animation: in-fade 0.9s ease-out forwards; }
 @keyframes in-pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
