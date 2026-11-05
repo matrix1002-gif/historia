@@ -16,6 +16,8 @@
 
   function create(canvas, opt) {
     var FR = opt.lang !== "en";
+    H = Math.max(480, Math.min(800, Math.round(W * (window.innerHeight || 560) / (window.innerWidth || 360)))); GY = H - 70;
+    canvas.style.aspectRatio = W + " / " + H;
     var ctx = canvas.getContext("2d");
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = W * dpr; canvas.height = H * dpr;

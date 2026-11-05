@@ -962,3 +962,14 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .opt, .qopt { transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease; }
 .opt:active, .qopt:active { transform: scale(0.98); }
 @media (prefers-reduced-motion: reduce) { .screen, .eras > li, .today, .learn-head, .df-menu, .tresor-hero, .resume, .q-card, .df-menu::after, .df-menu-art, .df-card, .df-over { animation: none !important; } .btn, .era { transition: none; } }
+
+/* Jeu Conquête en plein écran */
+.dfscreen { position: fixed; inset: 0; z-index: 60; padding: 0 !important; margin: 0; background: #1b1626; display: flex; align-items: center; justify-content: center; animation: none; }
+.dfscreen .df-wrap { max-width: none; width: 100%; height: 100%; margin: 0; border: 0; border-radius: 0; box-shadow: none; display: flex; align-items: center; justify-content: center; }
+.dfscreen #df-canvas { height: 100vh; height: 100dvh; width: auto; max-width: 100vw; cursor: pointer; }
+.dfscreen .df-over { max-width: none; }
+.dfscreen .df-card { max-width: 440px; }
+.df-close { position: absolute; left: 10px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 5; background: rgba(30, 18, 6, 0.6); color: #f4e6c0; border-radius: 50%; }
+.dfscreen { display: block; }
+.dfscreen .df-wrap { position: absolute; inset: 0; }
+.dfscreen .df-close { position: absolute !important; left: 10px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; }

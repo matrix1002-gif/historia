@@ -681,7 +681,7 @@
     DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     DF.game.start();
   }
-  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><div class="top"><button class="icon-btn" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title">${L2("Conquête", "Conquest")}</h1></div>
+  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="icon-btn df-close" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button>
     <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : conquête de territoires", "Game: conquer territories")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function defenseCard() {
     const st = (S.stats && S.stats.defense) || { plays: 0, wins: 0, best: 0 };
