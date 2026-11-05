@@ -261,16 +261,17 @@
     tresor: { beat: 0.8, chords: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52], [50, 53, 57], [43, 46, 50], [48, 52, 55], [45, 49, 52]], mel: [62, 65, 69, 72, 74, 77], pad: ["triangle", 700, 0.04], drone: [[38, 0.08]], k: pat({ 0: 0.2, 3: 0.12, 8: 0.14, 11: 0.1 }), t: pat({ 4: 0.03, 12: 0.03 }), pl: { type: "triangle", decay: 1.2, vol: 0.065, p: [0.35, 0.15], chord: 0.8 }, bass: 1 }
   };
   // La Fuite : poursuite effrénée, tambours rapides, arpèges tendus
-  THEMES.fuite = { beat: 0.3, chords: [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52], [50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]], mel: [74, 77, 81, 82, 84], pad: ["sawtooth", 600, 0.02], drone: [[26, 0.09]], k: pat({ 0: 0.26, 4: 0.22, 8: 0.26, 10: 0.14, 12: 0.22 }), t: pat({ 2: 0.09, 6: 0.12, 7: 0.06, 10: 0.09, 14: 0.12, 15: 0.07 }), bass: 1, pl: { type: "sawtooth", cut: 2200, decay: 0.28, vol: 0.05, p: [0.95, 0.8], chord: 1, arp: 1 }, fb: 0.28,
-    lead: { type: "sawtooth", cut: 2600, att: 0.01, decay: 0.5, vol: 0.05, vib: 0.3, send: 0.3, bars: BARS(
-      "d5 . f5 . a5 . f5 . d5 . f5 a5 . g5 f5 .",
-      "bb4 . d5 . f5 . d5 . bb4 . d5 f5 . e5 d5 .",
-      "g4 . bb4 . d5 . bb4 . g5 . f5 d5 . bb4 d5 .",
-      "a4 . c#5 . e5 . a5 . g5 . e5 c#5 . e5 g5 .",
-      "d5 . f5 . a5 . d6 . c6 . a5 f5 . a5 c6 .",
-      "bb5 . a5 . f5 . d5 . f5 . a5 bb5 . a5 f5 .",
-      "g5 . f5 . e5 . d5 . c#5 . e5 g5 . a5 . .",
-      "a5 - - g5 e5 - c#5 - a4 . c#5 e5 a5 - - .") } };
+  // La Fuite : marche de fifres et tambours à la manière de 1789 (ré majeur, caisse claire, grosse caisse)
+  THEMES.fuite = { beat: 0.44, chords: [[50, 54, 57], [55, 59, 62], [50, 54, 57], [57, 61, 64], [50, 54, 57], [55, 59, 62], [57, 61, 64], [50, 54, 57]], mel: [74, 76, 78, 81], pad: ["sawtooth", 520, 0.02], drone: [[38, 0.06]], k: pat({ 0: 0.32, 4: 0.24, 8: 0.32, 12: 0.24 }), t: pat({ 2: 0.14, 3: 0.09, 6: 0.14, 7: 0.09, 10: 0.14, 11: 0.09, 14: 0.14, 15: 0.12 }), bass: 1, pl: { type: "triangle", decay: 0.2, vol: 0.03, p: [0, 0], chord: 1 }, fb: 0.1,
+    lead: { type: "square", cut: 3000, att: 0.006, decay: 0.26, vol: 0.034, vib: 0, send: 0.12, bars: BARS(
+      "d5 . d5 d5 f#5 - a5 - a5 - g5 f#5 e5 - d5 -",
+      "g5 . g5 g5 b5 - g5 - d5 - d5 e5 f#5 - g5 -",
+      "f#5 . f#5 f#5 a5 - f#5 - d5 - f#5 a5 d6 - - .",
+      "e5 . e5 e5 a5 - e5 - c#5 - e5 a5 g5 - e5 -",
+      "d6 . d6 d6 c#6 - a5 - b5 - a5 f#5 a5 - d6 -",
+      "b5 . b5 b5 d6 - b5 - g5 - b5 d6 g6 - - .",
+      "g5 . g5 f#5 e5 - e5 - f#5 - g5 a5 b5 - c#6 -",
+      "d6 - - . a5 - f#5 - d5 - . . d5 - - .") } };
   THEMES.modernes = Object.assign({}, THEMES.empire, { beat: 0.8, chords: [[52, 55, 59], [48, 52, 55], [50, 54, 57], [47, 50, 54], [52, 55, 59], [48, 52, 55], [45, 49, 52], [47, 51, 54]], mel: [64, 66, 69, 71, 73, 76, 78] });
 
   const Music = (() => {
