@@ -3,7 +3,7 @@
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;
   var STAGES = [
-    { at: 0, fr: "Campagne de Palestine", en: "Palestinian countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
+    { at: 0, fr: "Campagne de Terre sainte", en: "Holy Land countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
     { at: 20, fr: "Hameau", en: "Hamlet", sky: ["#9fd0ea", "#e8f3df"], far: "#8fb36f", mid: "#6f9a52", ground: ["#7fae52", "#5b8a3a"], pil: ["#b08a5a", "#8a6638", "#5e4220"], line: ["Quelques chaumières : le premier hameau est à toi !", "A few thatched huts: your first hamlet is yours!"] },
     { at: 45, fr: "Village", en: "Village", sky: ["#8ec6ee", "#eaf5e2"], far: "#7fa66a", mid: "#628f4d", ground: ["#78a64c", "#557f34"], pil: ["#c9a06a", "#9a7442", "#6a4a24"], line: ["Une église, un moulin : le village prospère.", "A church, a windmill: the village prospers."] },
     { at: 75, fr: "Bourg marchand", en: "Market town", sky: ["#86bfe8", "#f0f4e4"], far: "#8aa0b8", mid: "#6d86a0", ground: ["#7da04e", "#587a35"], pil: ["#b9b4a6", "#8f8a7c", "#615d52"], line: ["Remparts de bois et marché : un vrai bourg !", "Timber walls and a market: a proper town!"] },
@@ -145,7 +145,7 @@
         else if (s === 1) { house(30, GY, 34, 22, "#c9a77a", "#a6803f", "plain"); house(100, GY, 28, 18, "#c9a77a", "#a6803f", "plain"); tree(170, GY, 1, "#4f8a3a"); house(220, GY, 36, 24, "#c9a77a", "#a6803f", "plain"); tree(300, GY, 0.9, "#5a9a40"); }
         else if (s === 2) { house(20, GY, 40, 28, "#e6d3a8", "#9a3b2e", "timber"); rect(82, GY - 48, 26, 48, "#d9cdb4"); poly([80, GY - 48, 95, GY - 78, 110, GY - 48], "#6a4a3a"); house(130, GY, 38, 26, "#e6d3a8", "#9a3b2e", "timber"); rect(214, GY - 40, 8, 40, "#8a6a40"); ctx.strokeStyle = "#5a3d20"; ctx.lineWidth = 3; ctx.beginPath(); var a = t * 1.5; ctx.moveTo(218 - Math.cos(a) * 24, GY - 40 - Math.sin(a) * 24); ctx.lineTo(218 + Math.cos(a) * 24, GY - 40 + Math.sin(a) * 24); ctx.moveTo(218 - Math.sin(a) * 24, GY - 40 + Math.cos(a) * 24); ctx.lineTo(218 + Math.sin(a) * 24, GY - 40 - Math.cos(a) * 24); ctx.stroke(); house(270, GY, 40, 28, "#e6d3a8", "#9a3b2e", "timber"); }
         else if (s === 3) { house(10, GY, 40, 34, "#e0d2ac", "#8e3a2c", "timber"); house(62, GY, 36, 40, "#d8caa4", "#7a3328", "timber"); rect(120, GY - 56, 30, 56, "#bdb8aa"); poly([116, GY - 56, 135, GY - 90, 154, GY - 56], "#555a66"); house(176, GY, 44, 34, "#e0d2ac", "#8e3a2c", "timber"); rect(240, GY - 18, 70, 18, "#8a6638"); rect(244, GY - 34, 62, 16, "#c9503c"); rect(300, GY - 60, 8, 60, "#6a4a28"); }
-        else if (s === 4) { rect(0, GY - 54, 360, 54, "#a9a59a"); for (var i = 0; i < 18; i++) rect(i * 20 + 2, GY - 62, 12, 10, "#a9a59a"); tower(40, GY, 42, 100, "#b4b0a4", true); tower(250, GY, 44, 112, "#b4b0a4", false); house(130, GY - 54, 40, 30, "#d8caa4", "#8e3a2c", "stone"); house(190, GY - 54, 36, 24, "#d8caa4", "#7a3328", "stone"); }
+        else if (s === 4) { rect(0, GY - 54, 360, 54, "#a9a59a"); for (var i = 0; i < 18; i++) rect(i * 20 + 2, GY - 62, 12, 10, "#a9a59a"); tower(40, GY, 42, 100, "#b4b0a4", true); tower(250, GY, 44, 112, "#b4b0a4", true); house(130, GY - 54, 40, 30, "#d8caa4", "#8e3a2c", "stone"); house(190, GY - 54, 36, 24, "#d8caa4", "#7a3328", "stone"); }
         else if (s === 5) { rect(30, GY - 90, 290, 90, "#b9b4a8"); for (var j = 0; j < 14; j++) rect(30 + j * 21 + 2, GY - 100, 13, 11, "#b9b4a8"); tower(14, GY, 46, 140, "#a8a396", true); tower(300, GY, 46, 140, "#a8a396", true); rect(150, GY - 160, 60, 160, "#aeab9e"); for (var m = 0; m < 4; m++) rect(150 + m * 16, GY - 168, 11, 10, "#aeab9e"); poly([145, GY - 160, 180, GY - 214, 215, GY - 160], "#7a2a34"); rect(172, GY - 60, 16, 60, "#3a2e22"); rect(177, GY - 215, 2, 24, "#443"); poly([179, GY - 215, 196, GY - 208, 179, GY - 201], "#d9b13a"); }
         else { rect(0, GY - 40, 360, 40, "#d8c690"); for (var q = 0; q < 6; q++) { rect(q * 62 + 12, GY - 70, 34, 70, "#eadba8"); poly([q * 62 + 8, GY - 70, q * 62 + 29, GY - 104, q * 62 + 50, GY - 70], q % 2 ? "#9a2f3c" : "#2f5a9a"); rect(q * 62 + 28, GY - 128, 2, 24, "#443"); poly([q * 62 + 30, GY - 128, q * 62 + 44, GY - 122, q * 62 + 30, GY - 116], q % 2 ? "#d9b13a" : "#b02a37"); } rect(150, GY - 190, 62, 190, "#efe2b4"); poly([142, GY - 190, 181, GY - 262, 220, GY - 190], "#c9a24a"); rect(176, GY - 70, 12, 70, "#6a4a22"); ctx.fillStyle = "#6aa2e0"; ctx.beginPath(); ctx.arc(181, GY - 138, 12, 0, 7); ctx.fill(); }
         ctx.restore();
@@ -207,10 +207,6 @@
       }
       col(p.x, -4, 54, p.top + 4, true);
       col(p.x, p.top + p.gap, 54, GY - p.top - p.gap, false);
-      if (p.flag && s >= 2) {
-        var fy = p.top + p.gap - 38; rect(p.x + 26, fy, 2, 38, "#443");
-        poly([p.x + 28, fy, p.x + 46 + Math.sin(t * 6 + p.x) * 3, fy + 7, p.x + 28, fy + 14], s >= 5 ? "#d9b13a" : "#b02a37");
-      }
     }
     function drawKnight(x, y, rot, tier, flapK) {
       ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(0.92, 0.92);
