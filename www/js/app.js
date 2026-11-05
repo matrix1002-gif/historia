@@ -398,7 +398,7 @@
   window.addEventListener("popstate", (e) => {
     const st = e.state || { name: "home" };
     closeSheet();
-    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult") {
+    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "maze") {
       T = null;
       view = { name: "home" };
       history.replaceState({ name: "home" }, "");
@@ -430,22 +430,24 @@
   // Ambiance : la couleur de l'époque teinte tout l'écran.
   const setTint = () => {
     const eid = view.name === "era" || view.name === "lesson" ? view.id : view.name === "quiz" && Q && Q.eraId ? Q.eraId : view.name === "result" && R && R.eraId ? R.eraId : view.name === "tgame" && T && T.scope !== "all" ? T.scope : null;
-    const e = eid ? eraById(eid) : null;
+    const e = view.name === "maze" && M ? eraById(M.venue === "abbaye" ? "moines" : "chevaliers") : eid ? eraById(eid) : null;
     document.documentElement.style.setProperty("--tint", e ? e.accent : "#3456b2");
     document.documentElement.dataset.era = e ? e.scene : view.name === "tgame" || view.name === "tresor" || view.name === "tresult" ? "tresor" : "";
   };
 
   const render = () => {
+    if (view.name !== "maze") M = null;
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
-    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame"), view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
+    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || (view.name === "maze" && !!M)), view.name === "maze" ? (M && M.venue === "abbaye" ? "moines" : "chevaliers") : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
+    if (view.name === "maze" && M) return ($app.innerHTML = mazeScreen());
     if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
     if (view.name === "gallery") return ($app.innerHTML = withTabs(galleryScreen(), "gallery"));
     if (view.name === "medals") return ($app.innerHTML = withTabs(medalsScreen(), "medals"));
@@ -497,6 +499,251 @@
     return `<section class="books"><h2 class="section">Pour aller plus loin</h2>
       <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${esc(b.author)}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul>
       <p class="aff-note">${esc(A.disclosure())}</p></section>`;
+  }
+
+  /* ===== Personnage et saint du jour ===== */
+  const MONTHS = EN
+    ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    : ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+  const L2 = (fr, en) => (EN ? en : fr);
+  let DAILY_MAP = null;
+  const dailyMaps = () => {
+    if (DAILY_MAP) return DAILY_MAP;
+    const D = window.HISTORIA_DAILY || {};
+    const parse = (s) => { const o = {}; String(s || "").split("\n").forEach((l) => { const p = l.split("|"); if (p.length > 1) o[p[0]] = p.slice(1); }); return o; };
+    DAILY_MAP = { f: parse(D.figures), s: parse(D.saints) };
+    return DAILY_MAP;
+  };
+  const CROSS_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v18M6 9h12"/></svg>';
+  function todayCard() {
+    const now = new Date();
+    const key = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+    const maps = dailyMaps();
+    const f = maps.f[key];
+    const sn = maps.s[key];
+    if (!f && !sn) return "";
+    const day = now.getDate();
+    const dateTxt = EN ? `${MONTHS[now.getMonth()]} ${day}` : `${day === 1 ? "1er" : day} ${MONTHS[now.getMonth()]}`;
+    let fig = "";
+    if (f) {
+      const y = fmtYear(Number(f[2]));
+      const when = f[0] === "n" ? L2(`Né en ${y}`, `Born in ${y}`) : f[0] === "m" ? L2(`Mort en ${y}`, `Died in ${y}`) : L2(`En ${y}`, `In ${y}`);
+      fig = `<h2 class="today-name">${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p><p class="today-text">${esc(f[3])}</p>`;
+    }
+    const saint = sn ? `<p class="today-saint">${CROSS_ICO}<span>${L2("Saint du jour", "Saint of the day")} : <b>${esc(sn[0])}</b></span></p>` : "";
+    return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}</section>`;
+  }
+
+  /* ===== Le Labyrinthe du Temps ===== */
+  const MZ_MAX = 5;
+  const MZ_START = 3;
+  const MZ_XP = 25;
+  let M = null; // partie en cours
+
+  const MZ_ICO = {
+    heart: (on) => `<svg class="mz-heart ${on ? "on" : "off"}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9.2C1.2 8.6 3 5 6.5 5c2 0 3.5 1.1 5.5 3 2-1.9 3.5-3 5.5-3 3.500 0 5.300 3.600 3.800 6.800C19 16.400 12 21 12 21z"/></svg>`,
+    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="12" r="4"/><path d="M11.5 12H21M18 12v3.500M21 12v2.500"/></svg>',
+    door: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V10a7 7 0 0 1 14 0v11z"/><path d="M12 4v17M5 13h14"/><circle cx="15.500" cy="16.500" r=".9" fill="currentColor"/></svg>',
+    exit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V9.500L12 3l8 6.500V21z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10.500 11V9.500a1.500 1.500 0 0 1 3 0V11"/></svg>',
+    guard: ICONS.sword,
+    knight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21v-9a6 6 0 0 1 12 0v9z"/><path d="M6 13h12M12 13v8"/><path d="M12 6c0-2.500 2-3.500 5-3"/></svg>'
+  };
+
+  function mazePool() {
+    const pool = [];
+    playable.forEach((e) => e.levels.forEach((lv, i) => lv.items.forEach((d, k) => { if (d.type === "qcm" || d.type === "tf") pool.push([e, lv, d, `${e.id}:${i}:${k}`]); })));
+    return shuffle(pool);
+  }
+  function mazeNextQ() {
+    if (M.pi >= M.pool.length) { M.pool = mazePool(); M.pi = 0; }
+    const [e, lv, d, key] = M.pool[M.pi++];
+    return prep(d.type, d, key, e.title, lv.title);
+  }
+  const mazeReveal = () => {
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) M.seen.add(`${M.x + dx},${M.y + dy}`);
+  };
+  const refreshM = () => { const el = document.getElementById("maze-body"); if (el) el.innerHTML = mazeInner(); };
+
+  function startMaze(venue) {
+    if (!window.HistoriaMaze || !playable.length) return;
+    venue = venue === "abbaye" ? "abbaye" : "chateau";
+    S.stats.mazeVenue = venue;
+    save();
+    const map = window.HistoriaMaze.generate(Math.random, 5, 5, 8);
+    M = { venue, map, x: map.start.x, y: map.start.y, hp: MZ_START, key: false, seen: new Set(), cleared: new Set(), pool: mazePool(), pi: 0, q: null, msg: "", status: "play", steps: 0, right: 0, wrong: 0, bump: 0 };
+    mazeReveal();
+    sfx("tap");
+    go("maze", {}, view.name === "maze" ? "replace" : "push");
+  }
+
+  function mazeMove(dx, dy) {
+    if (!M || M.q || M.status !== "play") return;
+    const nx = M.x + dx;
+    const ny = M.y + dy;
+    const c = M.map.grid[ny] && M.map.grid[ny][nx];
+    if (!c) return;
+    if (!c.t) { M.msg = L2("Un mur de pierre. Cherche un autre passage.", "A stone wall. Look for another way."); M.bump++; buzz(12); refreshM(); return; }
+    const id = `${nx},${ny}`;
+    if ((c.o === "door" || c.o === "guard") && !M.cleared.has(id)) {
+      M.q = { x: nx, y: ny, kind: c.o, it: mazeNextQ(), pick: null, done: false, good: false, gain: false };
+      M.msg = "";
+      sfx("tap");
+      refreshM();
+      return;
+    }
+    M.x = nx; M.y = ny; M.steps++;
+    mazeReveal();
+    M.msg = "";
+    sfx("tap");
+    if (c.o === "key" && !M.key) { M.key = true; M.msg = L2("Tu trouves la clé ! Cherche maintenant la sortie.", "You found the key! Now look for the exit."); sfx("star"); buzz([20, 30, 40]); }
+    if (c.o === "exit") {
+      if (M.key) return endMaze(true);
+      M.msg = L2("La grande porte est verrouillée : il te faut la clé.", "The great door is locked: you need the key.");
+      buzz(20);
+    }
+    refreshM();
+  }
+
+  function mazeAnswer(pick) {
+    if (!M || !M.q || M.q.done) return;
+    const q = M.q;
+    const it = q.it;
+    q.done = true;
+    q.pick = pick;
+    q.good = it.type === "qcm" ? !!it.opts[pick].ok : it.a === pick;
+    if (q.good) {
+      q.gain = M.hp < MZ_MAX;
+      M.hp = Math.min(MZ_MAX, M.hp + 1);
+      M.cleared.add(`${q.x},${q.y}`);
+      M.right++;
+      sfx("good"); buzz(14);
+    } else {
+      M.hp -= 1;
+      M.wrong++;
+      sfx("bad"); buzz([30, 50, 30]);
+    }
+    refreshM();
+    const fb = document.getElementById("fb");
+    if (fb) fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function mazeContinue() {
+    if (!M || !M.q || !M.q.done) return;
+    const q = M.q;
+    if (M.hp <= 0) return endMaze(false);
+    if (q.good) { M.x = q.x; M.y = q.y; M.steps++; mazeReveal(); }
+    M.q = null;
+    refreshM();
+  }
+
+  function endMaze(win) {
+    M.status = win ? "won" : "lost";
+    M.q = null;
+    const st = (S.stats.maze = Object.assign({ plays: 0, wins: 0 }, S.stats.maze));
+    st.plays++;
+    if (win) { st.wins++; S.xp += MZ_XP; }
+    save();
+    sfx(win ? "fanfare" : "lose");
+    buzz(win ? [40, 30, 80] : [60, 40, 60]);
+    if (window.HistoriaAds) window.HistoriaAds.quizFinished();
+    refreshM();
+    if (win) Art.confetti();
+    window.scrollTo(0, 0);
+  }
+
+  function mazeScreen() { return `<div class="screen mzscreen" id="maze"><div id="maze-body">${mazeInner()}</div></div>`; }
+
+  function mazeGrid() {
+    const m = M.map;
+    let out = "";
+    for (let y = 0; y < m.h; y++) {
+      for (let x = 0; x < m.w; x++) {
+        const c = m.grid[y][x];
+        const id = `${x},${y}`;
+        const vis = M.seen.has(id);
+        let cls = "fog";
+        let inner = "";
+        if (vis) {
+          cls = c.t ? "wall" : "floor";
+          if (x === M.x && y === M.y) { cls += " me"; inner = MZ_ICO.knight; }
+          else if (c.t && c.o) {
+            if (c.o === "key") { if (!M.key) { cls += " o-key"; inner = MZ_ICO.key; } }
+            else if (c.o === "exit") { cls += " o-exit"; inner = MZ_ICO.exit; }
+            else if (M.cleared.has(id)) cls += " open";
+            else { cls += c.o === "door" ? " o-door" : " o-guard"; inner = c.o === "door" ? MZ_ICO.door : MZ_ICO.guard; }
+          }
+        }
+        out += `<div class="mz-c ${cls}">${inner}</div>`;
+      }
+    }
+    return `<div class="mz-grid mz-${M.venue} ${M.bump % 2 ? "bump-a" : "bump-b"}" style="--w:${m.w}" role="img" aria-label="${L2("Plan du labyrinthe", "Maze map")}">${out}</div>`;
+  }
+
+  function mazeQuestion() {
+    const q = M.q;
+    const it = q.it;
+    const castle = M.venue === "chateau";
+    const who = q.kind === "guard"
+      ? (castle ? L2("Un garde en armure te barre la route !", "An armoured guard blocks your way!") : L2("Un frère gardien te barre la route !", "A watchful brother blocks your way!"))
+      : (castle ? L2("Une lourde porte ferrée est verrouillée.", "A heavy iron-banded door is locked.") : L2("La porte du cloître est verrouillée.", "The cloister door is locked."));
+    let body;
+    if (it.type === "qcm") {
+      const Lt = ["A", "B", "C", "D"];
+      body = `<ul class="options">${it.opts.map((o, k) => {
+        let cls = "", mark = UI.check;
+        if (q.done) {
+          if (o.ok) cls = "correct";
+          else if (k === q.pick) { cls = "wrong"; mark = UI.cross; }
+          else cls = "dim";
+        }
+        return `<li><button class="opt ${cls}" data-act="mzpick" data-i="${k}" ${q.done ? "disabled" : ""}><span class="letter">${Lt[k]}</span><span>${esc(o.t)}</span>${mark}</button></li>`;
+      }).join("")}</ul>`;
+    } else {
+      const cls = (v) => (!q.done ? "" : it.a === v ? "correct" : q.pick === v ? "wrong" : "dim");
+      body = `<div class="tf"><button class="tf-btn ${cls(true)}" data-act="mzpick" data-v="1" ${q.done ? "disabled" : ""}>${L2("Vrai", "True")}</button><button class="tf-btn ${cls(false)}" data-act="mzpick" data-v="0" ${q.done ? "disabled" : ""}>${L2("Faux", "False")}</button></div>`;
+    }
+    let fb = "";
+    if (q.done) {
+      const ansTxt = it.type === "tf" ? (it.a ? L2("Vrai", "True") : L2("Faux", "False")) : it.ans;
+      const title = q.good ? (q.gain ? L2("Bonne réponse ! +1 point de vie", "Correct! +1 hit point") : L2("Bonne réponse !", "Correct!")) : L2("Mauvaise réponse ! −1 point de vie", "Wrong! −1 hit point");
+      const btn = M.hp <= 0 ? L2("Continuer", "Continue") : q.good ? L2("Avancer", "Move on") : L2("Reculer", "Step back");
+      fb = `<div class="feedback ${q.good ? "good" : "bad"}" id="fb"><h3>${title}</h3>${q.good ? "" : `<p>${L2("La bonne réponse", "The right answer")} : <b>${esc(ansTxt)}</b></p>`}${it.e ? `<p>${esc(it.e)}</p>` : ""}<button class="btn btn-gold" data-act="mzcont">${btn}</button></div>`;
+    }
+    return `<section class="mz-q"><p class="mz-who">${who}</p><h2 class="mz-qtext">${esc(it.q)}</h2>${body}${fb}</section>`;
+  }
+
+  function mazeEnd() {
+    const win = M.status === "won";
+    const castle = M.venue === "chateau";
+    const text = win
+      ? (castle ? L2("Tu as retrouvé la clé et franchi la grande porte : le soleil se lève sur les remparts.", "You found the key and passed through the great gate: the sun rises over the ramparts.")
+        : L2("Tu as retrouvé la clé et ouvert la porte de l'abbaye : l'air frais du matin te frappe le visage.", "You found the key and opened the abbey door: the cool morning air hits your face."))
+      : L2("Tes forces t'ont abandonné au fond des couloirs. Relis tes fiches et retente ta chance !", "Your strength gave out in the depths of the corridors. Review your lessons and try again!");
+    return `<section class="tresor-hero mz-end"><div class="coin">${win ? UI.seal : MZ_ICO.knight}</div>
+      <h1>${win ? L2("Tu t'es évadé !", "You escaped!") : L2("Fin de l'aventure", "End of the adventure")}</h1>
+      <p>${text}</p>
+      <p class="mz-sum"><b>${M.right}</b> ${L2(plural(M.right, "bonne réponse", "bonnes réponses"), plural(M.right, "right answer", "right answers"))} · <b>${M.wrong}</b> ${L2(plural(M.wrong, "erreur", "erreurs"), plural(M.wrong, "mistake", "mistakes"))} · <b>${M.steps}</b> ${L2("pas", "steps")}${win ? ` · <b>+${MZ_XP} XP</b>` : ""}</p></section>
+      <div class="stack"><button class="btn btn-gold" data-act="mzstart" data-v="${M.venue}">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="mzquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div>`;
+  }
+
+  function mazeInner() {
+    const top = `<div class="top"><button class="icon-btn" data-act="mzquit" aria-label="${L2("Quitter le labyrinthe", "Leave the labyrinth")}">${UI.close}</button><h1 class="page-title mz-title">${L2("Le Labyrinthe du Temps", "The Labyrinth of Time")}</h1></div>`;
+    if (M.status !== "play") return top + mazeEnd();
+    const hearts = Array.from({ length: MZ_MAX }, (_, i) => MZ_ICO.heart(i < M.hp)).join("");
+    const hud = `<div class="mz-hud"><span class="mz-hearts" role="img" aria-label="${M.hp} / ${MZ_MAX} ${L2("points de vie", "hit points")}">${hearts}</span><span class="mz-key ${M.key ? "on" : ""}">${MZ_ICO.key}<small>${M.key ? L2("Clé trouvée", "Key found") : L2("Clé à trouver", "Find the key")}</small></span></div>`;
+    const hint = M.msg || (M.key ? L2("Tu as la clé : trouve la sortie !", "You have the key: find the exit!") : L2("Trouve la clé, puis la sortie. Chaque porte et chaque garde pose une question.", "Find the key, then the exit. Every door and guard asks a question."));
+    const dir = (cls, dx, dy, label) => `<button class="${cls}" data-act="mzmove" data-dx="${dx}" data-dy="${dy}" aria-label="${label}">${UI.go}</button>`;
+    const pad = `<div class="mz-pad">${dir("up", 0, -1, L2("Haut", "Up"))}${dir("left", -1, 0, L2("Gauche", "Left"))}${dir("down", 0, 1, L2("Bas", "Down"))}${dir("right", 1, 0, L2("Droite", "Right"))}</div>`;
+    return top + hud + (M.q ? mazeQuestion() : `${mazeGrid()}<p class="mz-msg" role="status">${esc(hint)}</p>${pad}`);
+  }
+
+  function mazeCard() {
+    const st = (S.stats && S.stats.maze) || { plays: 0, wins: 0 };
+    const last = S.stats && S.stats.mazeVenue === "abbaye" ? "abbaye" : "chateau";
+    const rec = st.plays ? `<small class="mz-rec">${L2(`${st.wins} évasion${st.wins > 1 ? "s" : ""} sur ${st.plays} partie${st.plays > 1 ? "s" : ""}`, `${st.wins} escape${st.wins === 1 ? "" : "s"} in ${st.plays} game${st.plays === 1 ? "" : "s"}`)}</small>` : "";
+    return `<section class="mz-card"><h2>${L2("Le Labyrinthe du Temps", "The Labyrinth of Time")}</h2>
+      <p>${L2("Tu es un chevalier prisonnier d'un lieu médiéval. Avance case par case, trouve la clé puis la sortie. Chaque porte et chaque garde te pose une question : juste, tu gagnes un point de vie ; faux, tu en perds un.", "You are a knight trapped in a medieval place. Move square by square, find the key and then the exit. Every door and guard asks you a question: right, you gain a hit point; wrong, you lose one.")}</p>
+      <div class="mz-venues"><button class="btn ${last === "chateau" ? "btn-gold" : "btn-line"}" data-act="mzstart" data-v="chateau">${L2("Château fort", "Castle")}</button><button class="btn ${last === "abbaye" ? "btn-gold" : "btn-line"}" data-act="mzstart" data-v="abbaye">${L2("Abbaye", "Abbey")}</button></div>${rec}</section>`;
   }
 
   function homeScreen() {
@@ -559,6 +806,7 @@
         </span>
       </button>
 
+      ${todayCard()}
       <h2 class="section">Apprendre, époque par époque</h2>
       <p class="learn-note">Choisis une époque, lis la fiche de chaque niveau, puis passe au quiz pour valider ce que tu as appris.</p>
       <ul class="eras">${eraCards}</ul>
@@ -986,6 +1234,7 @@
     <div class="screen">
       ${topBar("Quiz")}
       <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
+      ${mazeCard()}
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1289,6 +1538,11 @@
           S = defaults(); save(); closeSheet(); render();
         }
         break;
+      case "mzstart": startMaze(el.dataset.v); break;
+      case "mzmove": mazeMove(Number(el.dataset.dx), Number(el.dataset.dy)); break;
+      case "mzpick": mazeAnswer(el.dataset.i !== undefined ? Number(el.dataset.i) : el.dataset.v === "1"); break;
+      case "mzcont": mazeContinue(); break;
+      case "mzquit": if (!M || M.status !== "play" || confirm(L2("Quitter le labyrinthe ? La partie sera perdue.", "Leave the labyrinth? The game will be lost."))) { M = null; back(); } break;
       case "privacy": window.open(EN ? "privacy.html?lang=en" : "privacy.html", "_blank", "noopener"); break;
       case "lang": window.HI.set(EN ? "fr" : "en"); break;
       case "setlang": if (el.dataset.l !== (EN ? "en" : "fr")) window.HI.set(el.dataset.l); break;
@@ -1307,7 +1561,29 @@
     if (out) out.textContent = fmtYear(Q.st.v);
   });
 
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeSheet(); });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") closeSheet();
+    if (view.name !== "maze" || !M || M.q || M.status !== "play" || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    const k = ev.key.toLowerCase();
+    const mv = { arrowup: [0, -1], w: [0, -1], z: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], q: [-1, 0], arrowright: [1, 0], d: [1, 0] }[k];
+    if (mv) { ev.preventDefault(); mazeMove(mv[0], mv[1]); }
+  });
+
+  // Balayage du doigt sur la carte.
+  let swipe = null;
+  document.addEventListener("touchstart", (ev) => {
+    swipe = null;
+    if (view.name !== "maze" || !ev.target.closest || !ev.target.closest(".mz-grid") || !ev.touches[0]) return;
+    swipe = { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+  }, { passive: true });
+  document.addEventListener("touchend", (ev) => {
+    if (!swipe || !ev.changedTouches[0]) return;
+    const dx = ev.changedTouches[0].clientX - swipe.x;
+    const dy = ev.changedTouches[0].clientY - swipe.y;
+    swipe = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    if (Math.abs(dx) > Math.abs(dy)) mazeMove(dx > 0 ? 1 : -1, 0); else mazeMove(0, dy > 0 ? 1 : -1);
+  }, { passive: true });
 
   /* ===== Démarrage ===== */
   history.replaceState({ name: "home" }, "");

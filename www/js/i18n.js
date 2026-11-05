@@ -20,6 +20,8 @@
   var EN_READY = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades", "capetiens", "renaissance", "grand-siecle", "revolution", "empire"]; // époques déjà traduites en anglais
   IDS.forEach(function (id) { if (lang === "en" && EN_READY.indexOf(id) < 0) return; document.write('<script src="' + dir + id + '.js" onerror="void 0"><\/script>'); });
 
+  document.write('<script src="js/daily/' + lang + '.js"><\/script>'); // personnage et saint du jour
+
   if (lang !== "en") return;
   document.documentElement.lang = "en";
   document.title = "Historia – History of France and of Christendom";
