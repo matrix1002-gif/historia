@@ -8,7 +8,7 @@
   try { lang = localStorage.getItem("historia.lang") || ""; } catch (e) { /* ignoré */ }
   if (lang !== "fr" && lang !== "en") lang = /^fr/i.test(navigator.language || "fr") ? "fr" : "en";
 
-  var IDS = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades", "capetiens", "renaissance", "grand-siecle", "revolution", "empire"];
+  var IDS = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades", "capetiens", "renaissance", "grand-siecle", "revolution", "empire", "modernes"];
   window.HI = {
     lang: lang,
     set: function (l) { try { localStorage.setItem("historia.lang", l); } catch (e) { /* ignoré */ } location.reload(); },
@@ -17,7 +17,7 @@
 
   // Chargement du contenu dans la bonne langue (les scripts s'exécutent dans l'ordre).
   var dir = lang === "en" ? "js/eras/en/" : "js/eras/";
-  var EN_READY = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades", "capetiens", "renaissance", "grand-siecle", "revolution", "empire"]; // époques déjà traduites en anglais
+  var EN_READY = ["gaule", "evangelisation", "carolingiens", "moines", "chevaliers", "croisades", "capetiens", "renaissance", "grand-siecle", "revolution", "empire", "modernes"]; // époques déjà traduites en anglais
   IDS.forEach(function (id) { if (lang === "en" && EN_READY.indexOf(id) < 0) return; document.write('<script src="' + dir + id + '.js" onerror="void 0"><\/script>'); });
 
   document.write('<script src="js/daily/' + lang + '.js"><\/script>'); // personnage et saint du jour
@@ -42,7 +42,8 @@
     renaissance: ["Renaissance & Wars of Religion", "1494 – 1598"],
     "grand-siecle": ["The Grand Siècle", "1598 – 1715"],
     revolution: ["Enlightenment & Revolution", "1715 – 1799"],
-    empire: ["Napoleon & the 19th Century", "1799 – 1870"]
+    empire: ["Napoleon & the 19th Century", "1799 – 1870"],
+    modernes: ["The Contemporary World", "1870 – today"]
   };
   if (typeof ERA_META !== "undefined") ERA_META.forEach(function (m) { var e = ERA_EN[m.id]; if (e) { m.title = e[0]; m.period = e[1]; } });
   var RANK_EN = ["Page", "Squire", "Knight", "Banneret", "Baron", "Count", "Marquis", "Duke", "Constable", "Marshal", "Chronicler of the Realm"];
@@ -112,11 +113,11 @@
     // Médailles
     "Premiers pas": "First steps", "Réussis ton premier niveau.": "Pass your first level.",
     "Apprenti": "Apprentice", "Réussis 10 niveaux.": "Pass 10 levels.", "Compagnon": "Journeyman", "Réussis 30 niveaux.": "Pass 30 levels.",
-    "Maître": "Master", "Réussis 60 niveaux.": "Pass 60 levels.", "Grand Maître": "Grand Master", "Réussis les 110 niveaux.": "Pass all 110 levels.",
+    "Maître": "Master", "Réussis 60 niveaux.": "Pass 60 levels.", "Grand Maître": "Grand Master", "Réussis les 120 niveaux.": "Pass all 120 levels.",
     "Étoile d'or": "Gold star", "Obtiens 3 étoiles à un niveau.": "Get 3 stars on a level.", "Constellation": "Constellation", "Obtiens 3 étoiles à 10 niveaux.": "Get 3 stars on 10 levels.",
     "Voûte céleste": "Starry vault", "Obtiens 3 étoiles à 40 niveaux.": "Get 3 stars on 40 levels.",
     "Premier sceau": "First seal", "Termine une époque entière.": "Complete a whole era.", "Chancelier": "Chancellor", "Obtiens 5 sceaux d'époque.": "Earn 5 era seals.",
-    "Sceau du royaume": "Seal of the realm", "Obtiens les 11 sceaux.": "Earn all 11 seals.",
+    "Sceau du royaume": "Seal of the realm", "Obtiens les 12 sceaux.": "Earn all 12 seals.",
     "Collectionneur": "Collector", "Débloque 5 personnages.": "Unlock 5 characters.", "Galerie royale": "Royal gallery", "Débloque 25 personnages.": "Unlock 25 characters.",
     "Panthéon": "Pantheon", "Débloque tous les personnages.": "Unlock every character.",
     "Veilleur": "Watchman", "Joue 3 jours de suite.": "Play 3 days in a row.", "Gardien": "Guardian", "Joue 7 jours de suite.": "Play 7 days in a row.",

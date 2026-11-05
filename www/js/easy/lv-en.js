@@ -405,4 +405,44 @@ empire|9|Who was elected president in 1848?|Louis-Napoleon Bonaparte|Louis-Phili
 empire|10|Which emperor entrusted Paris to Haussmann?|Napoleon III|Napoleon I|Louis-Philippe|Charles X|Haussmann cut great boulevards.
 empire|10|Which town saw Napoleon III's defeat in 1870?|Sedan|Waterloo|Austerlitz|Paris|He was taken prisoner.
 empire|10|Which regime was proclaimed on 4 September 1870?|The Republic|The Empire|The monarchy|The Restoration|The Third Republic began.
-empire|10|Which war ended the Second Empire?|The Franco-Prussian War|The Crimean War|The Hundred Years' War|The Spanish War|It was lost in 1870.`;
+empire|10|Which war ended the Second Empire?|The Franco-Prussian War|The Crimean War|The Hundred Years' War|The Spanish War|It was lost in 1870.
+modernes|1|Which city was besieged during the winter of 1870-1871?|Paris|Lyon|Marseille|Rouen|Parisians suffered from hunger and cold.
+modernes|1|How did the minister Gambetta leave besieged Paris?|In a balloon|By train|On horseback|By boat|It was a spectacular feat for the time.
+modernes|1|In which palace was the German Empire proclaimed in 1871?|At Versailles|At Chambord|At Fontainebleau|At Amboise|In the Hall of Mirrors.
+modernes|1|Which flag did the Count of Chambord refuse?|The tricolour flag|The red flag|The black flag|The blue flag|He demanded the white flag.
+modernes|2|Which minister of Public Instruction had the school laws passed?|Jules Ferry|Georges Clemenceau|Léon Blum|Charles de Gaulle|He made school free, secular and compulsory.
+modernes|2|From what age did school become compulsory?|From age 6|From age 3|From age 10|From age 16|Schooling was compulsory from 6 to 13.
+modernes|2|What are the teachers of the Republic nicknamed?|The black hussars|The red guards|The white brothers|The grey knights|The nickname comes from their dark clothes.
+modernes|2|Which diploma was taken at the end of primary school?|The school certificate|The baccalaureate|The bachelor's degree|The doctorate|Many pupils stopped at this diploma.
+modernes|3|Which captain was wrongly accused of treason in 1894?|Dreyfus|Esterhazy|Picquart|Zola|He was recognised as innocent in 1906.
+modernes|3|Which famous letter did Zola publish in 1898?|“J'accuse…!”|“I think, therefore I am”|“Long live freedom”|“To arms, citizens”|It appeared in the newspaper L'Aurore.
+modernes|3|Which text of 1905 separated the Church and the State?|The law separating the Churches and the State|The Civil Code|The Veil law|The Treaty of Versailles|It is the founding law of French secularism.
+modernes|3|Where was Dreyfus sent after his conviction?|To Devil's Island|To Saint Helena|To Elba|To Mont-Saint-Michel|It was a penal colony off Guiana.
+modernes|4|For which fair was the Eiffel Tower built?|The 1889 World's Fair|The 1900 Olympic Games|Napoleon's coronation|The centenary of Waterloo|It celebrated the centenary of the Revolution.
+modernes|4|Who held the first paid cinema screening in 1895?|The Lumière brothers|Louis Pasteur|Pierre Curie|Gustave Eiffel|It took place in Paris.
+modernes|4|Which scientist developed the rabies vaccine?|Louis Pasteur|Pierre Curie|Gustave Eiffel|Louis Blériot|He developed it in 1885.
+modernes|4|Which scientist received two Nobel Prizes?|Marie Curie|Louise Michel|Coco Chanel|Joséphine Baker|She studied radioactivity.
+modernes|5|Which battle stopped the Germans in September 1914?|The Battle of the Marne|The Battle of Verdun|The Battle of Waterloo|The Battle of Valmy|Parisian taxis carried soldiers to the front.
+modernes|5|What are French soldiers of the Great War nicknamed?|The poilus|The grognards|The hussars|The zouaves|They lived in the trenches.
+modernes|5|Where was the armistice of 11 November 1918 signed?|At Rethondes|At Versailles|At Sedan|At Metz|It was in the forest of Compiègne.
+modernes|5|Which statesman is nicknamed Father Victory?|Clemenceau|Pétain|Foch|Joffre|He led the government in 1918.
+modernes|6|Which Popular Front measure allowed people to go on holiday?|Paid holidays|Retirement at 60|Women's vote|Social Security|Two weeks of holiday were introduced in 1936.
+modernes|6|Who led the Popular Front government in 1936?|Léon Blum|Georges Clemenceau|Charles de Gaulle|Napoleon III|He was the first socialist to lead the government.
+modernes|6|Which event of 1929 triggered a great economic crisis?|The Wall Street crash|The fall of the Wall|The Commune|The Vél' d'Hiv roundup|The New York Stock Exchange collapsed.
+modernes|6|Who crossed the Atlantic non-stop by plane in 1927?|Charles Lindbergh|Louis Blériot|Jean Moulin|Pierre Curie|He flew from New York to Paris.
+modernes|7|What did General de Gaulle launch on 18 June 1940?|An appeal to continue the fight|An armistice|A landing|A law|He spoke from London, on the BBC.
+modernes|7|Which regime was set up at Vichy in 1940?|Pétain's regime|The Fourth Republic|The Commune|The Directory|It collaborated with Germany.
+modernes|7|Which Allied operation began on 6 June 1944?|The Normandy landings|The liberation of Paris|Germany's surrender|The armistice of Rethondes|It was Operation Overlord.
+modernes|7|Who united the Resistance movements in 1943?|Jean Moulin|Philippe Pétain|Léon Blum|Jean Jaurès|He created the National Council of the Resistance.
+modernes|8|Which protection system was created in 1945?|Social Security|The Bank of France|The Senate|The Legion of Honour|It protects against illness, old age and unemployment.
+modernes|8|Which American plan helped rebuild Europe?|The Marshall Plan|The Schlieffen Plan|The Vigipirate plan|The Maginot plan|It was launched in 1947.
+modernes|8|Which general founded the Fifth Republic in 1958?|Charles de Gaulle|Philippe Pétain|Georges Clemenceau|Ferdinand Foch|He returned to power during the Algerian crisis.
+modernes|8|Which war ended with the Évian Accords?|The Algerian War|The Indochina War|The Crimean War|The Hundred Years' War|Algeria became independent in 1962.
+modernes|9|In which year did the big strikes of May 68 break out?|1968|1958|1978|1988|Ten million employees went on strike.
+modernes|9|Who had the abortion law passed in 1975?|Simone Veil|Louise Michel|Marie Curie|Joséphine Baker|She was then Health Minister.
+modernes|9|Who had the death penalty abolished in 1981?|Robert Badinter|Valéry Giscard d'Estaing|Jacques Chirac|Georges Pompidou|He was then Justice Minister.
+modernes|9|Which wall was opened on 9 November 1989?|The Berlin Wall|The Atlantic Wall|The Maginot Line|Hadrian's Wall|It had split the city in two since 1961.
+modernes|10|Which treaty of 1992 created the European Union?|The Treaty of Maastricht|The Treaty of Rome|The Treaty of Versailles|The Treaty of Verdun|It was signed in the Netherlands.
+modernes|10|Which currency replaced the franc in 2002?|The euro|The dollar|The pound|The germinal franc|Euro coins and notes entered circulation.
+modernes|10|Which 2015 conference led to the Paris climate agreement?|COP21|COP1|The G7|The Rio summit|Almost all countries committed to limiting warming.
+modernes|10|Which country won the football World Cup in 1998?|France|Brazil|Germany|Italy|The French celebrated the victory in the streets.`;

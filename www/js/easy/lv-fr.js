@@ -405,4 +405,44 @@ empire|9|Qui est élu président en 1848 ?|Louis-Napoléon Bonaparte|Louis-Phili
 empire|10|Quel empereur confie Paris à Haussmann ?|Napoléon III|Napoléon Ier|Louis-Philippe|Charles X|Haussmann perce de grands boulevards.
 empire|10|Quelle ville de 1870 voit la défaite de Napoléon III ?|Sedan|Waterloo|Austerlitz|Paris|Il est fait prisonnier.
 empire|10|Quel régime est proclamé le 4 septembre 1870 ?|La République|L'Empire|La monarchie|La Restauration|La Troisième République commence.
-empire|10|Quelle guerre met fin au Second Empire ?|La guerre franco-prussienne|La guerre de Crimée|La guerre de Cent Ans|La guerre d'Espagne|Elle est perdue en 1870.`;
+empire|10|Quelle guerre met fin au Second Empire ?|La guerre franco-prussienne|La guerre de Crimée|La guerre de Cent Ans|La guerre d'Espagne|Elle est perdue en 1870.
+modernes|1|Quelle ville est assiégée pendant l'hiver 1870-1871 ?|Paris|Lyon|Marseille|Rouen|Les Parisiens souffrent du froid et de la faim.
+modernes|1|Comment le ministre Gambetta quitte-t-il Paris assiégée ?|En ballon|En train|À cheval|En bateau|C'est un exploit spectaculaire pour l'époque.
+modernes|1|Dans quel château l'empire allemand est-il proclamé en 1871 ?|À Versailles|À Chambord|À Fontainebleau|À Amboise|Dans la galerie des Glaces.
+modernes|1|Quel drapeau le comte de Chambord refuse-t-il ?|Le drapeau tricolore|Le drapeau rouge|Le drapeau noir|Le drapeau bleu|Il exige le drapeau blanc.
+modernes|2|Quel ministre de l'Instruction publique fait voter les lois scolaires ?|Jules Ferry|Georges Clemenceau|Léon Blum|Charles de Gaulle|Il rend l'école gratuite, laïque et obligatoire.
+modernes|2|À partir de quel âge l'école devient-elle obligatoire ?|À 6 ans|À 3 ans|À 10 ans|À 16 ans|L'obligation court de 6 à 13 ans.
+modernes|2|Comment appelle-t-on les instituteurs de la République ?|Les hussards noirs|Les gardes rouges|Les frères blancs|Les chevaliers gris|Le surnom vient de leur tenue sombre.
+modernes|2|Quel diplôme passe-t-on à la fin de l'école primaire ?|Le certificat d'études|Le baccalauréat|La licence|Le doctorat|Beaucoup d'élèves s'arrêtent à ce diplôme.
+modernes|3|Quel capitaine est accusé à tort de trahison en 1894 ?|Dreyfus|Esterhazy|Picquart|Zola|Il sera reconnu innocent en 1906.
+modernes|3|Quelle célèbre lettre Zola publie-t-il en 1898 ?|« J'accuse… ! »|« Je pense, donc je suis »|« Vive la liberté »|« Aux armes, citoyens »|Elle paraît dans le journal L'Aurore.
+modernes|3|Quel texte de 1905 sépare l'Église et l'État ?|La loi de séparation des Églises et de l'État|Le Code civil|La loi Veil|Le traité de Versailles|C'est la loi fondatrice de la laïcité française.
+modernes|3|Où Dreyfus est-il envoyé après sa condamnation ?|À l'île du Diable|À Sainte-Hélène|À l'île d'Elbe|Au Mont-Saint-Michel|C'est un bagne au large de la Guyane.
+modernes|4|Pour quelle exposition la tour Eiffel est-elle construite ?|L'Exposition universelle de 1889|Les Jeux olympiques de 1900|Le sacre de Napoléon|Le centenaire de Waterloo|Elle fête le centenaire de la Révolution.
+modernes|4|Qui organise la première projection payante de cinéma en 1895 ?|Les frères Lumière|Louis Pasteur|Pierre Curie|Gustave Eiffel|Elle a lieu à Paris.
+modernes|4|Quel savant met au point le vaccin contre la rage ?|Louis Pasteur|Pierre Curie|Gustave Eiffel|Louis Blériot|Il le met au point en 1885.
+modernes|4|Quelle scientifique reçoit deux prix Nobel ?|Marie Curie|Louise Michel|Coco Chanel|Joséphine Baker|Elle étudie la radioactivité.
+modernes|5|Quelle bataille arrête les Allemands en septembre 1914 ?|La bataille de la Marne|La bataille de Verdun|La bataille de Waterloo|La bataille de Valmy|Les taxis parisiens ont transporté des soldats.
+modernes|5|Comment surnomme-t-on les soldats français de la Grande Guerre ?|Les poilus|Les grognards|Les hussards|Les zouaves|Ils vivent dans les tranchées.
+modernes|5|Où l'armistice du 11 novembre 1918 est-il signé ?|À Rethondes|À Versailles|À Sedan|À Metz|C'est dans la forêt de Compiègne.
+modernes|5|Quel homme d'État est surnommé le Père la Victoire ?|Clemenceau|Pétain|Foch|Joffre|Il dirige le gouvernement en 1918.
+modernes|6|Quelle mesure du Front populaire permet de partir en vacances ?|Les congés payés|La retraite à 60 ans|Le vote des femmes|La Sécurité sociale|Deux semaines de congés sont instaurées en 1936.
+modernes|6|Qui dirige le gouvernement du Front populaire en 1936 ?|Léon Blum|Georges Clemenceau|Charles de Gaulle|Napoléon III|Il est le premier socialiste à diriger le gouvernement.
+modernes|6|Quel événement de 1929 déclenche une grande crise économique ?|Le krach de Wall Street|La chute du Mur|La Commune|La rafle du Vél' d'Hiv|La Bourse de New York s'effondre.
+modernes|6|Qui traverse l'Atlantique en avion sans escale en 1927 ?|Charles Lindbergh|Louis Blériot|Jean Moulin|Pierre Curie|Il relie New York à Paris.
+modernes|7|Que lance le général de Gaulle le 18 juin 1940 ?|Un appel à continuer la lutte|Un armistice|Un débarquement|Une loi|Il parle depuis Londres, à la BBC.
+modernes|7|Quel régime s'installe à Vichy en 1940 ?|Le régime de Pétain|La IVe République|La Commune|Le Directoire|Il collabore avec l'Allemagne.
+modernes|7|Quelle opération alliée débute le 6 juin 1944 ?|Le débarquement en Normandie|La libération de Paris|La capitulation de l'Allemagne|L'armistice de Rethondes|C'est l'opération Overlord.
+modernes|7|Qui unifie les mouvements de Résistance en 1943 ?|Jean Moulin|Philippe Pétain|Léon Blum|Jean Jaurès|Il crée le Conseil national de la Résistance.
+modernes|8|Quel système de protection est créé en 1945 ?|La Sécurité sociale|La Banque de France|Le Sénat|La Légion d'honneur|Elle protège contre la maladie, la vieillesse et le chômage.
+modernes|8|Quel plan américain aide à reconstruire l'Europe ?|Le plan Marshall|Le plan Schlieffen|Le plan Vigipirate|Le plan Maginot|Il est lancé en 1947.
+modernes|8|Quel général fonde la Ve République en 1958 ?|Charles de Gaulle|Philippe Pétain|Georges Clemenceau|Ferdinand Foch|Il revient au pouvoir pendant la crise algérienne.
+modernes|8|Quelle guerre prend fin avec les accords d'Évian ?|La guerre d'Algérie|La guerre d'Indochine|La guerre de Crimée|La guerre de Cent Ans|L'Algérie devient indépendante en 1962.
+modernes|9|En quelle année éclatent les grandes grèves de Mai 68 ?|1968|1958|1978|1988|Dix millions de salariés font grève.
+modernes|9|Qui fait voter la loi sur l'IVG en 1975 ?|Simone Veil|Louise Michel|Marie Curie|Joséphine Baker|Elle est alors ministre de la Santé.
+modernes|9|Qui fait abolir la peine de mort en 1981 ?|Robert Badinter|Valéry Giscard d'Estaing|Jacques Chirac|Georges Pompidou|Il est alors ministre de la Justice.
+modernes|9|Quel mur est ouvert le 9 novembre 1989 ?|Le mur de Berlin|Le mur de l'Atlantique|La ligne Maginot|Le mur d'Hadrien|Il coupait la ville en deux depuis 1961.
+modernes|10|Quel traité de 1992 crée l'Union européenne ?|Le traité de Maastricht|Le traité de Rome|Le traité de Versailles|Le traité de Verdun|Il est signé aux Pays-Bas.
+modernes|10|Quelle monnaie remplace le franc en 2002 ?|L'euro|Le dollar|La livre|Le franc germinal|Les pièces et billets en euros entrent en circulation.
+modernes|10|Quelle conférence de 2015 aboutit à l'accord de Paris sur le climat ?|La COP21|La COP1|Le G7|Le sommet de Rio|Presque tous les pays s'engagent à limiter le réchauffement.
+modernes|10|Quel pays gagne la Coupe du monde de football en 1998 ?|La France|Le Brésil|L'Allemagne|L'Italie|Les Français fêtent la victoire dans les rues.`;

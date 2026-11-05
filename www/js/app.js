@@ -226,13 +226,13 @@
     { id: "p10", name: "Apprenti", desc: "Réussis 10 niveaux.", icon: "book", tier: 1, cur: levelsPassed, max: 10 },
     { id: "p30", name: "Compagnon", desc: "Réussis 30 niveaux.", icon: "book", tier: 2, cur: levelsPassed, max: 30 },
     { id: "p60", name: "Maître", desc: "Réussis 60 niveaux.", icon: "crown", tier: 2, cur: levelsPassed, max: 60 },
-    { id: "p110", name: "Grand Maître", desc: "Réussis les 110 niveaux.", icon: "crown", tier: 3, cur: levelsPassed, max: 110 },
+    { id: "p110", name: "Grand Maître", desc: "Réussis les 120 niveaux.", icon: "crown", tier: 3, cur: levelsPassed, max: 120 },
     { id: "s1", name: "Étoile d'or", desc: "Obtiens 3 étoiles à un niveau.", icon: "star", tier: 1, cur: threeStars, max: 1 },
     { id: "s10", name: "Constellation", desc: "Obtiens 3 étoiles à 10 niveaux.", icon: "star", tier: 2, cur: threeStars, max: 10 },
     { id: "s40", name: "Voûte céleste", desc: "Obtiens 3 étoiles à 40 niveaux.", icon: "star", tier: 3, cur: threeStars, max: 40 },
     { id: "k1", name: "Premier sceau", desc: "Termine une époque entière.", icon: "seal", tier: 1, cur: sealsCount, max: 1 },
     { id: "k5", name: "Chancelier", desc: "Obtiens 5 sceaux d'époque.", icon: "seal", tier: 2, cur: sealsCount, max: 5 },
-    { id: "k11", name: "Sceau du royaume", desc: "Obtiens les 11 sceaux.", icon: "seal", tier: 3, cur: sealsCount, max: 11 },
+    { id: "k11", name: "Sceau du royaume", desc: "Obtiens les 12 sceaux.", icon: "seal", tier: 3, cur: sealsCount, max: 12 },
     { id: "c5", name: "Collectionneur", desc: "Débloque 5 personnages.", icon: "helmet", tier: 1, cur: charsOwned, max: 5 },
     { id: "c25", name: "Galerie royale", desc: "Débloque 25 personnages.", icon: "helmet", tier: 2, cur: charsOwned, max: 25 },
     { id: "cAll", name: "Panthéon", desc: "Débloque tous les personnages.", icon: "helmet", tier: 3, cur: charsOwned, max: () => Math.max(charsTotal(), 1) },
@@ -304,7 +304,7 @@
 
   // Questions de culture générale, faciles : on peut y répondre sans avoir lu les fiches.
   let EASY_LIST = null;
-  const easyEra = (y) => (y <= 475 ? "gaule" : y <= 750 ? "evangelisation" : y <= 986 ? "carolingiens" : y <= 1095 ? "moines" : y <= 1291 ? "croisades" : y <= 1328 ? "capetiens" : y <= 1453 ? "chevaliers" : y <= 1588 ? "renaissance" : y <= 1714 ? "grand-siecle" : y <= 1799 ? "revolution" : "empire");
+  const easyEra = (y) => (y <= 475 ? "gaule" : y <= 750 ? "evangelisation" : y <= 986 ? "carolingiens" : y <= 1095 ? "moines" : y <= 1291 ? "croisades" : y <= 1328 ? "capetiens" : y <= 1453 ? "chevaliers" : y <= 1588 ? "renaissance" : y <= 1714 ? "grand-siecle" : y <= 1799 ? "revolution" : y <= 1870 ? "empire" : "modernes");
   const centTxt = (c, bc) => (EN ? `${c}${c % 10 === 1 && c !== 11 ? "st" : c % 10 === 2 && c !== 12 ? "nd" : c % 10 === 3 && c !== 13 ? "rd" : "th"} century${bc ? " BC" : ""}` : `${toRoman(c)}${c === 1 ? "er" : "e"} siècle${bc ? " av. J.-C." : ""}`);
   const periodOf = (y) => (y < 477 ? 0 : y < 1492 ? 1 : y < 1789 ? 2 : 3);
   const PERIODS = () => [L2("Antiquité", "Antiquity"), L2("Moyen Âge", "Middle Ages"), L2("Temps modernes", "Early modern era"), L2("Époque contemporaine", "Modern era")];

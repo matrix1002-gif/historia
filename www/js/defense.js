@@ -210,17 +210,48 @@
     }
     function drawPipe(p) {
       var c = STAGES[p.st].pil, s = p.st;
+      function shade(x, y, w, h) {
+        var g = ctx.createLinearGradient(x, 0, x + w, 0);
+        g.addColorStop(0, c[1]); g.addColorStop(0.28, c[0]); g.addColorStop(0.62, c[0]); g.addColorStop(1, c[2]);
+        ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+      }
+      function orn(x, y, w, h) {
+        ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+        ctx.strokeStyle = "rgba(0,0,0,0.18)"; ctx.fillStyle = "rgba(0,0,0,0.18)"; ctx.lineWidth = 1.5;
+        var k;
+        if (s === 0) { // grès sculpté : bandes à motifs et fissures
+          for (k = y + 14; k < y + h; k += 34) { ctx.fillRect(x, k, w, 5); for (var m = 0; m < 4; m++) { ctx.beginPath(); ctx.moveTo(x + 8 + m * 12, k + 9); ctx.lineTo(x + 14 + m * 12, k + 17); ctx.lineTo(x + 20 + m * 12, k + 9); ctx.stroke(); } }
+        } else if (s === 1) { // troncs liés de cordes
+          for (k = x + 13; k < x + w; k += 13) { ctx.beginPath(); ctx.moveTo(k, y); ctx.lineTo(k, y + h); ctx.stroke(); }
+          for (k = y + 20; k < y + h; k += 42) { ctx.strokeStyle = "#e6d4a0"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, k); ctx.lineTo(x + w, k + 4); ctx.stroke(); ctx.strokeStyle = "rgba(0,0,0,0.25)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, k + 3); ctx.lineTo(x + w, k + 7); ctx.stroke(); }
+        } else if (s === 2) { // colombages
+          for (k = y + 10; k < y + h; k += 44) { ctx.strokeStyle = "#4a3320"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, k); ctx.lineTo(x + w, k); ctx.moveTo(x, k); ctx.lineTo(x + w, k + 44); ctx.stroke(); }
+          ctx.fillStyle = "#6b6e76"; for (k = y + 24; k < y + h; k += 44) { ctx.beginPath(); ctx.arc(x + 8, k, 2, 0, 7); ctx.arc(x + w - 8, k, 2, 0, 7); ctx.fill(); }
+        } else if (s === 3 || s === 4) { // pierre taillée + meurtrières
+          for (k = y + 12; k < y + h; k += 18) { ctx.beginPath(); ctx.moveTo(x, k); ctx.lineTo(x + w, k); ctx.stroke(); var off = ((k - y) / 18) % 2 ? 12 : 26; ctx.beginPath(); ctx.moveTo(x + off, k); ctx.lineTo(x + off, k + 18); ctx.stroke(); }
+          ctx.fillStyle = "#23212c"; for (k = y + 40; k < y + h; k += 90) { ctx.fillRect(x + w / 2 - 3, k, 6, 20); ctx.fillRect(x + w / 2 - 8, k + 7, 16, 5); }
+        } else if (s === 5) { // tour de garde avec blason
+          for (k = y + 12; k < y + h; k += 16) { ctx.beginPath(); ctx.moveTo(x, k); ctx.lineTo(x + w, k); ctx.stroke(); }
+          for (k = y + 52; k < y + h; k += 120) { ctx.fillStyle = "#7a2a34"; ctx.beginPath(); ctx.moveTo(x + 12, k); ctx.lineTo(x + w - 12, k); ctx.lineTo(x + w - 12, k + 16); ctx.lineTo(x + w / 2, k + 30); ctx.lineTo(x + 12, k + 16); ctx.fill(); ctx.fillStyle = "#f0c64b"; ctx.beginPath(); ctx.arc(x + w / 2, k + 12, 5, 0, 7); ctx.fill(); }
+        } else { // colonnes cannelées dorées et gemmes
+          ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 2;
+          for (k = x + 10; k < x + w - 4; k += 10) { ctx.beginPath(); ctx.moveTo(k, y); ctx.lineTo(k, y + h); ctx.stroke(); }
+          for (k = y + 40; k < y + h; k += 110) { ctx.fillStyle = s === 7 ? "#8a3ad9" : "#c9322b"; ctx.beginPath(); ctx.moveTo(x + w / 2, k - 8); ctx.lineTo(x + w / 2 + 7, k); ctx.lineTo(x + w / 2, k + 8); ctx.lineTo(x + w / 2 - 7, k); ctx.fill(); ctx.strokeStyle = "#fff6c8"; ctx.lineWidth = 1.5; ctx.stroke(); }
+        }
+        ctx.restore();
+      }
       function col(x, y, w, h, capTop) {
-        rect(x, y, w, h, c[0]);
-        rect(x, y, 8, h, c[1]); rect(x + w - 9, y, 9, h, c[2]);
-        ctx.strokeStyle = "rgba(0,0,0,0.12)"; ctx.lineWidth = 1;
-        if (s <= 1) { for (var yy = y + 10; yy < y + h; yy += 18) { ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy); ctx.stroke(); } }
-        else if (s <= 2) { for (var xx = x + 14; xx < x + w; xx += 14) { ctx.beginPath(); ctx.moveTo(xx, y); ctx.lineTo(xx, y + h); ctx.stroke(); } }
-        else { for (var yy2 = y + 12; yy2 < y + h; yy2 += 16) { ctx.beginPath(); ctx.moveTo(x, yy2); ctx.lineTo(x + w, yy2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + ((yy2 / 16) % 2 ? 14 : 28), yy2); ctx.lineTo(x + ((yy2 / 16) % 2 ? 14 : 28), yy2 + 16); ctx.stroke(); } }
-        // chapiteau
-        var cy2 = capTop ? y + h - 16 : y;
-        rect(x - 5, cy2, w + 10, 16, c[0]); rect(x - 5, cy2, w + 10, 4, "rgba(255,255,255,0.28)"); rect(x - 5, cy2 + 12, w + 10, 4, "rgba(0,0,0,0.2)");
-        if (s >= 4) { var ey = capTop ? cy2 + 16 : cy2 - 8; for (var q = 0; q < 4; q++) rect(x - 5 + q * 17, capTop ? cy2 - 0 : cy2 - 8, 11, 8, c[0]); }
+        shade(x, y, w, h); orn(x, y, w, h);
+        // base / chapiteau massif avec relief
+        var cy2 = capTop ? y + h - 20 : y;
+        shade(x - 7, cy2, w + 14, 20);
+        rect(x - 7, cy2, w + 14, 4, "rgba(255,255,255,0.35)"); rect(x - 7, cy2 + 16, w + 14, 4, "rgba(0,0,0,0.3)");
+        if (s >= 5) { rect(x - 7, cy2 + 8, w + 14, 3, "#f0c64b"); }
+        if (s >= 3) { var cr = capTop ? cy2 + 20 : cy2 - 10; for (var q = 0; q < 4; q++) { shade(x - 7 + q * 17, cr, 11, 10); } }
+        // ombre portée sous le chapiteau
+        var sg = ctx.createLinearGradient(0, capTop ? cy2 + 20 : cy2 - 14, 0, capTop ? cy2 + 34 : cy2);
+        sg.addColorStop(capTop ? 0 : 1, "rgba(0,0,0,0.28)"); sg.addColorStop(capTop ? 1 : 0, "rgba(0,0,0,0)");
+        ctx.fillStyle = sg; ctx.fillRect(x, capTop ? cy2 + 20 : cy2 - 14, w, 14);
       }
       col(p.x, -4, 54, p.top + 4, true);
       col(p.x, p.top + p.gap, 54, GY - p.top - p.gap, false);

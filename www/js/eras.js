@@ -13,7 +13,8 @@ const ERA_META = [
   { id: "renaissance",    num: "VIII", title: "Renaissance & guerres de Religion", period: "1494 – 1598",            accent: "#e58fb0", icon: "turret",   scene: "renaissance" },
   { id: "grand-siecle",   num: "IX",   title: "Le Grand Siècle",                 period: "1598 – 1715",              accent: "#f2d16b", icon: "sun",      scene: "grand-siecle" },
   { id: "revolution",     num: "X",    title: "Lumières & Révolution",           period: "1715 – 1799",              accent: "#6ec6c1", icon: "phrygian", scene: "revolution" },
-  { id: "empire",         num: "XI",   title: "Napoléon & le XIXe siècle",       period: "1799 – 1870",              accent: "#c9d2e6", icon: "arch",     scene: "empire" }
+  { id: "empire",         num: "XI",   title: "Napoléon & le XIXe siècle",       period: "1799 – 1870",              accent: "#c9d2e6", icon: "arch",     scene: "empire" },
+  { id: "modernes",       num: "XII",  title: "Le monde contemporain",           period: "1870 – aujourd'hui",       accent: "#7fc4e8", icon: "tower",    scene: "modernes" }
 ];
 
 const RANKS = [

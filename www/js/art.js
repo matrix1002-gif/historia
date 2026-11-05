@@ -91,6 +91,14 @@
       <g stroke="#0b1430" stroke-width="3"><path d="M250 142V40"/></g>
       <path d="M250 40c0-14 12-22 22-20 8 2 14 8 12 16-2 6-8 8-12 6-6-3-10-2-12 4z" fill="${a}"/>
       <g><rect x="256" y="62" width="8" height="30" fill="#4a79d8"/><rect x="264" y="62" width="8" height="30" fill="#f3ead2"/><rect x="272" y="62" width="8" height="30" fill="#d7455a"/></g>`,
+    modernes: (a) => `
+      <g fill="#0b1430" fill-opacity=".92">
+        <path d="M180 22l-5 40-12 40-10 40h54l-10-40-12-40z"/><rect x="164" y="64" width="32" height="5"/><rect x="156" y="104" width="48" height="5"/>
+        <rect x="40" y="86" width="22" height="56"/><rect x="66" y="74" width="26" height="68"/><rect x="96" y="96" width="24" height="46"/>
+        <rect x="244" y="80" width="24" height="62"/><rect x="272" y="92" width="22" height="50"/><rect x="298" y="70" width="26" height="72"/>
+      </g>
+      <g fill="${a}" fill-opacity=".75"><rect x="46" y="94" width="4" height="4"/><rect x="54" y="106" width="4" height="4"/><rect x="72" y="84" width="4" height="4"/><rect x="82" y="100" width="4" height="4"/><rect x="250" y="90" width="4" height="4"/><rect x="258" y="108" width="4" height="4"/><rect x="304" y="82" width="4" height="4"/><rect x="314" y="102" width="4" height="4"/></g>
+      <path d="M232 36c0-6 4-10 10-10s10 4 10 10" stroke="${a}" stroke-opacity=".6" stroke-width="2" fill="none"/>`,
     empire: (a) => `
       <g fill="#0b1430" fill-opacity=".92">
         <rect x="116" y="52" width="128" height="90"/><rect x="108" y="44" width="144" height="12"/>
@@ -105,7 +113,7 @@
     gaule: ["#2f6b5a", "#143040"], evangelisation: ["#5f4a98", "#1a1a4a"], carolingiens: ["#9a7a2a", "#1c2150"],
     moines: ["#a35a3c", "#1a1d48"], chevaliers: ["#4f6aa8", "#13204f"], croisades: ["#b04a4a", "#2a1a44"],
     capetiens: ["#3f84ad", "#14234f"], renaissance: ["#b35f84", "#26194a"], "grand-siecle": ["#c9a23d", "#241d4c"],
-    revolution: ["#3f8f8a", "#162450"], empire: ["#8f9ab8", "#1a2350"]
+    revolution: ["#3f8f8a", "#162450"], empire: ["#8f9ab8", "#1a2350"], modernes: ["#4a8fc4", "#141f4a"]
   };
 
   function scene(id, accent) {
@@ -133,6 +141,7 @@
     turret: SVG('<path d="M14 42V22h20v20"/><path d="M11 22L24 5l13 17z"/><path d="M20 42v-9a4 4 0 0 1 8 0v9"/><path d="M24 5v-3"/>'),
     sun: SVG('<circle cx="24" cy="24" r="8"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/>'),
     phrygian: SVG('<path d="M8 36c0-12 8-22 20-22 6 0 10 4 10 8 0 3-2 4-4 4 3 3 4 6 3 10z"/><path d="M6 36h36"/><circle cx="36" cy="14" r="2"/>'),
+    tower: SVG('<path d="M24 3v6M20 41l3-30h2l3 30"/><path d="M16 44l4-16M32 44l-4-16"/><path d="M18 30h12M20 22h8"/><path d="M12 44h24"/>'),
     arch: SVG('<rect x="7" y="8" width="34" height="32" rx="1"/><path d="M16 40V24a8 8 0 0 1 16 0v16"/><path d="M7 15h34"/>'),
     seal: SVG('<circle cx="24" cy="20" r="12"/><path d="M17 30l-4 14 11-6 11 6-4-14"/><path d="M24 14l2 4 4 .6-3 3 .8 4.400L24 24l-3.800 2 .8-4.400-3-3 4-.6z"/>')
   };
@@ -251,6 +260,7 @@
     // Trésor (tous thèmes) : pulsation de suspense
     tresor: { beat: 0.8, chords: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52], [50, 53, 57], [43, 46, 50], [48, 52, 55], [45, 49, 52]], mel: [62, 65, 69, 72, 74, 77], pad: ["triangle", 700, 0.04], drone: [[38, 0.08]], k: pat({ 0: 0.2, 3: 0.12, 8: 0.14, 11: 0.1 }), t: pat({ 4: 0.03, 12: 0.03 }), pl: { type: "triangle", decay: 1.2, vol: 0.065, p: [0.35, 0.15], chord: 0.8 }, bass: 1 }
   };
+  THEMES.modernes = Object.assign({}, THEMES.empire, { beat: 0.8, chords: [[52, 55, 59], [48, 52, 55], [50, 54, 57], [47, 50, 54], [52, 55, 59], [48, 52, 55], [45, 49, 52], [47, 51, 54]], mel: [64, 66, 69, 71, 73, 76, 78] });
 
   const Music = (() => {
     let on = false, theme = "", cfg = null, master = null, drone = [], echo = null, timer = null, nextT = 0, step = 0, chord = 0, noiseBuf = null;
