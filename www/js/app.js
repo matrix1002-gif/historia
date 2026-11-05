@@ -471,7 +471,7 @@
   window.addEventListener("popstate", (e) => {
     const st = e.state || { name: "home" };
     closeSheet();
-    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult") {
+    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "defense") {
       T = null;
       view = { name: "home" };
       history.replaceState({ name: "home" }, "");
@@ -509,6 +509,7 @@
   };
 
   const render = () => {
+    if (view.name !== "defense" && DF) { if (DF.game) DF.game.destroy(); DF = null; }
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
@@ -519,6 +520,7 @@
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
+    if (view.name === "defense" && DF) { $app.innerHTML = defenseScreen(); return dfAttach(); }
     if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
     if (view.name === "gallery") return ($app.innerHTML = withTabs(galleryScreen(), "gallery"));
     if (view.name === "medals") return ($app.innerHTML = withTabs(medalsScreen(), "medals"));
@@ -614,6 +616,71 @@
     }
     const saint = sn ? `<p class="today-saint">${CROSS_ICO}<span>${L2("Saint du jour", "Saint of the day")} : <b>${esc(sn[0])}</b></span></p>` : "";
     return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}</section>`;
+  }
+
+  /* ===== Défends le roi ===== */
+  const DF_XP = 30;
+  let DF = null;
+  const dfStats = () => (S.stats.defense = Object.assign({ plays: 0, wins: 0, best: 0 }, S.stats.defense));
+  function startDefense() {
+    if (!window.HistoriaDefense) return;
+    sfx("tap");
+    DF = { game: null, phase: "intro", res: null };
+    go("defense", {}, view.name === "defense" ? "replace" : "push");
+  }
+  function dfIntro() {
+    const st = dfStats();
+    return `<div class="df-card"><h2>${L2("Complot au palais !", "Plot at the palace!")}</h2>
+      <p>${L2("Cette nuit, le duc félon et ses hommes de main envahissent la salle du trône. Toi seul, chevalier de la garde, peux sauver le roi avant qu'il ne soit trop tard.", "Tonight the treacherous duke and his henchmen storm the throne room. You alone, knight of the guard, can save the king before it is too late.")}</p>
+      <ul class="df-how"><li><b>${L2("Touche à gauche ou à droite", "Tap left or right")}</b> ${L2("pour foncer et frapper de l'épée.", "to dash and slash your sword.")}</li><li>${L2("Les armures demandent deux coups, le duc félon six.", "Armoured men take two hits, the duke six.")}</li><li>${L2("Enchaîne les coups : le combo multiplie ton score.", "Chain your hits: the combo multiplies your score.")}</li></ul>
+      <button class="btn btn-gold" data-act="dfgo">${L2("À l'épée !", "To arms!")}</button>
+      ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} points · ${st.wins} victoire${st.wins > 1 ? "s" : ""}`, `Best: ${st.best} points · ${st.wins} win${st.wins === 1 ? "" : "s"}`)}</small>` : ""}</div>`;
+  }
+  function dfEnd(r) {
+    const st = dfStats();
+    st.plays++;
+    const rec = r.score > st.best;
+    if (rec) st.best = r.score;
+    if (r.win) { st.wins++; S.xp += DF_XP; }
+    save();
+    if (window.HistoriaAds) window.HistoriaAds.quizFinished();
+    if (r.win) Art.confetti();
+    const fact = L2("Les complots contre les rois n'ont pas manqué : en 1560, la conjuration d'Amboise voulait enlever le jeune François II.", "Plots against kings were common: in 1560 the Amboise conspiracy tried to seize the young Francis II.");
+    const over = document.getElementById("df-over");
+    if (!over) return;
+    over.innerHTML = `<div class="df-card df-end ${r.win ? "win" : "lose"}"><h2>${r.win ? L2("Le roi est sauvé !", "The king is saved!") : L2("Le roi est tombé…", "The king has fallen…")}</h2>
+      <p class="df-big">${r.score} <small>${L2("points", "points")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
+      <p>${r.kills} ${L2(plural(r.kills, "conjuré mis hors d'état de nuire", "conjurés mis hors d'état de nuire"), plural(r.kills, "plotter stopped", "plotters stopped"))} · ${L2("meilleur combo", "best combo")} x${r.best}${r.win ? ` · <b>+${DF_XP} XP</b>` : ""}</p>
+      <p class="df-fact">${fact}</p>
+      <div class="stack"><button class="btn btn-gold" data-act="dfgo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="dfquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div></div>`;
+    over.hidden = false;
+  }
+  function dfAttach() {
+    const canvas = document.getElementById("df-canvas");
+    if (!canvas || !DF) return;
+    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
+    const over = document.getElementById("df-over");
+    if (over) { over.innerHTML = dfIntro(); over.hidden = false; }
+  }
+  function dfGo() {
+    if (!DF || !DF.game) return;
+    const over = document.getElementById("df-over");
+    if (over) over.hidden = true;
+    DF.phase = "play";
+    DF.game.destroy();
+    const canvas = document.getElementById("df-canvas");
+    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
+    DF.game.start();
+  }
+  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><div class="top"><button class="icon-btn" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title">${L2("Défends le roi", "Defend the King")}</h1></div>
+    <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : défends le roi", "Game: defend the king")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
+  function defenseCard() {
+    const st = (S.stats && S.stats.defense) || { plays: 0, wins: 0, best: 0 };
+    const rec = st.plays ? `<small class="mz-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : "";
+    return `<section class="df-menu"><div class="df-menu-art" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 52 L46 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M10 44 L22 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M50 52 L18 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M54 44 L42 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M22 10 l6 8 4-10 4 10 6-8 -2 14 h-16z" fill="#f0c64b" stroke="#7a5818" stroke-width="2"/></svg></div>
+      <div><h2>${L2("Défends le roi !", "Defend the King!")}</h2>
+      <p>${L2("Un coup d'État éclate dans la salle du trône. Épée au poing, repousse les conjurés. Un seul geste : touche à gauche ou à droite.", "A coup breaks out in the throne room. Sword in hand, fight off the plotters. One gesture: tap left or right.")}</p>
+      <button class="btn btn-gold" data-act="dfstart">${L2("Jouer", "Play")}</button>${rec}</div></section>`;
   }
 
   function homeScreen() {
@@ -1108,6 +1175,7 @@
     <div class="screen">
       ${topBar("Quiz")}
       <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
+      ${defenseCard()}
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1320,6 +1388,9 @@
       case "next-level": go("lesson", { id: R.eraId, lv: R.lvl + 1 }, "replace"); sfx("tap"); break;
       case "tab": { const v = el.dataset.v; if (v !== view.name) go(v, {}, "replace"); sfx("tap"); break; }
       case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
+      case "dfstart": startDefense(); break;
+      case "dfgo": dfGo(); break;
+      case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
       case "medals": go("medals"); break;

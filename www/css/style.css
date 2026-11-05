@@ -917,3 +917,48 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .learn-steps { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 14px 0 0; padding: 0; }
 .learn-steps li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 4px; border-radius: 999px; background: rgba(255, 249, 232, 0.85); border: 1px solid var(--gold-500); font-size: 13.5px; white-space: nowrap; }
 .learn-steps b { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold-500); color: #fff9e8; font-size: 13px; }
+
+/* ---------- Défends le roi ---------- */
+.df-menu { display: flex; gap: 14px; align-items: center; margin: 14px 0 22px; padding: 16px 16px; border-radius: var(--radius); border: 1px solid #5e4210; background: linear-gradient(135deg, #2a2438, #4b2a3a); color: #fff3d6; box-shadow: 0 8px 22px rgba(30, 10, 30, 0.4); position: relative; overflow: hidden; }
+.df-menu::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 40%, rgba(255, 230, 160, 0.16) 50%, transparent 60%); transform: translateX(-100%); animation: shine 4.5s ease-in-out infinite; pointer-events: none; }
+@keyframes shine { 55%, 100% { transform: translateX(100%); } }
+.df-menu-art { flex: none; width: 72px; height: 72px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5)); animation: sway 3s ease-in-out infinite; }
+@keyframes sway { 50% { transform: rotate(-6deg) scale(1.05); } }
+.df-menu h2 { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: 0.04em; color: #ffd98a; }
+.df-menu p { margin: 4px 0 10px; font-size: 16px; line-height: 1.35; color: #f1e6cf; }
+.df-menu .btn { padding: 10px 22px; }
+.df-menu .mz-rec { display: block; margin-top: 8px; color: #d8c9a8; }
+.df-wrap { position: relative; max-width: 480px; margin: 6px auto 0; border: 3px solid var(--gold-500); border-radius: var(--radius); overflow: hidden; background: #1b1626; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); line-height: 0; }
+#df-canvas { width: 100%; height: auto; aspect-ratio: 360 / 560; display: block; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: crosshair; }
+.df-over { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(14, 8, 20, 0.72); line-height: 1.4; animation: fade 0.3s ease-out; }
+.df-over[hidden] { display: none; }
+.df-card { width: 100%; max-height: 100%; overflow: auto; padding: 18px 16px; border-radius: var(--radius); border: 2px solid var(--gold-500); background: linear-gradient(180deg, #fff9e8, #f1e3bd); color: #3a2914; text-align: center; animation: pop 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) both; }
+.df-card h2 { font-family: var(--display); font-weight: 700; font-size: 22px; color: #6a1b24; margin-bottom: 6px; }
+.df-card p { font-size: 17px; margin: 6px 0; }
+.df-how { list-style: none; text-align: left; margin: 10px 0 14px; padding: 0; font-size: 16px; }
+.df-how li { padding: 4px 0 4px 22px; position: relative; }
+.df-how li::before { content: "⚔"; position: absolute; left: 0; color: #8a1f2b; }
+.df-big { font-family: var(--display); font-size: 40px; font-weight: 700; color: #8a5a14; line-height: 1.1; }
+.df-big small { font-size: 16px; }
+.df-big em { display: block; font-size: 16px; color: #2e7d4f; font-style: normal; }
+.df-fact { font-size: 15px !important; font-style: italic; color: #6f5f47; }
+.df-card .stack { margin-top: 12px; }
+.df-rec { display: block; margin-top: 10px; color: #6f5f47; }
+
+/* ---------- Animations et transitions ---------- */
+.screen { animation: screen-in 0.4s cubic-bezier(0.2, 0.8, 0.25, 1) both; }
+@keyframes screen-in { from { opacity: 0; transform: translateY(16px) scale(0.99); } to { opacity: 1; transform: none; } }
+.eras > li { animation: card-in 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.eras > li:nth-child(1) { animation-delay: 0.05s; } .eras > li:nth-child(2) { animation-delay: 0.1s; } .eras > li:nth-child(3) { animation-delay: 0.15s; } .eras > li:nth-child(4) { animation-delay: 0.2s; } .eras > li:nth-child(5) { animation-delay: 0.25s; } .eras > li:nth-child(6) { animation-delay: 0.3s; } .eras > li:nth-child(7) { animation-delay: 0.35s; } .eras > li:nth-child(8) { animation-delay: 0.4s; } .eras > li:nth-child(n+9) { animation-delay: 0.45s; }
+@keyframes card-in { from { opacity: 0; transform: translateY(28px) scale(0.97); } to { opacity: 1; transform: none; } }
+.today, .learn-head, .df-menu, .tresor-hero, .resume { animation: card-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.learn-head { animation-delay: 0.1s; }
+.btn, .era, .lv-main, .tab, .icon-btn { transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease; }
+.btn:active, .era:active, .lv-main:active, .icon-btn:active { transform: scale(0.97); }
+@media (hover: hover) { .era:hover { transform: translateY(-3px); filter: brightness(1.04); } .btn-gold:hover { filter: brightness(1.06); transform: translateY(-1px); } }
+.tab.on .tab-ico { animation: tab-bounce 0.45s cubic-bezier(0.2, 1.5, 0.4, 1); }
+@keyframes tab-bounce { 0% { transform: scale(0.7); } 100% { transform: none; } }
+.q-card { animation: card-in 0.4s ease-out both; }
+.opt, .qopt { transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease; }
+.opt:active, .qopt:active { transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce) { .screen, .eras > li, .today, .learn-head, .df-menu, .tresor-hero, .resume, .q-card, .df-menu::after, .df-menu-art, .df-card, .df-over { animation: none !important; } .btn, .era { transition: none; } }
