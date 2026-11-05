@@ -330,7 +330,11 @@
       ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fillRect(W - 112, 14, 100, 10);
       ctx.fillStyle = "#f0c64b"; ctx.fillRect(W - 112, 14, 100 * Math.min(1, st.score / TOTAL), 10);
       ctx.strokeStyle = "#f4e6c0"; ctx.lineWidth = 1; ctx.strokeRect(W - 112.5, 13.5, 101, 11);
-      ctx.textAlign = "center";
+      ctx.textAlign = "center"; ctx.lineJoin = "round";
+      var big = String(st.score), by = 112;
+      ctx.font = "900 64px Georgia, serif"; ctx.lineWidth = 9; ctx.strokeStyle = "#2a1a08"; ctx.strokeText(big, W / 2, by);
+      ctx.fillStyle = st.score >= TOTAL ? "#ffd84a" : "#fffaf0"; ctx.fillText(big, W / 2, by);
+      if (!st.over) { ctx.font = "700 12px Georgia, serif"; ctx.lineWidth = 4; ctx.strokeStyle = "#2a1a08"; var sub = FR ? "territoires" : "territories"; ctx.strokeText(sub, W / 2, by + 18); ctx.fillStyle = "#f4e6c0"; ctx.fillText(sub, W / 2, by + 18); }
       if (!st.started && !st.over) {
         ctx.fillStyle = "rgba(30,18,6,0.6)"; ctx.fillRect(40, 330, W - 80, 54);
         ctx.fillStyle = "#fff3d6"; ctx.font = "700 18px Georgia, serif";

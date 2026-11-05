@@ -11,8 +11,8 @@
   ];
   var SKY = [[0, "#2a2350", "#f6a86b"], [0.2, "#6fa8e0", "#f4e7c4"], [0.5, "#78b6ea", "#f1efd8"], [0.74, "#5a4a8c", "#f39a5c"], [0.9, "#1f1c48", "#8a4e72"], [1, "#2a2350", "#f6a86b"]];
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 10.5 + 11 * (1 - Math.exp(-t / 28)) + Math.min(t, 240) * 0.04; }
-  function rowTime(t) { return Math.max(0.56, 0.95 - t * 0.012); }
+  function speedAt(t) { return 10.5 + 12.5 * (1 - Math.exp(-t / 26)) + Math.min(t, 300) * 0.05; }
+  function rowTime(t) { return Math.max(0.52, 1.1 - t * 0.012); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function hex(c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); }
@@ -57,23 +57,33 @@
       for (var si = 0; si < 2; si++) {
         side = si ? 1 : -1;
         var zz = z + si * 2.2, r = rnd(), v = rnd();
+        var P = function (o) { st.scn.push(o); };
         if (b === 0) {
-          if (rnd() < 0.1 && d > 150) st.scn.push({ z: zz, side: side, off: 0.1, type: "church", v: v });
-          else if (r < 0.2) st.scn.push({ z: zz, side: side, off: 0.05, type: "lamp", v: v }, { z: zz + 2.5, side: side, off: 0.1, type: "house", v: v, h: 120 + rnd() * 120, w: 120 + rnd() * 30, kind: "stone" });
-          else st.scn.push({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 130 + rnd() * 130, w: 120 + rnd() * 30, kind: "stone" });
+          var big = ((d / 60) | 0);
+          if (d > 120 && r < 0.09) P({ z: zz, side: side, off: 0.1, type: "prison", v: v });
+          else if (d > 150 && r < 0.17) P({ z: zz, side: side, off: 0.1, type: "church", v: v });
+          else {
+            P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 150 + rnd() * 140, w: 130 + rnd() * 40, kind: "stone" });
+            P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: rnd(), h: 130 + rnd() * 150, w: 130 + rnd() * 40, kind: "stone" });
+            if (r > 0.8) P({ z: zz + 2.6, side: side, off: 0, type: "lamp", v: v });
+          }
         } else if (b === 1) {
-          if (r < 0.14) st.scn.push({ z: zz, side: side, off: 0.15, type: "church", v: v });
-          else if (r < 0.22) st.scn.push({ z: zz, side: side, off: 0.1, type: "well", v: v });
-          else if (r < 0.34) st.scn.push({ z: zz, side: side, off: 0.15, type: "tree", v: v }, { z: zz + 2.5, side: side, off: 0.6, type: "house", v: v, h: 90 + rnd() * 50, w: 120, kind: "timber" });
-          else st.scn.push({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 90 + rnd() * 70, w: 115 + rnd() * 30, kind: "timber" });
+          if (r < 0.14) P({ z: zz, side: side, off: 0.15, type: "church", v: v });
+          else if (r < 0.22) { P({ z: zz, side: side, off: 0.1, type: "well", v: v }); P({ z: zz + 2.8, side: side, off: 0.4, type: "house", v: v, h: 100, w: 120, kind: "timber" }); }
+          else if (r < 0.34) { P({ z: zz, side: side, off: 0.15, type: "tree", v: v }); P({ z: zz + 2.5, side: side, off: 0.6, type: "house", v: v, h: 100, w: 120, kind: "timber" }); }
+          else { P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 100 + rnd() * 80, w: 115 + rnd() * 30, kind: "timber" }); P({ z: zz + 2.8, side: side, off: 0.2 + rnd() * 0.5, type: rnd() < 0.5 ? "house" : "tree", v: rnd(), h: 90 + rnd() * 70, w: 115, kind: "timber" }); }
         } else if (b === 2) {
-          st.scn.push({ z: zz, side: side, off: 0.05 + rnd() * 0.25, type: rnd() < 0.55 ? "pine" : "tree", v: v }, { z: zz + 1.4, side: side, off: 0.9 + rnd() * 0.6, type: rnd() < 0.5 ? "pine" : "tree", v: rnd() });
+          for (var q = 0; q < 4; q++) P({ z: zz + q * 1.35, side: side, off: 0.02 + rnd() * 0.5 + q * 0.5, type: rnd() < 0.55 ? "pine" : "tree", v: rnd() });
+          if (rnd() < 0.5) P({ z: zz + 0.7, side: side, off: 0.0, type: "bush", v: v });
+          if (r < 0.1) P({ z: zz + 2, side: side, off: 0.5, type: "cabin", v: v });
+          else if (r < 0.3) P({ z: zz + 2, side: side, off: 0.05, type: "rock", v: v });
         } else {
-          if (r < 0.1 && ((d / BLEN) % 4 | 0) !== 99) st.scn.push({ z: zz, side: side, off: 0.5, type: "mill", v: v });
-          else if (r < 0.22) st.scn.push({ z: zz, side: side, off: 0.2, type: "farm", v: v });
-          else if (r < 0.4) st.scn.push({ z: zz, side: side, off: 0.15, type: "haystack", v: v }, { z: zz + 2.6, side: side, off: 0.1, type: "fence", v: v });
-          else if (r < 0.5) st.scn.push({ z: zz, side: side, off: 0.2, type: "tree", v: v });
-          else st.scn.push({ z: zz, side: side, off: 0.05, type: "fence", v: v }, { z: zz + 2.7, side: side, off: 0.05, type: "fence", v: v });
+          if (d > 100 && r < 0.07) P({ z: zz, side: side, off: 0.3, type: "chateau", v: v });
+          else if (r < 0.15) P({ z: zz, side: side, off: 0.5, type: "mill", v: v });
+          else if (r < 0.28) { P({ z: zz, side: side, off: 0.25, type: "farm", v: v }); P({ z: zz + 3.2, side: side, off: 0.1, type: "haystack", v: v }); }
+          else if (r < 0.46) { P({ z: zz, side: side, off: 0.15, type: "haystack", v: v }); P({ z: zz + 2.6, side: side, off: 0.1, type: "fence", v: v }); }
+          else if (r < 0.62) { P({ z: zz, side: side, off: 0.2, type: "tree", v: v }); P({ z: zz + 2.7, side: side, off: 0.9, type: "tree", v: rnd() }); P({ z: zz + 1.2, side: side, off: 0.05, type: "fence", v: v }); }
+          else { P({ z: zz, side: side, off: 0.05, type: "fence", v: v }); P({ z: zz + 2.7, side: side, off: 0.05, type: "fence", v: v }); if (r > 0.85) P({ z: zz + 1.5, side: side, off: 0.3, type: "bush", v: v }); }
         }
         // spectateurs
         var pc = b === 0 ? 0.9 : b === 1 ? 0.8 : b === 2 ? 0.15 : 0.55;
@@ -90,12 +100,13 @@
       var diff = Math.min(1, st.t / 40), b = bioAt(st.dist + z * 1.4), pool = POOL[b];
       var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
       var rtPrev = st.gapT || 1.1, r = rnd();
-      var fx = Math.min(1, 0.45 + st.t / 60), kind = n < 4 ? "lanes" : r < 0.16 * fx ? "alllow" : r < 0.32 * fx ? "allhigh" : r < 0.55 * fx ? "mix" : "lanes";
+      var fx = Math.min(1.45, 0.15 + st.t / 55), kind = n < 5 ? "lanes" : r < 0.14 * fx ? "alllow" : r < 0.28 * fx ? "allhigh" : r < 0.46 * fx ? "mix" : r < 0.62 * fx ? "mixb" : "lanes";
       var rt = Math.max(0.5, rowTime(st.t) * (n > 3 && rnd() < diff * 0.35 ? 0.8 : 1));
       if (kind !== "lanes") rt = Math.max(rt, 0.86);
       st.gapT = rt; st.lastKind = kind;
       if (kind === "alllow") { var tl = pick(pool.low); for (var l = -1; l <= 1; l++) st.obs.push({ type: tl, cat: "low", lane: l, z: z, hit: false }); }
       else if (kind === "mix") { for (var lm = -1; lm <= 1; lm++) { var cm = rnd() < 0.5 ? "low" : "high"; st.obs.push({ type: pick(pool[cm]), cat: cm, lane: lm, z: z, hit: false }); } }
+      else if (kind === "mixb") { var sf = Math.floor(rnd() * 3) - 1; if (st.lastKindRow === "lanes" && rtPrev < 0.78) sf = Math.max(-1, Math.min(1, st.lastFree + Math.floor(rnd() * 3) - 1)); st.lastFree = sf; for (var lb = -1; lb <= 1; lb++) { var qb = rnd(), cb = lb === sf ? (qb < 0.5 ? "low" : "high") : qb < 0.34 ? "low" : qb < 0.67 ? "high" : "block"; st.obs.push({ type: pick(pool[cb]), cat: cb, lane: lb, z: z, hit: false }); } }
       else if (kind === "allhigh") { var th = pick(pool.high); for (var l2 = -1; l2 <= 1; l2++) st.obs.push({ type: th, cat: "high", lane: l2, z: z, hit: false }); }
       else {
         var shift = rnd() < 0.5 ? 0 : (rnd() < 0.5 ? -1 : 1);
@@ -284,42 +295,64 @@
       [-1.5, 1.5].forEach(function (l) { ctx.beginPath(); ctx.moveTo(xOf(l, FAR + 6), yOf(FAR + 6)); ctx.lineTo(xOf(l, -1.2), yOf(-1.2)); ctx.stroke(); });
     }
 
-    /* ---------- bâtiments et décor ---------- */
-    var WALLS = [["#cdb890", "#a79068"], ["#bfae92", "#94836a"], ["#d1b394", "#9d7e60"], ["#bdb6a4", "#8d8878"], ["#c9bfa0", "#a09676"]];
-    var ROOFS = ["#5b4a52", "#4a4458", "#7a4a3a", "#4f5560", "#6a4a3e"];
-    function drawHouse(it, x, y, k) {
-      var w = it.w * k, h = it.h * k, xo = (1.5 * LW + 10 + it.off * LW) * k;
-      var bx = it.side < 0 ? W / 2 - xo - w : W / 2 + xo;
-      var col = WALLS[Math.floor(it.v * 5)], timber = it.kind === "timber";
-      rect(bx, y - h, w, h, col[0]);
-      rect(it.side < 0 ? bx + w - 7 * k : bx, y - h, 7 * k, h, col[1]);
-      if (timber) { ctx.strokeStyle = "#4e3820"; ctx.lineWidth = Math.max(1, 3 * k); ctx.strokeRect(bx, y - h, w, h); line(bx, y - h * 0.55, bx + w, y - h * 0.55, "#4e3820", 3 * k); line(bx + w * 0.5, y - h, bx + w * 0.5, y, "#4e3820", 3 * k); line(bx, y - h, bx + w * 0.5, y - h * 0.55, "#4e3820", 2.5 * k); line(bx + w, y - h, bx + w * 0.5, y - h * 0.55, "#4e3820", 2.5 * k); }
-      var rc = timber ? "#a8873a" : ROOFS[Math.floor(it.v * 5)];
-      poly([bx - 5 * k, y - h, bx + w / 2, y - h - 38 * k, bx + w + 5 * k, y - h], rc);
-      rect(bx + w * 0.7, y - h - 34 * k, 10 * k, 24 * k, "#7a6a60");
-      var rows = Math.max(1, Math.floor(it.h / 52));
-      for (var r = 0; r < rows; r++) for (var c = 0; c < 2; c++) {
-        var wx = bx + (14 + c * (w / k - 44)) * k, wy = y - h + (14 + r * 46) * k;
-        rect(wx, wy, 20 * k, 28 * k, ((r + c + Math.floor(it.v * 9)) % 3 === 0) ? "#f3d98a" : "#40364f");
-        rect(wx - 5 * k, wy, 5 * k, 28 * k, "#4e6a58"); rect(wx + 20 * k, wy, 5 * k, 28 * k, "#4e6a58");
+    /* ---------- bâtiments en 3D (volumes en perspective) ---------- */
+    var WALLS = [["#d6c196", "#a48c64"], ["#c9b89c", "#8f7c62"], ["#d9b998", "#9b7a5a"], ["#c4bdaa", "#8a8472"], ["#d0c5a2", "#9a8f6c"]];
+    var ROOFS = [["#6b5a64", "#4a3c46"], ["#5a5470", "#3e3a52"], ["#8c5642", "#63382a"], ["#5c6572", "#414a56"], ["#7a5648", "#563a30"]];
+    function PT(it, dd, zz, hh) { var k = kOf(zz); return [W / 2 + it.side * dd * k, yOf(zz) - hh * k]; }
+    function face(it, c, a) { var pts = []; a.forEach(function (p) { var q = PT(it, p[0], p[1], p[2]); pts.push(q[0], q[1]); }); poly(pts, c); }
+    function bld(it, o) {
+      var zn = it.z + (o.dz || 0), d = o.d, zf = zn + d, xi = 1.5 * LW + 8 + (o.off != null ? o.off : it.off) * LW, xo = xi + o.w, xc = (xi + xo) / 2, h = o.h, kn = kOf(zn);
+      face(it, o.ws, [[xi, zn, 0], [xi, zn, h], [xi, zf, h], [xi, zf, 0]]);
+      if (o.win) for (var j = 0; j < o.win[0]; j++) for (var r = 0; r < o.win[1]; r++) {
+        var za = zn + d * (0.1 + j * 0.86 / o.win[0]), zb = za + d * 0.42 / o.win[0], ha = 16 + r * (o.wh || 46), lit = (r + j + Math.floor(it.v * 9)) % 3 === 0;
+        face(it, o.bars ? "#15121a" : lit ? "#f3d98a" : "#40364f", [[xi, za, ha], [xi, zb, ha], [xi, zb, ha + (o.wk || 26)], [xi, za, ha + (o.wk || 26)]]);
+        if (o.bars) { var zm = (za + zb) / 2; face(it, "#8a8a92", [[xi, zm - 0.01, ha], [xi, zm + 0.01, ha], [xi, zm + 0.01, ha + (o.wk || 26)], [xi, zm - 0.01, ha + (o.wk || 26)]]); }
       }
-      rect(bx + w / 2 - 9 * k, y - 38 * k, 18 * k, 38 * k, "#4a3320");
+      if (o.roof === "gable") face(it, o.rc, [[xi - 7, zn, h], [xc, zn, h + o.rh], [xc, zf, h + o.rh], [xi - 7, zf, h]]);
+      else if (o.roof === "flat" && yOf(zn) - h * kn > HY) face(it, o.top || o.wf, [[xi, zn, h], [xo, zn, h], [xo, zf, h], [xi, zf, h]]);
+      face(it, o.wf, [[xi, zn, 0], [xo, zn, 0], [xo, zn, h], [xi, zn, h]]);
+      if (o.timber) { var tc = "#4e3820"; face(it, tc, [[xi, zn, h * 0.5], [xo, zn, h * 0.5], [xo, zn, h * 0.5 + 4], [xi, zn, h * 0.5 + 4]]); face(it, tc, [[xc - 2, zn, 0], [xc + 2, zn, 0], [xc + 2, zn, h], [xc - 2, zn, h]]); for (var tj = 0; tj < 4; tj++) { var zt = zn + d * (0.1 + tj * 0.26); face(it, tc, [[xi, zt, 0], [xi, zt + 0.04, 0], [xi, zt + 0.04, h], [xi, zt, h]]); } face(it, tc, [[xi, zn, h * 0.5], [xi, zf, h * 0.5], [xi, zf, h * 0.5 + 4], [xi, zn, h * 0.5 + 4]]); }
+      if (o.fw) for (var fc = 0; fc < o.fw[0]; fc++) for (var fr = 0; fr < o.fw[1]; fr++) {
+        var fx = xi + 10 + fc * ((o.w - 40) / Math.max(1, o.fw[0] - 1 || 1)), fh = (o.fh0 || 52) + fr * (o.wh || 46), flit = (fr + fc + Math.floor(it.v * 7)) % 3 === 0;
+        face(it, o.bars ? "#15121a" : flit ? "#f3d98a" : "#40364f", [[fx, zn, fh], [fx + 18, zn, fh], [fx + 18, zn, fh + 26], [fx, zn, fh + 26]]);
+        if (!o.bars) { face(it, "#4e6a58", [[fx - 5, zn, fh], [fx, zn, fh], [fx, zn, fh + 26], [fx - 5, zn, fh + 26]]); face(it, "#4e6a58", [[fx + 18, zn, fh], [fx + 23, zn, fh], [fx + 23, zn, fh + 26], [fx + 18, zn, fh + 26]]); }
+      }
+      if (o.door) { var dc = o.dcol || "#4a3320"; face(it, dc, [[xc - 10, zn, 0], [xc + 10, zn, 0], [xc + 10, zn, 36], [xc, zn, 44], [xc - 10, zn, 36]]); if (o.gate) { for (var gi = -2; gi <= 2; gi++) face(it, "#9a9aa4", [[xc + gi * 4 - 0.8, zn, 0], [xc + gi * 4 + 0.8, zn, 0], [xc + gi * 4 + 0.8, zn, 40], [xc + gi * 4 - 0.8, zn, 40]]); } }
+      if (o.roof === "gable") { face(it, o.wf, [[xi, zn, h], [xo, zn, h], [xc, zn, h + o.rh]]); face(it, o.rc, [[xi - 7, zn, h - 2], [xi, zn, h - 2], [xc, zn, h + o.rh], [xc, zn, h + o.rh - 5]]); }
+      if (o.roof === "pyr") { var zc = zn + d / 2; face(it, o.rs, [[xi - 4, zn, h], [xi - 4, zf, h], [xc, zc, h + o.rh]]); face(it, o.rc, [[xi - 4, zn, h], [xo + 4, zn, h], [xc, zc, h + o.rh]]); if (o.flag) { var fp = PT(it, xc, zc, h + o.rh), kk = kOf(zc); line(fp[0], fp[1], fp[0], fp[1] - 26 * kk, "#2a2a2a", 1.6 * kk); poly([fp[0], fp[1] - 26 * kk, fp[0] + it.side * -16 * kk, fp[1] - 22 * kk + Math.sin(st.t * 5) * 2 * kk, fp[0], fp[1] - 17 * kk], o.flag); } }
+      if (o.crown) { var nn = 7; for (var m = 0; m < nn; m++) { var za2 = zn + d * m / nn, zb2 = za2 + d * 0.5 / nn; face(it, o.ws, [[xi, za2, h], [xi, zb2, h], [xi, zb2, h + 11], [xi, za2, h + 11]]); } for (var m2 = 0; m2 < 5; m2++) { var xa = xi + (o.w) * m2 / 5; face(it, o.wf, [[xa, zn, h], [xa + o.w * 0.1, zn, h], [xa + o.w * 0.1, zn, h + 11], [xa, zn, h + 11]]); } }
     }
-    function drawChurch(it, x, y, k) {
-      var xo = (1.5 * LW + 8 + it.off * LW) * k, nw = 150 * k, nh = 108 * k, tw = 58 * k, th = 230 * k;
-      var bx = it.side < 0 ? W / 2 - xo - nw - tw * 0.4 : W / 2 + xo;
-      var tx = it.side < 0 ? bx + nw - tw * 0.2 : bx - tw * 0.8 + 0.0;
-      if (it.side > 0) tx = bx;
-      var nx = it.side < 0 ? bx : bx + tw;
-      rect(nx, y - nh, nw, nh, "#cfc7b2"); poly([nx - 4 * k, y - nh, nx + nw / 2, y - nh - 40 * k, nx + nw + 4 * k, y - nh], "#6a5a58");
-      for (var i = 0; i < 3; i++) { rect(nx + (16 + i * 44) * k, y - nh + 30 * k, 14 * k, 36 * k, "#3a4a7a"); poly([nx + (16 + i * 44) * k, y - nh + 30 * k, nx + (23 + i * 44) * k, y - nh + 20 * k, nx + (30 + i * 44) * k, y - nh + 30 * k], "#3a4a7a"); }
-      rect(tx, y - th, tw, th, "#d8d0bb"); rect(tx + tw - 7 * k, y - th, 7 * k, th, "#b3aa94");
-      rect(tx + 14 * k, y - th + 40 * k, 30 * k, 46 * k, "#4a3f3a"); for (var s = 0; s < 4; s++) rect(tx + 14 * k, y - th + (46 + s * 10) * k, 30 * k, 3 * k, "#7a6a60");
-      circ(tx + tw / 2, y - th + 110 * k, 11 * k, "#f4efdc"); line(tx + tw / 2, y - th + 110 * k, tx + tw / 2, y - th + 103 * k, "#2a2a2a", 1.6 * k); line(tx + tw / 2, y - th + 110 * k, tx + tw / 2 + 5 * k, y - th + 110 * k, "#2a2a2a", 1.6 * k);
-      poly([tx - 4 * k, y - th, tx + tw / 2, y - th - 86 * k, tx + tw + 4 * k, y - th], "#4f5a78");
-      line(tx + tw / 2, y - th - 86 * k, tx + tw / 2, y - th - 112 * k, "#d9b24a", 2.4 * k); line(tx + tw / 2 - 7 * k, y - th - 102 * k, tx + tw / 2 + 7 * k, y - th - 102 * k, "#d9b24a", 2.4 * k);
-      poly([tx + tw / 2 - 14 * k, y, tx + tw / 2 - 14 * k, y - 38 * k, tx + tw / 2, y - 52 * k, tx + tw / 2 + 14 * k, y - 38 * k, tx + tw / 2 + 14 * k, y], "#3a2a1c");
+    function drawHouse(it, x, y, k) {
+      var wi = Math.floor(it.v * 5), tim = it.kind === "timber", c = WALLS[wi], rf = ROOFS[(wi + 2) % 5];
+      var h = it.h * 0.78;
+      bld(it, { w: it.w * 0.8, h: h, d: tim ? 2.4 : 2.9, wf: tim ? "#e0d2ae" : c[0], ws: tim ? "#b4a37e" : c[1], roof: "gable", rc: tim ? "#c19a48" : rf[0], rh: tim ? 40 : 48, win: [2, Math.max(1, Math.floor(h / 52))], fw: [2, Math.max(1, Math.floor(h / 52))], door: true, timber: tim });
+      if (!tim && it.h > 190) { var cp = PT(it, 1.5 * LW + 8 + it.off * LW + it.w * 0.55, it.z + 1.4, h + 40), kc = kOf(it.z + 1.4); rect(cp[0] - 5 * kc, cp[1] - 22 * kc, 10 * kc, 30 * kc, "#6e5e58"); }
     }
+    function drawChurch(it) {
+      var nave = { side: it.side, off: it.off, z: it.z + 1.9, v: it.v }, tw = { side: it.side, off: it.off, z: it.z, v: it.v };
+      bld(nave, { w: 120, h: 105, d: 3.4, wf: "#d6cdb6", ws: "#aaa08a", roof: "gable", rc: "#6a5a58", rh: 46, win: [3, 1], wh: 0, wk: 42, bars: false, door: false });
+      bld(tw, { off: it.off, w: 66, h: 235, d: 1.6, wf: "#e0d8c3", ws: "#b0a88f", roof: "pyr", rc: "#58648a", rs: "#414b6c", rh: 105, door: true, dcol: "#3a2a1c", flag: null });
+      var xi = 1.5 * LW + 8 + it.off * LW, c = PT(tw, xi + 33, it.z, 190), kk = kOf(it.z);
+      circ(c[0], c[1], 12 * kk, "#f4efdc"); line(c[0], c[1], c[0], c[1] - 8 * kk, "#2a2a2a", 1.6 * kk); line(c[0], c[1], c[0] + 5 * kk, c[1], "#2a2a2a", 1.6 * kk);
+      face(tw, "#2a2430", [[xi + 22, it.z, 140], [xi + 44, it.z, 140], [xi + 44, it.z, 176], [xi + 33, it.z, 186], [xi + 22, it.z, 176]]);
+      var tp = PT(tw, xi + 33, it.z + 0.8, 235 + 105), kt = kOf(it.z + 0.8); line(tp[0], tp[1], tp[0], tp[1] - 24 * kt, "#d9b24a", 2.4 * kt); line(tp[0] - 7 * kt, tp[1] - 15 * kt, tp[0] + 7 * kt, tp[1] - 15 * kt, "#d9b24a", 2.4 * kt);
+    }
+    function drawPrison(it) {
+      var a = { side: it.side, off: it.off, z: it.z + 1.1, v: it.v }, t1 = { side: it.side, off: it.off, z: it.z, v: it.v }, t2 = { side: it.side, off: it.off, z: it.z + 3.6, v: it.v };
+      bld(t2, { w: 54, h: 215, d: 1.5, wf: "#8d8a88", ws: "#66625f", roof: "pyr", rc: "#2f2c36", rs: "#201e26", rh: 70, win: [1, 3], wh: 52, wk: 24, bars: true, crown: false });
+      bld(a, { w: 160, h: 170, d: 3.1, wf: "#9a9692", ws: "#6f6b68", roof: "flat", top: "#7a7672", win: [4, 3], wh: 44, wk: 22, bars: true, crown: true, door: true, gate: true, dcol: "#1b1620" });
+      bld(t1, { w: 62, h: 235, d: 1.7, wf: "#a39f9b", ws: "#76726f", roof: "pyr", rc: "#2f2c36", rs: "#201e26", rh: 78, win: [1, 3], wh: 52, wk: 24, bars: true, fw: [2, 3], fh0: 60, flag: "#b02a37" });
+    }
+    function drawChateau(it) {
+      var a = { side: it.side, off: it.off, z: it.z + 1.2, v: it.v }, t1 = { side: it.side, off: it.off, z: it.z, v: it.v }, t2 = { side: it.side, off: it.off, z: it.z + 3.8, v: it.v };
+      bld(t2, { w: 50, h: 170, d: 1.4, wf: "#e8dcc0", ws: "#bcae90", roof: "pyr", rc: "#4a5f8a", rs: "#364768", rh: 70, win: [1, 2], wh: 52 });
+      bld(a, { w: 150, h: 120, d: 3.3, wf: "#eadfc4", ws: "#bfb294", roof: "gable", rc: "#4a5f8a", rh: 52, win: [4, 2], fw: [3, 2], door: true, wh: 46, dcol: "#4a3320" });
+      bld(t1, { w: 56, h: 190, d: 1.6, wf: "#f0e6cc", ws: "#c4b698", roof: "pyr", rc: "#4a5f8a", rs: "#364768", rh: 82, win: [1, 3], wh: 50, fw: [2, 3], fh0: 50, flag: "#d9b13a" });
+    }
+    function drawCabin(it) { bld(it, { w: 74, h: 54, d: 2, wf: "#8a6a44", ws: "#664a2e", roof: "gable", rc: "#b49a52", rh: 34, win: [1, 1], fw: [1, 1], fh0: 20, door: true }); }
+    function drawChurchOld() {}
+    function drawBush(it, x, y, k) { var xo = (1.5 * LW + 10 + it.off * LW) * k, tx = it.side < 0 ? W / 2 - xo : W / 2 + xo; ell(tx, y, 22 * k, 5 * k, "rgba(0,0,0,0.18)"); circ(tx, y - 12 * k, 16 * k, "#33642f"); circ(tx - 12 * k, y - 8 * k, 12 * k, "#2b5a2c"); circ(tx + 12 * k, y - 9 * k, 13 * k, "#3f7a36"); }
+    function drawRock(it, x, y, k) { var xo = (1.5 * LW + 10 + it.off * LW) * k, tx = it.side < 0 ? W / 2 - xo : W / 2 + xo; poly([tx - 24 * k, y, tx - 16 * k, y - 26 * k, tx + 4 * k, y - 34 * k, tx + 24 * k, y - 14 * k, tx + 28 * k, y], "#8a8a86"); poly([tx + 4 * k, y - 34 * k, tx + 24 * k, y - 14 * k, tx + 28 * k, y, tx + 6 * k, y], "#6c6c6a"); }
     function drawTree(it, x, y, k, pine) {
       var xo = (1.5 * LW + 12 + it.off * LW) * k, tx = it.side < 0 ? W / 2 - xo : W / 2 + xo, s = (0.85 + it.v * 0.5) * k;
       var gr = ["#3d7a3a", "#2f6a34", "#4d8a3c", "#356a3a"][Math.floor(it.v * 4)];
@@ -335,12 +368,7 @@
       var a = st.t * 0.9 + it.v * 6; for (var i = 0; i < 4; i++) { var an = a + i * 1.5708, ex = tx + Math.cos(an) * 72 * k, ey = y - 112 * k + Math.sin(an) * 72 * k; line(tx, y - 112 * k, ex, ey, "#5e4226", 3 * k); var nx = -Math.sin(an) * 12 * k, ny = Math.cos(an) * 12 * k; poly([tx + Math.cos(an) * 20 * k, y - 112 * k + Math.sin(an) * 20 * k, ex, ey, ex + nx, ey + ny, tx + Math.cos(an) * 20 * k + nx, y - 112 * k + Math.sin(an) * 20 * k + ny], "rgba(240,232,210,0.9)"); }
       circ(tx, y - 112 * k, 5 * k, "#3a2a1c");
     }
-    function drawFarm(it, x, y, k) {
-      var xo = (1.5 * LW + 16 + it.off * LW) * k, w = 150 * k, h = 62 * k, bx = it.side < 0 ? W / 2 - xo - w : W / 2 + xo;
-      rect(bx, y - h, w, h, "#d8c9a4"); rect(bx, y - h, w, 5 * k, "#bda878");
-      poly([bx - 8 * k, y - h, bx + w * 0.5, y - h - 50 * k, bx + w + 8 * k, y - h], "#b08a3a"); poly([bx - 8 * k, y - h, bx + w * 0.5, y - h - 50 * k, bx + w * 0.5, y - h], "rgba(0,0,0,0.1)");
-      rect(bx + 14 * k, y - 42 * k, 26 * k, 42 * k, "#5a3e24"); rect(bx + w - 40 * k, y - 46 * k, 18 * k, 20 * k, "#40364f"); rect(bx + w * 0.55, y - h - 44 * k, 9 * k, 26 * k, "#8a7a68");
-    }
+    function drawFarm(it) { bld(it, { w: 130, h: 64, d: 3, wf: "#dccfaa", ws: "#b3a47e", roof: "gable", rc: "#b08a3a", rh: 46, win: [2, 1], fw: [1, 1], fh0: 30, door: true }); }
     function drawHay(it, x, y, k) {
       var xo = (1.5 * LW + 20 + it.off * LW) * k, tx = it.side < 0 ? W / 2 - xo : W / 2 + xo;
       poly([tx - 34 * k, y, tx - 22 * k, y - 52 * k, tx, y - 74 * k, tx + 22 * k, y - 52 * k, tx + 34 * k, y], "#d4b250"); poly([tx - 10 * k, y, tx, y - 74 * k, tx + 22 * k, y - 52 * k, tx + 34 * k, y], "rgba(0,0,0,0.1)");
@@ -365,9 +393,9 @@
       var k = kOf(it.z), y = yOf(it.z);
       ctx.globalAlpha = fade(it.z);
       switch (it.type) {
-        case "house": drawHouse(it, 0, y, k); break; case "church": drawChurch(it, 0, y, k); break;
+        case "house": drawHouse(it, 0, y, k); break; case "church": drawChurch(it); break; case "prison": drawPrison(it); break; case "chateau": drawChateau(it); break; case "cabin": drawCabin(it); break; case "bush": drawBush(it, 0, y, k); break; case "rock": drawRock(it, 0, y, k); break;
         case "tree": drawTree(it, 0, y, k, false); break; case "pine": drawTree(it, 0, y, k, true); break;
-        case "mill": drawMill(it, 0, y, k); break; case "farm": drawFarm(it, 0, y, k); break;
+        case "mill": drawMill(it, 0, y, k); break; case "farm": drawFarm(it); break;
         case "haystack": drawHay(it, 0, y, k); break; case "fence": drawFence(it, 0, y, k); break;
         case "well": drawWell(it, 0, y, k); break; case "lamp": drawLamp(it, 0, y, k); break;
       }
@@ -488,10 +516,9 @@
     /* ---------- HUD ---------- */
     function hud() {
       ctx.textAlign = "center";
-      ctx.fillStyle = "rgba(20,10,14,0.55)"; ctx.fillRect(W / 2 - 62, 12, 124, 40);
-      ctx.fillStyle = "#ffe9a8"; ctx.font = "700 26px Georgia, serif"; ctx.fillText(String(st.over ? st.finalScore : score()), W / 2, 42);
-      ctx.font = "700 11px Georgia, serif"; ctx.fillStyle = "#e7d7b0";
-      ctx.fillText(Math.floor(st.dist) + " m  ·  " + st.coins + " ●", W / 2, 66);
+      ctx.lineJoin = "round"; var sc = String(st.over ? st.finalScore : score());
+      ctx.font = "900 58px Georgia, serif"; ctx.lineWidth = 9; ctx.strokeStyle = "#1c0f14"; ctx.strokeText(sc, W / 2, 62); ctx.fillStyle = "#fffaf0"; ctx.fillText(sc, W / 2, 62);
+      ctx.font = "700 12px Georgia, serif"; ctx.lineWidth = 4; var sub = Math.floor(st.dist) + " m  ·  " + st.coins + " ●"; ctx.strokeText(sub, W / 2, 82); ctx.fillStyle = "#f4e6c0"; ctx.fillText(sub, W / 2, 82);
       var gx = W - 24, gh = 120, gy0 = 24;
       ctx.fillStyle = "rgba(20,10,14,0.55)"; ctx.fillRect(gx - 8, gy0 - 6, 16, gh + 12);
       var g = st.warn > 0 ? st.warn / 8 : 0;
