@@ -3,9 +3,10 @@
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;
   /* physique (px et secondes) : bond franc, chute plus violente que la montée */
-  var FLAP = 227, GU = 558, GD = 558, VMAX = 335, STEP = 1 / 120;
+  var TS = 1.28; // le temps s'écoule plus vite : même géométrie, jeu plus nerveux
+  var FLAP = 227 * TS, GU = 558 * TS * TS, GD = 558 * TS * TS, VMAX = 335 * TS, STEP = 1 / 120;
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedOf(n) { return 120 + Math.min(n, 150) * 0.65; }
+  function speedOf(n) { return (120 + Math.min(n, 150) * 0.7) * TS; }
   function gapOf(n) { return Math.max(142, 182 - n * 0.8); }
   function spaceOf(n) { return Math.max(188, 222 - n * 0.55); }
   var STAGES = [
@@ -44,14 +45,14 @@
       var speed = speedOf(st.score);
       var space = spaceOf(st.score);
       var T = space / speed; // secondes entre deux portes
-      var fq = 1.3 + Math.min(st.score, 150) * 0.016;
+      var fq = (1.3 + Math.min(st.score, 150) * 0.016) * TS;
       var amp = st.score < 15 ? 0 : Math.min(34, 10 + (st.score - 15) * 0.4, 56 / fq);
       var lo = 66 + gap / 2 + amp, hi = GY - 66 - gap / 2 - amp;
       var c = lo + rnd() * Math.max(0, hi - lo);
       if (st.lastC != null) {
         // la porte suivante doit rester atteignable : on borne le décalage vertical selon le temps disponible
         var slack = (st.lastAmp || 0) + amp; // les portes mobiles peuvent s'écarter dans le pire sens
-        var up = Math.max(10, 58 * T - slack * 0.6), down = Math.max(20, 150 * T - slack * 0.6);
+        var up = Math.max(10, 58 * TS * T - slack * 0.6), down = Math.max(20, 150 * TS * T - slack * 0.6);
         c = Math.max(st.lastC - up, Math.min(st.lastC + down, c));
         c = Math.max(lo, Math.min(hi, c));
       }
@@ -114,7 +115,7 @@
       if (!st.started) { st.y = Math.round(GY * 0.5) + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
       st.vy += (st.vy < 0 ? GU : GD) * dt; if (st.vy > VMAX) st.vy = VMAX;
       st.y += st.vy * dt;
-      st.rot = Math.max(-0.45, Math.min(0.6, st.vy / 480));
+      st.rot = Math.max(-0.45, Math.min(0.6, st.vy / (480 * TS)));
       st.scroll += speed * dt;
       st.pipes.forEach(function (p) { p.x -= speed * dt; if (p.amp) { var lo = 66, hi = GY - 66 - p.gap; p.top = Math.max(lo, Math.min(hi, p.base + Math.sin(t * p.fq + p.ph) * p.amp)); } });
       var lastp = st.pipes[st.pipes.length - 1];
