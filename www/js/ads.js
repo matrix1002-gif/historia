@@ -52,14 +52,14 @@
       AdMob.addListener("interstitialAdDismissed", function () { hot = false; prepare(); });
       ready = true;
       prepare();
-      if ((wanted !== "quiz" && wanted !== "tgame" && wanted !== "defense")) showBanner();
+      if ((wanted !== "quiz" && wanted !== "tgame" && wanted !== "defense" && wanted !== "run")) showBanner();
     } catch (e) { /* les publicités sont facultatives : l'application continue sans */ }
   }
 
   window.HistoriaAds = {
     screen: function (name) {
       wanted = name;
-      if (name === "quiz" || name === "tgame" || name === "defense") hideBanner(); else showBanner();
+      if (name === "quiz" || name === "tgame" || name === "defense" || name === "run") hideBanner(); else showBanner();
     },
     quizFinished: function () {
       done++;

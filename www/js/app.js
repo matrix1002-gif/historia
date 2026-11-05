@@ -490,7 +490,7 @@
   window.addEventListener("popstate", (e) => {
     const st = e.state || { name: "home" };
     closeSheet();
-    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "defense") {
+    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "defense" || st.name === "run") {
       T = null;
       view = { name: "home" };
       history.replaceState({ name: "home" }, "");
@@ -529,10 +529,11 @@
 
   const render = () => {
     if (view.name !== "defense" && DF) { if (DF.game) DF.game.destroy(); DF = null; }
+    if (view.name !== "run" && RN) { if (RN.game) RN.game.destroy(); RN = null; }
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
-    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense"), view.name === "defense" ? "croisades" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
+    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "revolution" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
@@ -540,6 +541,7 @@
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
     if (view.name === "defense" && DF) { $app.innerHTML = defenseScreen(); return dfAttach(); }
+    if (view.name === "run" && RN) { $app.innerHTML = runScreen(); return rnAttach(); }
     if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
     if (view.name === "gallery") return ($app.innerHTML = withTabs(galleryScreen(), "gallery"));
     if (view.name === "medals") return ($app.innerHTML = withTabs(medalsScreen(), "medals"));
@@ -702,6 +704,72 @@
       <div><h2>${L2("Conquête !", "Conquest!")}</h2>
       <p>${L2("Un chevalier, un cheval qui bondit, 200 territoires à conquérir. Le paysage et ton armure changent à chaque étape. Touche pour sauter !", "A knight, a leaping horse, 200 territories to conquer. The scenery and your armour change at every stage. Tap to jump!")}</p>
       <button class="btn btn-gold" data-act="dfstart">${L2("Jouer", "Play")}</button>${rec}</div></section>`;
+  }
+
+  /* ===== La Fuite (course du révolutionnaire) ===== */
+  let RN = null;
+  const rnStats = () => (S.stats.run = Object.assign({ plays: 0, best: 0, far: 0 }, S.stats.run));
+  function startRun() {
+    if (!window.HistoriaRun) return;
+    sfx("tap");
+    RN = { game: null, phase: "intro" };
+    go("run", {}, view.name === "run" ? "replace" : "push");
+  }
+  function rnIntro() {
+    const st = rnStats();
+    return `<div class="df-card"><h2>${L2("La Fuite !", "The Escape!")}</h2>
+      <p>${L2("Paris, 1789. Tu as osé crier « Vive la Nation ! » : la garde royale est à tes trousses. Cours, esquive, ne te laisse pas rattraper !", "Paris, 1789. You dared to shout “Long live the Nation!”: the royal guard is on your heels. Run, dodge, don't get caught!")}</p>
+      <ul class="df-how"><li><b>${L2("Glisse à gauche / à droite", "Swipe left / right")}</b> ${L2("pour changer de voie.", "to change lane.")}</li><li><b>${L2("Vers le haut", "Swipe up")}</b> ${L2("pour sauter les caisses, ", "to jump crates, ")}<b>${L2("vers le bas", "down")}</b> ${L2("pour passer sous les poutres.", "to slide under beams.")}</li><li>${L2("Un obstacle heurté rapproche la garde : deux faux pas et c'est fini. La course ne s'arrête jamais, elle ne fait que s'accélérer…", "Hitting an obstacle lets the guards close in: two slips and it's over. The chase never ends, it only gets faster…")}</li></ul>
+      <button class="btn btn-gold" data-act="rngo">${L2("Courir !", "Run!")}</button>
+      ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : ""}</div>`;
+  }
+  function rnEnd(r) {
+    const st = rnStats();
+    st.plays++;
+    const rec = r.score > st.best;
+    if (rec) st.best = r.score;
+    if (r.meters > st.far) st.far = r.meters;
+    const xp = Math.min(40, Math.floor(r.score / 25));
+    S.xp += xp;
+    save();
+    if (window.HistoriaAds) window.HistoriaAds.quizFinished();
+    if (rec && r.score > 0) Art.confetti();
+    const over = document.getElementById("df-over");
+    if (!over) return;
+    over.innerHTML = `<div class="df-card df-end lose"><h2>${L2("Rattrapé par la garde !", "Caught by the guard!")}</h2>
+      <p class="df-big">${r.score} <small>${L2("points", "points")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
+      <p>${r.meters} m · ${r.coins} ${L2("cocardes", "cockades")}${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
+      <p class="df-fact">${L2("En 1789, la cocarde bleu-blanc-rouge naît à Paris : elle mêle le bleu et le rouge de la ville au blanc de la monarchie.", "In 1789 the blue-white-red cockade was born in Paris: it joined the blue and red of the city to the white of the monarchy.")}</p>
+      <div class="stack"><button class="btn btn-gold" data-act="rngo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="rnquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div></div>`;
+    over.hidden = false;
+  }
+  function rnMake() {
+    return window.HistoriaRun.create(document.getElementById("df-canvas"), { lang: EN ? "en" : "fr", sfx, buzz, best: rnStats().best, onEnd: (r) => { if (RN) { RN.phase = "end"; rnEnd(r); } } });
+  }
+  function rnAttach() {
+    if (!document.getElementById("df-canvas") || !RN) return;
+    RN.game = rnMake();
+    const over = document.getElementById("df-over");
+    if (over) { over.innerHTML = rnIntro(); over.hidden = false; }
+  }
+  function rnGo() {
+    if (!RN || !RN.game) return;
+    const over = document.getElementById("df-over");
+    if (over) over.hidden = true;
+    RN.phase = "play";
+    RN.game.destroy();
+    RN.game = rnMake();
+    RN.game.start();
+  }
+  const runScreen = () => `<div class="screen dfscreen" id="run"><button class="icon-btn df-close" data-act="rnquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button>
+    <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : fuir la garde royale", "Game: escape the royal guard")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
+  function runCard() {
+    const st = (S.stats && S.stats.run) || { plays: 0, best: 0 };
+    const rec = st.plays ? `<small class="mz-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : "";
+    return `<section class="df-menu rn-menu"><div class="df-menu-art" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="10" fill="#e8b890"/><path d="M20 20 Q24 4 38 8 Q50 6 46 20 Z" fill="#c8323c"/><circle cx="43" cy="16" r="3" fill="#fff"/><path d="M18 58 L22 34 H42 L46 58 Z" fill="#2f4fa8"/><path d="M22 36 L42 56" stroke="#f2efe6" stroke-width="4"/></svg></div>
+      <div><h2>${L2("La Fuite !", "The Escape!")}</h2>
+      <p>${L2("Révolutionnaire poursuivi par la garde royale, cours dans les rues de Paris : esquive, saute, glisse… Une course sans fin, de plus en plus rapide !", "A revolutionary hunted by the royal guard, run through the streets of Paris: dodge, jump, slide… An endless chase that keeps getting faster!")}</p>
+      <button class="btn btn-gold" data-act="rnstart">${L2("Jouer", "Play")}</button>${rec}</div></section>`;
   }
 
   function homeScreen() {
@@ -1197,6 +1265,7 @@
       ${topBar("Quiz")}
       <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
       ${defenseCard()}
+      ${runCard()}
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1411,6 +1480,9 @@
       case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
       case "dfstart": startDefense(); break;
       case "dfgo": dfGo(); break;
+      case "rnstart": startRun(); break;
+      case "rngo": rnGo(); break;
+      case "rnquit": if (!RN || RN.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { if (RN && RN.game) RN.game.destroy(); RN = null; back(); } break;
       case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;

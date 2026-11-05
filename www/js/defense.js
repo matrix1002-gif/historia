@@ -2,6 +2,12 @@
    Chaque porte franchie = un territoire conquis (jusqu'à 200). Le paysage et le chevalier changent avec la conquête. */
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;
+  /* physique (px et secondes) : bond franc, chute plus violente que la montée */
+  var FLAP = 440, GU = 1560, GD = 2800, VMAX = 860, STEP = 1 / 120;
+  function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function speedOf(n) { return 118 + Math.min(n, 200) * 0.8; }
+  function gapOf(n) { return Math.max(130, 182 - n * 0.52); }
+  function spaceOf(n) { return Math.max(185, 218 - n * 0.2); }
   var STAGES = [
     { at: 0, fr: "Campagne de Terre sainte", en: "Holy Land countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
     { at: 20, fr: "Hameau", en: "Hamlet", sky: ["#9fd0ea", "#e8f3df"], far: "#8fb36f", mid: "#6f9a52", ground: ["#7fae52", "#5b8a3a"], pil: ["#b08a5a", "#8a6638", "#5e4220"], line: ["Quelques chaumières : le premier hameau est à toi !", "A few thatched huts: your first hamlet is yours!"] },
@@ -22,9 +28,10 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var raf = 0, dead = false, last = 0, t = 0;
+    var raf = 0, dead = false, last = 0, t = 0, acc = 0;
     var st = null;
     var best = 0;
+    var rnd = rngOf(opt.seed != null ? opt.seed : (Math.random() * 4294967296));
 
     function reset() {
       st = { y: Math.round(GY * 0.5), vy: 0, score: 0, over: false, started: false, scroll: 0, pipes: [], next: 330, parts: [], banner: null, shake: 0, flash: 0, endT: 0, rot: 0, flap: 0 };
@@ -33,30 +40,30 @@
     }
     function addPipe(x) {
       var s = stageOf(st.score);
-      var gap = Math.max(108, 172 - st.score * 0.55);
-      var speed = 118 + Math.min(st.score, 260) * 0.95;
-      var space = Math.max(165, 205 - st.score * 0.2);
+      var gap = gapOf(st.score);
+      var speed = speedOf(st.score);
+      var space = spaceOf(st.score);
       var T = space / speed; // secondes entre deux portes
       var fq = 1.2 + Math.min(st.score, 200) * 0.012;
-      var amp = st.score < 25 ? 0 : Math.min(70, 14 + (st.score - 25) * 0.6, 80 / fq);
+      var amp = st.score < 25 ? 0 : Math.min(46, 10 + (st.score - 25) * 0.35, 60 / fq);
       var lo = 66 + gap / 2 + amp, hi = GY - 66 - gap / 2 - amp;
-      var c = lo + Math.random() * Math.max(0, hi - lo);
+      var c = lo + rnd() * Math.max(0, hi - lo);
       if (st.lastC != null) {
         // la porte suivante doit rester atteignable : on borne le décalage vertical selon le temps disponible
-        var up = 70 * T, down = 150 * T;
-        var lim = Math.max(28, Math.min(150, T * 100));
-        c = Math.max(st.lastC - Math.min(up, lim) , Math.min(st.lastC + Math.min(down, lim), c));
+        var slack = (st.lastAmp || 0) + amp; // les portes mobiles peuvent s'écarter dans le pire sens
+        var up = Math.max(12, 82 * T - slack), down = Math.max(20, 170 * T - slack);
+        c = Math.max(st.lastC - up, Math.min(st.lastC + down, c));
         c = Math.max(lo, Math.min(hi, c));
       }
-      st.lastC = c;
+      st.lastC = c; st.lastAmp = amp;
       var top = c - gap / 2;
-      st.pipes.push({ x: x, base: top, top: top, gap: gap, passed: false, st: s, amp: amp, ph: Math.random() * 6.28, fq: fq });
+      st.pipes.push({ x: x, base: top, top: top, gap: gap, passed: false, st: s, amp: amp, ph: rnd() * 6.28, fq: fq });
     }
     function flap() {
       if (dead) return;
       if (st.over) return;
       if (!st.started) st.started = true;
-      st.vy = -6.1; st.flap = 1;
+      st.vy = -FLAP; st.flap = 1;
       if (opt.sfx) opt.sfx("tap");
     }
     function burst(x, y, col, n) {
@@ -70,15 +77,15 @@
     }
     function point() {
       st.score++;
-      if (opt.sfx && st.score % 5 === 0) opt.sfx("ok");
+      if (opt.sfx && st.score % 5 === 0) opt.sfx("good");
       burst(KX + 30, st.y, "#f0c64b", 6);
       var a = stageOf(st.score - 1), b = stageOf(st.score);
       if (b !== a && st.score !== TOTAL) {
         st.banner = { t: 0, s: b };
-        if (opt.sfx) opt.sfx("ok");
+        if (opt.sfx) opt.sfx("good");
         if (opt.buzz) opt.buzz(20);
       }
-      if (st.score === TOTAL) { st.banner = { t: 0, s: 7, hunger: true }; burst(W / 2, 200, "#f0c64b", 50); if (opt.sfx) opt.sfx("ok"); }
+      if (st.score === TOTAL) { st.banner = { t: 0, s: 7, hunger: true }; burst(W / 2, 200, "#f0c64b", 50); if (opt.sfx) opt.sfx("good"); }
     }
     function finish(win) {
       st.over = true; st.win = win; st.endT = 0;
@@ -91,11 +98,11 @@
       if (st.flash > 0) st.flash -= dt * 2;
       if (st.shake > 0) st.shake -= dt * 25;
       st.flap = Math.max(0, st.flap - dt * 4);
-      st.parts.forEach(function (p) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= dt * 1.3; });
+      st.parts.forEach(function (p) { p.x += p.vx * dt * 60; p.y += p.vy * dt * 60; p.vy += 0.12 * dt * 60; p.life -= dt * 1.3; });
       st.parts = st.parts.filter(function (p) { return p.life > 0; });
       if (st.over) {
         st.endT += dt;
-        if (!st.win) { st.vy += 0.5; st.y = Math.min(GY - 14, st.y + st.vy); st.rot += dt * 6; }
+        if (!st.win) { st.vy += 0.5 * dt * 60 * 60; st.y = Math.min(GY - 14, st.y + st.vy * dt); st.rot += dt * 6; }
         if (st.endT > (st.win ? 2.6 : 1.1) && !st.done) {
           st.done = true;
           if (st.score > best) best = st.score;
@@ -103,15 +110,15 @@
         }
         return;
       }
-      var speed = 118 + Math.min(st.score, 260) * 0.95;
+      var speed = speedOf(st.score);
       if (!st.started) { st.y = Math.round(GY * 0.5) + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
-      st.vy += 15 * dt * 1.0; if (st.vy > 9) st.vy = 9;
-      st.y += st.vy * 60 * dt * 0.62;
-      st.rot = Math.max(-0.45, Math.min(0.7, st.vy * 0.07));
+      st.vy += (st.vy < 0 ? GU : GD) * dt; if (st.vy > VMAX) st.vy = VMAX;
+      st.y += st.vy * dt;
+      st.rot = Math.max(-0.45, Math.min(0.7, st.vy / 900));
       st.scroll += speed * dt;
       st.pipes.forEach(function (p) { p.x -= speed * dt; if (p.amp) { var lo = 66, hi = GY - 66 - p.gap; p.top = Math.max(lo, Math.min(hi, p.base + Math.sin(t * p.fq + p.ph) * p.amp)); } });
       var lastp = st.pipes[st.pipes.length - 1];
-      if (lastp.x < W - Math.max(165, 205 - st.score * 0.2)) addPipe(W + 40);
+      if (lastp.x < W - spaceOf(st.score)) addPipe(W + 40);
       st.pipes = st.pipes.filter(function (p) { return p.x > -80; });
       st.pipes.forEach(function (p) {
         if (!p.passed && p.x + 54 < KX - 12) { p.passed = true; point(); }
@@ -368,7 +375,7 @@
     function loop(ts) {
       if (dead) return;
       var dt = Math.min(0.033, (ts - (last || ts)) / 1000); last = ts;
-      update(dt); draw();
+      acc += dt; while (acc >= STEP) { update(STEP); acc -= STEP; } draw();
       raf = requestAnimationFrame(loop);
     }
     function onDown(e) { e.preventDefault(); flap(); }
@@ -380,8 +387,10 @@
     return {
       start: function () { reset(); last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); },
       destroy: function () { dead = true; cancelAnimationFrame(raf); canvas.removeEventListener("pointerdown", onDown); window.removeEventListener("keydown", onKey); },
-      _state: function () { return st; }
+      _state: function () { return st; },
+      _step: function (n) { for (var i = 0; i < n; i++) update(STEP); },
+      _flap: flap, _t: function () { return t; }
     };
   }
-  window.HistoriaDefense = { create: create, STAGES: STAGES };
+  window.HistoriaDefense = { create: create, STAGES: STAGES, _phys: { FLAP: FLAP, GU: GU, GD: GD, VMAX: VMAX, STEP: STEP, speedOf: speedOf, KX: KX } };
 })();
