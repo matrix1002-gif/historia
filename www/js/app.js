@@ -151,9 +151,12 @@
   const levelItems = (e, i) => {
     const lv = e.levels[i];
     const items = shuffle(lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title)));
-    // Pour varier d'une partie à l'autre : jusqu'à 3 questions de la fiche sont remplacées par des questions simples de la même époque.
+    // Pour varier d'une partie à l'autre : jusqu'à 6 questions de la fiche sont remplacées par des questions simples de la même époque.
     try {
-      const swap = shuffle(easyList().filter((x) => x.era === e.id && !isGen(x))).slice(0, 3);
+      const hand = easyList().filter((x) => x.era === e.id && !isGen(x));
+      // d'abord les questions de ce chapitre, puis celles des chapitres voisins, puis le reste de l'époque
+      const near = shuffle(hand.filter((x) => x.lv === i)).concat(shuffle(hand.filter((x) => x.lv !== undefined && x.lv !== i && Math.abs(x.lv - i) <= 1)), shuffle(hand.filter((x) => x.lv === undefined)));
+      const swap = near.slice(0, 6);
       const slots = shuffle(items.map((it, k) => (it.type === "qcm" ? k : -1)).filter((k) => k >= 0)).slice(0, swap.length);
       slots.forEach((k, n) => { items[k] = prep("qcm", swap[n].d, swap[n].key, e.title, lv.title); });
     } catch (err) { /* les questions de la fiche suffisent */ }
@@ -329,6 +332,10 @@
     if (EASY_LIST) return EASY_LIST;
     EASY_LIST = String(window.HISTORIA_EASY || "").split("\n").map((l) => l.split("|")).filter((p) => p.length === 7 && eraById(p[0]))
       .map((p, i) => ({ era: p[0], d: { q: p[1], c: p[2], w: [p[3], p[4], p[5]], e: p[6] }, key: `easy:${p[0]}:${i}` }));
+    const n0 = EASY_LIST.length;
+    const lvq = String(window.HISTORIA_LV || "").split("\n").map((l) => l.split("|")).filter((p) => p.length === 8 && eraById(p[0]))
+      .map((p, i) => ({ era: p[0], lv: (+p[1]) - 1, d: { q: p[2], c: p[3], w: [p[4], p[5], p[6]], e: p[7] }, key: `easy:${p[0]}:lv${n0 + i}` }));
+    EASY_LIST = EASY_LIST.concat(lvq);
     try { EASY_LIST = EASY_LIST.concat(genEasy().filter((x) => eraById(x.era))); } catch (err) { /* les questions faites à la main suffisent */ }
     return EASY_LIST;
   };
@@ -618,7 +625,7 @@
     return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}</section>`;
   }
 
-  /* ===== Défends le roi ===== */
+  /* ===== Conquête (jeu du chevalier) ===== */
   const DF_XP = 30;
   let DF = null;
   const dfStats = () => (S.stats.defense = Object.assign({ plays: 0, wins: 0, best: 0 }, S.stats.defense));
@@ -630,28 +637,30 @@
   }
   function dfIntro() {
     const st = dfStats();
-    return `<div class="df-card"><h2>${L2("Complot au palais !", "Plot at the palace!")}</h2>
-      <p>${L2("Cette nuit, le duc félon et ses hommes de main envahissent la salle du trône. Toi seul, chevalier de la garde, peux sauver le roi avant qu'il ne soit trop tard.", "Tonight the treacherous duke and his henchmen storm the throne room. You alone, knight of the guard, can save the king before it is too late.")}</p>
-      <ul class="df-how"><li><b>${L2("Touche à gauche ou à droite", "Tap left or right")}</b> ${L2("pour foncer et frapper de l'épée.", "to dash and slash your sword.")}</li><li>${L2("Les armures demandent deux coups, le duc félon six.", "Armoured men take two hits, the duke six.")}</li><li>${L2("Enchaîne les coups : le combo multiplie ton score.", "Chain your hits: the combo multiplies your score.")}</li></ul>
-      <button class="btn btn-gold" data-act="dfgo">${L2("À l'épée !", "To arms!")}</button>
-      ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} points · ${st.wins} victoire${st.wins > 1 ? "s" : ""}`, `Best: ${st.best} points · ${st.wins} win${st.wins === 1 ? "" : "s"}`)}</small>` : ""}</div>`;
+    return `<div class="df-card"><h2>${L2("Conquête !", "Conquest!")}</h2>
+      <p>${L2("Chevalier d'Orient, ouvre-toi un royaume : franchis les obstacles, chaque porte te donne un territoire. Vise les 200 !", "Knight of the East, carve out a kingdom: clear the obstacles, every gate wins you a territory. Aim for 200!")}</p>
+      <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
+      <button class="btn btn-gold" data-act="dfgo">${L2("En selle !", "Ride!")}</button>
+      ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : ""}</div>`;
   }
   function dfEnd(r) {
     const st = dfStats();
     st.plays++;
     const rec = r.score > st.best;
     if (rec) st.best = r.score;
-    if (r.win) { st.wins++; S.xp += DF_XP; }
+    if (r.win) st.wins++;
+    const xp = Math.min(40, Math.floor(r.score / 5));
+    S.xp += xp;
     save();
     if (window.HistoriaAds) window.HistoriaAds.quizFinished();
     if (r.win) Art.confetti();
-    const fact = L2("Les complots contre les rois n'ont pas manqué : en 1560, la conjuration d'Amboise voulait enlever le jeune François II.", "Plots against kings were common: in 1560 the Amboise conspiracy tried to seize the young Francis II.");
+    const SG = window.HistoriaDefense.STAGES[r.stage];
     const over = document.getElementById("df-over");
     if (!over) return;
-    over.innerHTML = `<div class="df-card df-end ${r.win ? "win" : "lose"}"><h2>${r.win ? L2("Le roi est sauvé !", "The king is saved!") : L2("Le roi est tombé…", "The king has fallen…")}</h2>
-      <p class="df-big">${r.score} <small>${L2("points", "points")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
-      <p>${r.kills} ${L2(plural(r.kills, "conjuré mis hors d'état de nuire", "conjurés mis hors d'état de nuire"), plural(r.kills, "plotter stopped", "plotters stopped"))} · ${L2("meilleur combo", "best combo")} x${r.best}${r.win ? ` · <b>+${DF_XP} XP</b>` : ""}</p>
-      <p class="df-fact">${fact}</p>
+    over.innerHTML = `<div class="df-card df-end ${r.win ? "win" : "lose"}"><h2>${r.win ? L2("Un empire est né !", "An empire is born!") : L2("Ton cheval s'effondre…", "Your horse has fallen…")}</h2>
+      <p class="df-big">${r.score} <small>${L2("territoires", "territories")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
+      <p>${L2("Tu t'es arrêté en :", "You stopped in:")} <b>${EN ? SG.en : SG.fr}</b>${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
+      <p class="df-fact">${L2("Les seigneurs du Moyen Âge s'agrandissaient par la guerre, mais aussi par le mariage et l'héritage.", "Medieval lords grew their lands by war, but also by marriage and inheritance.")}</p>
       <div class="stack"><button class="btn btn-gold" data-act="dfgo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="dfquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div></div>`;
     over.hidden = false;
   }
@@ -672,14 +681,14 @@
     DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     DF.game.start();
   }
-  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><div class="top"><button class="icon-btn" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title">${L2("Défends le roi", "Defend the King")}</h1></div>
-    <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : défends le roi", "Game: defend the king")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
+  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><div class="top"><button class="icon-btn" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title">${L2("Conquête", "Conquest")}</h1></div>
+    <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : conquête de territoires", "Game: conquer territories")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function defenseCard() {
     const st = (S.stats && S.stats.defense) || { plays: 0, wins: 0, best: 0 };
-    const rec = st.plays ? `<small class="mz-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : "";
+    const rec = st.plays ? `<small class="mz-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : "";
     return `<section class="df-menu"><div class="df-menu-art" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 52 L46 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M10 44 L22 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M50 52 L18 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M54 44 L42 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M22 10 l6 8 4-10 4 10 6-8 -2 14 h-16z" fill="#f0c64b" stroke="#7a5818" stroke-width="2"/></svg></div>
-      <div><h2>${L2("Défends le roi !", "Defend the King!")}</h2>
-      <p>${L2("Un coup d'État éclate dans la salle du trône. Épée au poing, repousse les conjurés. Un seul geste : touche à gauche ou à droite.", "A coup breaks out in the throne room. Sword in hand, fight off the plotters. One gesture: tap left or right.")}</p>
+      <div><h2>${L2("Conquête !", "Conquest!")}</h2>
+      <p>${L2("Un chevalier, un cheval qui bondit, 200 territoires à conquérir. Le paysage et ton armure changent à chaque étape. Touche pour sauter !", "A knight, a leaping horse, 200 territories to conquer. The scenery and your armour change at every stage. Tap to jump!")}</p>
       <button class="btn btn-gold" data-act="dfstart">${L2("Jouer", "Play")}</button>${rec}</div></section>`;
   }
 

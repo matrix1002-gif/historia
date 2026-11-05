@@ -23,6 +23,7 @@
   document.write('<script src="js/daily/' + lang + '.js"><\/script>'); // personnage et saint du jour
   document.write('<script src="js/daily/more-' + lang + '.js"><\/script>'); // suite du récit du jour
   document.write('<script src="js/easy/more-' + lang + '.js"><\/script>'); // questions thématiques supplémentaires
+  document.write('<script src="js/easy/lv-' + lang + '.js"><\/script>'); // questions par chapitre
   document.write('<script src="js/easy/' + lang + '.js"><\/script>'); // questions de culture générale
 
   if (lang !== "en") return;
