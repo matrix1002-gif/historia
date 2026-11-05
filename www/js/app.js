@@ -639,7 +639,7 @@
     const st = dfStats();
     return `<div class="df-card"><h2>${L2("Conquête !", "Conquest!")}</h2>
       <p>${L2("Chevalier d'Orient, ouvre-toi un royaume : franchis les obstacles, chaque porte te donne un territoire. Vise les 200 !", "Knight of the East, carve out a kingdom: clear the obstacles, every gate wins you a territory. Aim for 200!")}</p>
-      <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
+      <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Ça s'accélère, puis les obstacles se mettent à bouger. Après 200, la course continue…", "It speeds up, then the obstacles start to move. After 200, the ride goes on…")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
       <button class="btn btn-gold" data-act="dfgo">${L2("En selle !", "Ride!")}</button>
       ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : ""}</div>`;
   }
@@ -649,7 +649,7 @@
     const rec = r.score > st.best;
     if (rec) st.best = r.score;
     if (r.win) st.wins++;
-    const xp = Math.min(40, Math.floor(r.score / 5));
+    const xp = Math.min(40, Math.floor(r.score / 5)) + (r.score > 200 ? Math.min(20, Math.floor((r.score - 200) / 5)) : 0);
     S.xp += xp;
     save();
     if (window.HistoriaAds) window.HistoriaAds.quizFinished();
@@ -657,7 +657,7 @@
     const SG = window.HistoriaDefense.STAGES[r.stage];
     const over = document.getElementById("df-over");
     if (!over) return;
-    over.innerHTML = `<div class="df-card df-end ${r.win ? "win" : "lose"}"><h2>${r.win ? L2("Un empire est né !", "An empire is born!") : L2("Ton cheval s'effondre…", "Your horse has fallen…")}</h2>
+    over.innerHTML = `<div class="df-card df-end ${r.win ? "win" : "lose"}"><h2>${r.win ? L2("Un empire est né, et la faim demeure !", "An empire is born, and the hunger remains!") : L2("Ton cheval s'effondre…", "Your horse has fallen…")}</h2>
       <p class="df-big">${r.score} <small>${L2("territoires", "territories")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
       <p>${L2("Tu t'es arrêté en :", "You stopped in:")} <b>${EN ? SG.en : SG.fr}</b>${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
       <p class="df-fact">${L2("Les seigneurs du Moyen Âge s'agrandissaient par la guerre, mais aussi par le mariage et l'héritage.", "Medieval lords grew their lands by war, but also by marriage and inheritance.")}</p>

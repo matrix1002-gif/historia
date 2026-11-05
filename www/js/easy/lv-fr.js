@@ -9,11 +9,9 @@ gaule|2|Quel est l'ancien nom grec de Marseille ?|Massalia|Lugdunum|Nemausus|Al�
 gaule|2|Comment les marchands grecs voyagent-ils vers la Gaule ?|En bateau|En avion|En train|En voiture|Marseille est un port sur la Méditerranée.
 gaule|3|Comment s'appellent les prêtres savants des Gaulois ?|Les druides|Les moines|Les pharaons|Les samouraïs|Les druides enseignaient, jugeaient et priaient.
 gaule|3|Quelle plante sacrée les druides coupent-ils avec une serpe d'or ?|Le gui|Le lierre|La rose|Le blé|La cueillette du gui est restée célèbre.
-gaule|3|Sous quel arbre sacré les druides se réunissent-ils ?|Le chêne|Le palmier|Le cactus|Le baobab|Le chêne était l'arbre des druides.
 gaule|3|Quelle est la grande fête gauloise à l'origine d'Halloween ?|Samain|Noël|Pâques|Carnaval|Samain marquait le début de l'hiver.
 gaule|4|Quel général romain arrive en Gaule en 58 av. J.-C. ?|Jules César|Néron|Auguste|Trajan|Il y reste huit ans.
 gaule|4|Comment s'appelle le livre où César raconte sa guerre ?|La Guerre des Gaules|L'Iliade|La Bible|L'Odyssée|César l'a écrit lui-même.
-gaule|4|Quelle langue César utilise-t-il pour écrire ?|Le latin|Le gaulois|Le grec seulement|Le français|Le latin est la langue des Romains.
 gaule|4|Quels peuples se divisent face à César ?|Les tribus gauloises|Les Égyptiens|Les Mongols|Les Vikings|Les Gaulois n'étaient pas unis.
 gaule|5|Quel est le chef gaulois qui unit les tribus en 52 av. J.-C. ?|Vercingétorix|Astérix|Clovis|Attila|Il vient du peuple arverne.
 gaule|5|Où Vercingétorix remporte-t-il une victoire contre César ?|Gergovie|Waterloo|Marathon|Alésia|À Gergovie, César doit reculer.
@@ -24,8 +22,6 @@ gaule|6|Quel empereur est né à Lugdunum ?|Claude|Néron|Auguste|Hadrien|Claude
 gaule|6|Quel monument romain existe encore à Lyon, sur la colline de Fourvière ?|Un théâtre antique|Un gratte-ciel|Un château fort|Une cathédrale gothique|Le théâtre de Fourvière sert encore aux spectacles.
 gaule|6|Quels deux fleuves se rejoignent à Lyon ?|Le Rhône et la Saône|La Seine et la Loire|Le Rhin et le Danube|La Garonne et la Dordogne|Lugdunum était un carrefour.
 gaule|7|Que transporte un aqueduc ?|De l'eau|Du vin|Des soldats|Des marchandises|Le pont du Gard est un aqueduc.
-gaule|7|Quelle région est célèbre pour le pont du Gard ?|Le Sud de la France|La Bretagne|L'Alsace|La Normandie|Il se trouve près de Nîmes.
-gaule|7|Que sont les voies romaines ?|Des routes pavées|Des canaux|Des tunnels|Des ponts de bois|Les Romains les construisent pour relier les villes.
 gaule|7|Quel moyen de chauffage les riches Romains utilisent-ils ?|Le chauffage par le sol (hypocauste)|Le chauffage électrique|Le gaz|Le poêle à bois moderne|L'air chaud circulait sous le sol.
 gaule|8|Que deviennent les Gaulois après la conquête ?|Des Gallo-Romains|Des Vikings|Des Francs|Des Goths|Ils mélangent traditions gauloises et romaines.
 gaule|8|Quelle langue les Gaulois adoptent-ils peu à peu ?|Le latin|Le grec|L'arabe|Le russe|Le latin deviendra le français.
@@ -63,17 +59,12 @@ evangelisation|6|Quel pape envoie Augustin de Cantorbéry en Angleterre ?|Grégo
 evangelisation|6|Quel roi anglo-saxon accueille Augustin en 597 ?|Æthelberht du Kent|Alfred le Grand|Arthur|Richard Cœur de Lion|Sa femme Berthe est chrétienne.
 evangelisation|6|Dans quelle ville anglaise Augustin fonde-t-il son siège ?|Cantorbéry|Londres|Oxford|York|Cantorbéry reste le centre de l'Église d'Angleterre.
 evangelisation|6|Quel peuple vit alors en Angleterre ?|Les Anglo-Saxons|Les Gaulois|Les Romains|Les Vikings|Ils étaient païens.
-evangelisation|7|De quel pays vient Boniface, l'« apôtre des Germains » ?|L'Angleterre|La France|L'Italie|L'Espagne|Il est un moine anglo-saxon.
 evangelisation|7|Que fait Boniface au chêne de Geismar ?|Il le fait abattre|Il le décore|Il y prêche des animaux|Il s'y repose|Il montre que les dieux païens sont impuissants.
-evangelisation|7|Quelle ville est liée à Boniface en Allemagne ?|Fulda|Paris|Lyon|Rome|Il y fonde une abbaye.
 evangelisation|7|Dans quelle région Boniface est-il tué en 754 ?|La Frise|La Gaule|L'Égypte|La Bretagne|Il y meurt avec ses compagnons.
 evangelisation|8|Quels deux frères évangélisent les Slaves ?|Cyrille et Méthode|Pierre et Paul|Jacques et Jean|Romulus et Rémus|Ils viennent de Thessalonique.
 evangelisation|8|Qu'inventent Cyrille et Méthode pour les Slaves ?|Un alphabet|Une épée|Une cathédrale|Une loi|L'alphabet cyrillique en est l'héritier.
 evangelisation|8|Dans quelle langue traduisent-ils la Bible ?|Le slavon|Le latin|Le français|Le chinois|Ils veulent que chacun comprenne.
-evangelisation|8|Quel est le grand empire dont viennent Cyrille et Méthode ?|L'Empire byzantin|L'Empire romain d'Occident|L'Empire mongol|L'Empire inca|Ils viennent de Thessalonique.
-evangelisation|9|Quel roi des Francs se fait baptiser à Reims ?|Clovis|Charlemagne|Pépin|Hugues Capet|Vers 496.
 evangelisation|9|Quel roi anglo-saxon fonde le royaume d'Angleterre au IXe siècle ?|Alfred le Grand|Arthur|Richard|Harold|Alfred défend l'Angleterre contre les Vikings.
-evangelisation|9|Quel pays le roi Étienne christianise-t-il en l'an 1000 ?|La Hongrie|La Norvège|L'Espagne|L'Angleterre|Saint Étienne est le premier roi chrétien de Hongrie.
 evangelisation|9|Quel peuple reçoit le christianisme avec Vladimir de Kiev ?|Les Russes|Les Chinois|Les Arabes|Les Incas|Vladimir est baptisé vers 988.
 evangelisation|10|Quelle est l'année du grand schisme entre Rome et Constantinople ?|1054|476|800|1789|Les deux Églises se séparent.
 evangelisation|10|Quelles sont les deux grandes Églises issues du schisme ?|Catholique et orthodoxe|Protestante et anglicane|Juive et musulmane|Aucune des deux|Le pape et le patriarche s'excommunient.
@@ -83,9 +74,7 @@ carolingiens|1|Quel roi franc est baptisé à Reims vers 496 ?|Clovis|Charlemagn
 carolingiens|1|Quelle victoire de Clovis en 486 lui ouvre le nord de la Gaule ?|Soissons|Poitiers|Tolbiac|Verdun|On raconte l'histoire du vase de Soissons.
 carolingiens|1|Quelle est la dynastie de Clovis ?|Les Mérovingiens|Les Carolingiens|Les Capétiens|Les Valois|Le nom vient de Mérovée.
 carolingiens|1|Quelle ville Clovis choisit-il comme capitale ?|Paris|Reims|Marseille|Rome|Il y est enterré.
-carolingiens|2|Comment appelle-t-on les rois mérovingiens sans pouvoir réel ?|Les rois fainéants|Les rois sages|Les rois soldats|Les rois pauvres|Le pouvoir passe aux maires du palais.
 carolingiens|2|Quel est le rôle des maires du palais ?|Diriger le royaume à la place du roi|Cuisiner au palais|Garder les clés|Chasser|Ils sont les vrais chefs.
-carolingiens|2|Comment s'appelle la reine franque célèbre pour sa cruauté, Brunehaut ou Clotilde ?|Brunehaut|Clotilde|Geneviève|Blanche|Brunehaut et Frédégonde se font la guerre.
 carolingiens|2|Comment appelle-t-on la famille de Pépin et Charles Martel ?|Les Pippinides|Les Capétiens|Les Valois|Les Bourbons|Cette famille devient très puissante.
 carolingiens|3|En quelle année Charles Martel bat-il les Arabes à Poitiers ?|732|476|800|1066|La bataille arrête leur avancée en Gaule.
 carolingiens|3|Quel surnom a Charles, vainqueur des Arabes ?|Martel (le marteau)|Le Chauve|Le Gros|Le Simple|Il frappe comme un marteau.
@@ -105,7 +94,6 @@ carolingiens|6|Quel titre reçoit Charlemagne ?|Empereur|Duc|Comte|Pape|Il réta
 carolingiens|6|Dans quelle ville a lieu son couronnement ?|Rome|Paris|Reims|Aix-la-Chapelle|C'est la ville du pape.
 carolingiens|7|Quel savant anglais dirige l'école du palais ?|Alcuin|Colbert|Richelieu|Bède|Il organise le renouveau des lettres.
 carolingiens|7|Quelle écriture est créée à cette époque ?|La minuscule caroline|Les hiéroglyphes|Le cunéiforme|Les runes|Elle est à l'origine de nos lettres.
-carolingiens|7|Quels livres sont copiés par les moines ?|Des livres de l'Antiquité|Des journaux|Des magazines|Des manuels scolaires modernes|Ils sauvent ainsi beaucoup de textes.
 carolingiens|7|Qui reçoit l'éducation de l'école du palais ?|Les fils de nobles et de grands|Seulement les paysans|Seulement les femmes|Tous les enfants|Charlemagne veut des gens instruits.
 carolingiens|8|Comment appelle-t-on les envoyés de l'empereur ?|Les missi dominici|Les troubadours|Les chevaliers|Les druides|Ils contrôlent l'empire.
 carolingiens|8|Comment s'appelle un grand domaine agricole carolingien ?|Une villa|Une cathédrale|Une abbaye|Une forteresse|Il comprend des champs et des ateliers.
@@ -113,11 +101,9 @@ carolingiens|8|Quels sont les noms des divisions de l'empire ?|Des comtés|Des d
 carolingiens|8|Quel animal est important pour les guerriers francs ?|Le cheval|Le chameau|L'éléphant|Le tigre|La cavalerie devient décisive.
 carolingiens|9|Quel traité partage l'empire en 843 ?|Le traité de Verdun|Le traité de Paris|Le traité de Rome|Le traité de Versailles|Il partage l'empire en trois.
 carolingiens|9|Combien de petits-fils de Charlemagne se partagent l'empire ?|Trois|Deux|Dix|Un seul|Lothaire, Louis et Charles.
-carolingiens|9|Quel petit-fils reçoit la partie ouest, future France ?|Charles le Chauve|Lothaire|Louis le Germanique|Pépin|Il règne sur la France de l'Ouest.
 carolingiens|9|Que devient la partie est de l'empire ?|La future Allemagne|La future Angleterre|La future Espagne|La future Russie|Elle revient à Louis le Germanique.
 carolingiens|10|Quel peuple du Nord attaque la France au IXe siècle ?|Les Vikings|Les Arabes|Les Romains|Les Gaulois|Ils viennent de Scandinavie.
 carolingiens|10|Quelle ville est assiégée par les Vikings en 885 ?|Paris|Marseille|Lyon|Reims|Le comte Eudes la défend.
-carolingiens|10|Quel traité de 911 donne la Normandie aux Vikings ?|Saint-Clair-sur-Epte|Verdun|Troyes|Utrecht|Rollon devient duc de Normandie.
 carolingiens|10|Comment les Vikings sont-ils venus en France ?|Sur des drakkars|En avion|En train|À dos de chameau|Leurs bateaux sont rapides.
 moines|1|Quel saint est le père des moines d'Occident ?|Benoît de Nursie|Martin|François|Dominique|Il écrit une Règle célèbre.
 moines|1|Comment s'appelle la Règle des moines bénédictins ?|La Règle de saint Benoît|La Règle de saint Louis|La Règle de saint Martin|La Règle du roi|Elle organise la vie des abbayes.
@@ -144,7 +130,6 @@ moines|6|De quelle couleur sont les habits des moines de Cluny ?|Noirs|Blancs|Ro
 moines|6|Comment s'appelle le chef d'une grande abbaye ?|L'abbé|Le baron|Le duc|Le maire|L'abbé de Cluny était très influent.
 moines|6|De quel ordre fait partie Cluny ?|L'ordre bénédictin|L'ordre des Templiers|Les franciscains|Les jésuites|Ils suivent la Règle de saint Benoît.
 moines|7|Quel moine célèbre prêche la deuxième croisade ?|Bernard de Clairvaux|Benoît|Martin|Louis|Il est le fondateur de Clairvaux.
-moines|7|De quelle couleur est l'habit des cisterciens ?|Blanc|Noir|Rouge|Bleu|On les appelle les moines blancs.
 moines|7|Quel est le style des abbayes cisterciennes ?|Très sobre|Très décoré|Très coloré|Très haut|Ils refusent le luxe.
 moines|7|De quelle région est Cîteaux ?|La Bourgogne|La Bretagne|L'Alsace|La Provence|Cîteaux est près de Dijon.
 moines|8|Comment s'appelle le style des abbayes aux arcs en plein cintre ?|L'art roman|L'art gothique|L'art moderne|L'art baroque|Il est massif et sobre.
@@ -156,7 +141,6 @@ moines|9|Dans quel pays vit Hildegarde de Bingen ?|L'Allemagne|La France|L'Itali
 moines|9|Pourquoi Hildegarde est-elle célèbre ?|Pour ses visions, ses chants et ses remèdes|Pour ses guerres|Pour ses voyages|Pour ses tournois|Elle a écrit des traités.
 moines|9|Quel type d'œuvre musicale compose Hildegarde ?|Des chants religieux|Des opéras|Du rock|Des valses|Elle compose de nombreux chants.
 moines|10|Quel ordre vit en silence et solitude, dans la Chartreuse ?|Les chartreux|Les dominicains|Les franciscains|Les templiers|Leur monastère est dans les Alpes.
-moines|10|Quel saint fonde les frères mendiants franciscains ?|François d'Assise|Dominique|Benoît|Louis|Il choisit la pauvreté.
 moines|10|Que font les frères mendiants pour vivre ?|Ils mendient|Ils chassent|Ils font la guerre|Ils vendent des armes|Ils vivent de dons.
 moines|10|Quel autre ordre mendiant est fondé par Dominique ?|Les dominicains|Les jésuites|Les bénédictins|Les templiers|Ils prêchent et étudient.
 chevaliers|1|Quels sont les trois ordres du Moyen Âge ?|Ceux qui prient, combattent et travaillent|Rois, reines, princes|Nord, sud, ouest|Villes, villages, hameaux|Clergé, noblesse et paysans.
@@ -169,7 +153,6 @@ chevaliers|2|Quelle cérémonie fait d'un écuyer un chevalier ?|L'adoubement|Le
 chevaliers|2|Que reçoit le chevalier lors de l'adoubement ?|Une épée|Une couronne|Un livre|Un bâton|Il jure de protéger les faibles.
 chevaliers|3|Quelle est la tour principale d'un château fort ?|Le donjon|La chapelle|La cave|La porte|Le seigneur y habite souvent.
 chevaliers|3|Comment s'appelle le fossé rempli d'eau autour du château ?|Les douves|La cave|Le chemin de ronde|Le pont|Elles protègent des assaillants.
-chevaliers|3|Quel dispositif permet d'entrer dans le château ?|Le pont-levis|L'ascenseur|Le tunnel|Le téléphérique|Il se lève en cas d'attaque.
 chevaliers|3|À quoi servent les meurtrières ?|À tirer à l'arc en étant protégé|À aérer|À éclairer|À faire passer le courrier|Ce sont des fentes étroites.
 chevaliers|4|De quoi est faite la cotte de mailles ?|D'anneaux de fer|De cuir|De laine|De tissu|Elle protège le corps.
 chevaliers|4|Comment s'appelle le cheval de guerre du chevalier ?|Le destrier|Le poney|L'âne|Le mulet|Il est grand et fort.
@@ -177,10 +160,8 @@ chevaliers|4|Quel objet protège la tête du chevalier ?|Le heaume|Le chapeau|Le
 chevaliers|4|Quel accessoire du cheval aide le chevalier à tenir en selle ?|Les étriers|Les rênes seulement|Les clochettes|Les gants|Les étriers donnent de la stabilité.
 chevaliers|5|Comment s'appelle un combat à cheval avec des lances ?|La joute|Le duel|La bataille|La course|Elle se déroule dans un tournoi.
 chevaliers|5|Où se déroulent les joutes ?|Dans les lices|Au château|À l'abbaye|Dans les thermes|On entoure la lice de barrières.
-chevaliers|5|Comment s'appelle l'ensemble des combats et jeux entre chevaliers ?|Le tournoi|Le carnaval|Le banquet|Le marché|Les nobles y viennent de loin.
 chevaliers|5|Que gagne le vainqueur d'une joute ?|Des honneurs et des prix|Un château|Un empire|Rien|Il gagne parfois cheval et armure du vaincu.
 chevaliers|6|Quelle institution protège les faibles pendant les guerres privées ?|La Paix de Dieu|La Paix des Braves|La Paix romaine|La Paix de Paris|L'Église limite la violence.
-chevaliers|6|Que doit faire le chevalier selon son serment ?|Protéger les faibles et l'Église|Piller les villages|Devenir roi|Voyager seul|C'est un code d'honneur.
 chevaliers|6|Quel jour de la semaine la Trêve de Dieu interdit-elle les combats ?|Du mercredi soir au lundi matin|Tous les jours|Seulement le lundi|Seulement l'été|Elle limite fortement les combats.
 chevaliers|6|Qui sont les alliés de l'Église dans la paix de Dieu ?|Les seigneurs et les évêques|Les Vikings|Les pirates|Les brigands|Ils jurent de respecter la paix.
 chevaliers|7|Quel roi légendaire a une Table ronde ?|Arthur|Charlemagne|Louis IX|Clovis|La Table ronde réunit ses chevaliers.
@@ -200,12 +181,9 @@ chevaliers|10|Quel roi s'entoure encore de chevaliers à Marignan ?|François Ie
 chevaliers|10|Quel écrivain espagnol se moque d'un vieux chevalier ?|Cervantès|Molière|Rabelais|Shakespeare|Don Quichotte est son héros.
 chevaliers|10|Quel est le dernier tournoi royal fatal en France ?|Celui d'Henri II en 1559|Celui de Louis IX|Celui de Charlemagne|Celui de Clovis|Le roi meurt blessé à l'œil.
 croisades|1|Dans quelle ville de France Urbain II lance-t-il l'appel ?|Clermont|Paris|Reims|Lyon|C'est en 1095.
-croisades|1|Quel cri est lancé par la foule à Clermont ?|« Dieu le veut ! »|« Vive le roi ! »|« À Rome ! »|« Vive la liberté ! »|Le cri est resté célèbre.
-croisades|1|Quel est le but de la première croisade ?|Délivrer Jérusalem|Conquérir l'Angleterre|Piller Rome|Chasser les Vikings|Les croisés veulent reprendre la ville sainte.
 croisades|1|Qu'est-ce qu'un pape ?|Le chef de l'Église catholique|Un roi|Un empereur|Un général|Urbain II est pape.
 croisades|2|Quel prédicateur mène la croisade populaire ?|Pierre l'Ermite|Saint Louis|Saladin|Hugues Capet|Il rassemble des foules de pauvres.
 croisades|2|Quel prince français part avec son armée ?|Godefroy de Bouillon|Louis XIV|Napoléon|Clovis|Il devient « avoué du Saint-Sépulcre ».
-croisades|2|Quelle ville est la première grande étape vers l'Orient ?|Constantinople|Londres|Paris|Madrid|Les croisés y arrivent en 1096.
 croisades|2|Comment les croisés voyagent-ils ?|À pied, à cheval et en bateau|En avion|En train|En voiture|Le voyage dure des mois.
 croisades|3|Quelle ville les croisés assiègent-ils avant Jérusalem ?|Antioche|Paris|Lyon|Rome|Elle tombe en 1098.
 croisades|3|En quelle année les croisés prennent-ils Jérusalem ?|1099|476|800|1204|La ville tombe après un siège.
@@ -225,7 +203,6 @@ croisades|6|Quelle reine accompagne son mari en croisade ?|Aliénor d'Aquitaine|
 croisades|6|Quel est le résultat de la deuxième croisade ?|Un échec|Une grande victoire|La prise de Rome|La fin des croisades|Les croisés échouent devant Damas.
 croisades|7|Quel sultan reprend Jérusalem en 1187 ?|Saladin|Soliman|Gengis Khan|Mehmed|Il l'emporte à Hattin.
 croisades|7|Quelle bataille de 1187 est une défaite pour les croisés ?|Hattin|Azincourt|Poitiers|Bouvines|Elle ouvre Jérusalem à Saladin.
-croisades|7|Quel peuple dirige Saladin ?|Les Ayyoubides|Les Romains|Les Francs|Les Vikings|Il est un chef kurde.
 croisades|7|Quelle qualité est reconnue à Saladin par ses ennemis ?|La générosité|La cruauté|La lâcheté|La richesse|Il est respecté.
 croisades|8|Quel roi d'Angleterre part pour la troisième croisade ?|Richard Cœur de Lion|Henri VIII|Édouard III|Guillaume|Il est un grand guerrier.
 croisades|8|Quel roi de France part avec lui ?|Philippe Auguste|Louis IX|Charles V|Henri IV|Les deux rois se disputent.
@@ -253,11 +230,9 @@ capetiens|3|Quelle forteresse Philippe Auguste fait-il construire à Paris ?|Le 
 capetiens|3|Que fait Philippe Auguste pour Paris ?|Il la pave et la fortifie|Il la détruit|Il la quitte|Il la vend|Il l'entoure d'une enceinte.
 capetiens|4|Comment appelle-t-on Louis IX ?|Saint Louis|Louis le Gros|Louis le Pieux|Louis le Fainéant|Il est canonisé en 1297.
 capetiens|4|Où rend-il la justice selon la tradition ?|Sous un chêne à Vincennes|Au Louvre|À Versailles|Dans une cathédrale|La scène est célèbre.
-capetiens|4|Quelle chapelle fait-il construire pour la couronne d'épines ?|La Sainte-Chapelle|Notre-Dame|La Madeleine|Saint-Denis|Elle est ornée de vitraux.
 capetiens|4|Dans quelle croisade meurt-il ?|La huitième|La première|La troisième|La quatrième|Il meurt de maladie à Tunis.
 capetiens|5|Quel est le style des grandes cathédrales ?|Gothique|Roman|Baroque|Moderne|Il utilise l'arc brisé.
 capetiens|5|Que sont les vitraux ?|Des fenêtres de verre coloré|Des peintures sur mur|Des mosaïques|Des tapisseries|Ils racontent des histoires.
-capetiens|5|Comment s'appelle la cathédrale de Paris commencée en 1163 ?|Notre-Dame|Saint-Denis|Chartres|Reims|Elle a plusieurs siècles.
 capetiens|5|Que sont les arcs-boutants ?|Des appuis extérieurs qui soutiennent les murs|Des fenêtres|Des statues|Des cloches|Ils permettent de monter très haut.
 capetiens|6|Quel événement attire les marchands de toute l'Europe ?|Les foires|Les tournois|Les croisades|Les procès|Les foires de Champagne sont célèbres.
 capetiens|6|Quel groupe grandit dans les villes ?|Les bourgeois|Les serfs|Les moines|Les chevaliers|Ils vivent du commerce.
@@ -279,7 +254,6 @@ capetiens|10|Quelle jeune fille délivre Orléans ?|Jeanne d'Arc|Aliénor|Blanch
 capetiens|10|Où Jeanne d'Arc est-elle brûlée ?|À Rouen|À Paris|À Orléans|À Reims|C'est en 1431.
 capetiens|10|Quel roi est sacré à Reims grâce à Jeanne ?|Charles VII|Louis XI|Charles VI|Henri IV|Le sacre a lieu en 1429.
 capetiens|10|Quelle bataille de 1453 clôt la guerre de Cent Ans ?|Castillon|Poitiers|Crécy|Azincourt|C'est la dernière bataille.
-renaissance|1|Quel roi de France part conquérir l'Italie en 1494 ?|Charles VIII|François Ier|Henri IV|Louis XIV|Il veut Naples.
 renaissance|1|Quel est le but des guerres d'Italie ?|Conquérir des territoires|Trouver du pétrole|Chercher l'or du Nouveau Monde|Défendre l'Église|Les rois rêvent d'Italie.
 renaissance|1|Que découvrent les Français en Italie ?|L'art de la Renaissance|La poudre à canon|Le chocolat|L'électricité|Ils ramènent des artistes.
 renaissance|1|Quelle ville italienne est un grand centre d'art ?|Florence|Berlin|Madrid|Londres|Elle est dirigée par les Médicis.
@@ -301,7 +275,6 @@ renaissance|5|Quel réformateur s'installe à Genève ?|Calvin|Luther|Zwingli|He
 renaissance|5|Comment appelle-t-on les chrétiens qui suivent Luther ?|Les protestants|Les catholiques|Les orthodoxes|Les druides|Leur mouvement divise l'Europe.
 renaissance|6|Quel navigateur découvre l'Amérique en 1492 ?|Christophe Colomb|Magellan|Cartier|Vasco de Gama|Il croit atteindre l'Inde.
 renaissance|6|Quel explorateur français arrive au Canada en 1534 ?|Jacques Cartier|Champlain|La Salle|Marquette|Il explore le Saint-Laurent.
-renaissance|6|Qui fait le premier tour du monde (expédition) ?|Magellan|Colomb|Cartier|Vespucci|Il meurt en cours de route.
 renaissance|6|Quel nouveau légume vient d'Amérique ?|La pomme de terre|Le blé|L'artichaut|Le chou|Elle changera l'alimentation.
 renaissance|7|Quel roi meurt dans un tournoi en 1559 ?|Henri II|François Ier|Charles IX|Henri IV|Il est blessé à l'œil.
 renaissance|7|Quel poète est le chef de la Pléiade ?|Ronsard|Molière|Hugo|Baudelaire|Il écrit pour Cassandre.
@@ -321,7 +294,6 @@ renaissance|10|Que dit-on qu'Henri IV a répondu avant d'abjurer ?|« Paris vaut
 renaissance|10|Comment s'appelle la guerre entre catholiques extrémistes et Henri IV ?|La Ligue|La Fronde|La Terreur|La Commune|Elle s'oppose à un roi protestant.
 grand-siecle|1|Quel roi est surnommé « le bon roi Henri » ?|Henri IV|Louis XIV|François Ier|Charles IX|Il veut que chacun ait « la poule au pot ».
 grand-siecle|1|Quel ministre conseille Henri IV pour l'économie ?|Sully|Colbert|Richelieu|Mazarin|Il développe l'agriculture.
-grand-siecle|1|Comment meurt Henri IV en 1610 ?|Assassiné par Ravaillac|Dans une bataille|De maladie|Dans un accident|Il est poignardé dans son carrosse.
 grand-siecle|1|Quelle explorateur fonde Québec en 1608 ?|Champlain|Cartier|Colomb|La Salle|Il fonde la Nouvelle-France.
 grand-siecle|2|Quel âge a Louis XIII quand son père meurt ?|Neuf ans|Vingt ans|Trente ans|Quarante ans|Sa mère Marie de Médicis est régente.
 grand-siecle|2|Quelle reine est régente pendant la jeunesse de Louis XIII ?|Marie de Médicis|Anne d'Autriche|Catherine de Médicis|Marie-Antoinette|Elle gouverne en son nom.
@@ -345,7 +317,6 @@ grand-siecle|6|Que fait Colbert pour la marine ?|Il la développe|Il la supprime
 grand-siecle|6|Quel produit de luxe fait la réputation de la France ?|Les tapisseries des Gobelins|Les voitures|Le plastique|Les vêtements de sport|Les manufactures sont royales.
 grand-siecle|7|Quel château Louis XIV fait-il agrandir ?|Versailles|Chambord|Amboise|Blois|Il y installe la cour en 1682.
 grand-siecle|7|Quelle galerie célèbre de Versailles est ornée de miroirs ?|La galerie des Glaces|La galerie Médicis|La galerie des Batailles|La galerie des Armures|Elle est très célèbre.
-grand-siecle|7|Qui dessine les jardins de Versailles ?|Le Nôtre|Mansart|Le Vau|Vauban|Ils sont très géométriques.
 grand-siecle|7|Pourquoi le roi installe-t-il la cour à Versailles ?|Pour contrôler la noblesse|Pour se cacher|Pour chasser|Pour fuir Paris|Les nobles dépendent du roi.
 grand-siecle|8|Quel auteur écrit « Le Malade imaginaire » ?|Molière|Racine|La Fontaine|Hugo|Il est mort sur scène.
 grand-siecle|8|Quel auteur écrit « Phèdre » ?|Racine|Corneille|Molière|Voltaire|C'est une tragédie.
@@ -381,7 +352,6 @@ revolution|5|Où prêtent-ils serment le 20 juin 1789 ?|Dans la salle du Jeu de 
 revolution|5|Quel roi refuse d'abord la réforme ?|Louis XVI|Louis XV|Louis XIV|Louis XIII|Il hésite.
 revolution|6|Quelle prison est prise le 14 juillet 1789 ?|La Bastille|Le Louvre|La Conciergerie|Vincennes|Elle symbolise l'arbitraire.
 revolution|6|Quel texte du 26 août 1789 proclame les droits de l'homme ?|La Déclaration des droits de l'homme|Le Code civil|La Constitution|La Charte|Elle dit que « les hommes naissent libres ».
-revolution|6|Quelle nuit voit l'abolition des privilèges ?|Le 4 août|Le 14 juillet|Le 20 juin|Le 1er janvier|Les nobles renoncent aux droits.
 revolution|6|Que devient la Bastille ensuite ?|Elle est démolie|Elle devient un musée|Elle devient un château|Elle devient un palais|Ses pierres sont vendues.
 revolution|7|Où le roi tente-t-il de s'enfuir en 1791 ?|Vers l'Est, arrêté à Varennes|Vers l'Ouest|Vers Rome|Vers Londres|Il est reconnu.
 revolution|7|Que décide la Constitution civile du clergé ?|Les prêtres sont élus et payés par l'État|Les prêtres sont chassés|Le pape est roi|L'Église est abolie|Elle divise les catholiques.
@@ -413,11 +383,9 @@ empire|3|Que crée Napoléon pour former l'élite ?|Les lycées|Les universités
 empire|3|Quelle nouvelle monnaie stable est créée ?|Le franc germinal|L'euro|Le dollar|La livre|Il reste stable un siècle.
 empire|4|En quelle année Napoléon est-il sacré empereur ?|1804|1789|1815|1799|Au Notre-Dame de Paris.
 empire|4|Quelle bataille navale de 1805 est perdue ?|Trafalgar|Austerlitz|Iéna|Eylau|Nelson y est tué.
-empire|4|Quelle bataille de 1805 est la plus célèbre victoire ?|Austerlitz|Waterloo|Trafalgar|Leipzig|La « bataille des Trois Empereurs ».
 empire|4|Où se trouve Austerlitz ?|En Moravie (République tchèque actuelle)|En France|En Espagne|En Italie|Napoléon bat les Russes et les Autrichiens.
 empire|5|Contre quel pays part la campagne de 1812 ?|La Russie|L'Angleterre|L'Espagne|L'Autriche|Napoléon veut punir le tsar.
 empire|5|Quelle ville russe est prise puis brûlée ?|Moscou|Saint-Pétersbourg|Kiev|Varsovie|L'armée doit se retirer.
-empire|5|Quel fleuve connaît le drame de la Bérézina ?|La Bérézina|La Volga|Le Rhin|Le Danube|Des milliers de soldats y meurent.
 empire|5|Qu'est-ce qui détruit la Grande Armée ?|Le froid et la faim|La peste|Les dragons|Les Vikings|Peu de soldats reviennent.
 empire|6|Quelle bataille de 1813 est une grande défaite ?|Leipzig|Austerlitz|Iéna|Wagram|C'est la « bataille des Nations ».
 empire|6|Sur quelle île Napoléon est-il exilé en 1814 ?|L'île d'Elbe|Sainte-Hélène|La Corse|Malte|Il en revient en 1815.
@@ -428,7 +396,6 @@ empire|7|Quel roi est renversé en 1830 ?|Charles X|Louis XVIII|Louis-Philippe|N
 empire|7|Combien de jours durent les Trois Glorieuses ?|Trois jours|Un jour|Dix jours|Un mois|Du 27 au 29 juillet 1830.
 empire|7|Quel drapeau reprend-on en 1830 ?|Le drapeau tricolore|Le drapeau blanc|Le drapeau rouge|Le drapeau noir|Il revient avec Louis-Philippe.
 empire|8|Quel roi règne de 1830 à 1848 ?|Louis-Philippe|Charles X|Louis XVIII|Napoléon III|On l'appelle le roi citoyen.
-empire|8|Quel moyen de transport apparaît dans les années 1830 ?|Le chemin de fer|L'avion|La voiture|Le métro|Les premières lignes sont ouvertes.
 empire|8|Qu'est-ce que la révolution industrielle ?|L'usage des machines dans les usines|Le retour aux champs|La fin des villes|Une guerre|Elle change la vie.
 empire|8|Quelle ressource alimente les machines ?|Le charbon|Le soleil|L'éolien|Le nucléaire|Le charbon fait fonctionner la vapeur.
 empire|9|En quelle année la République est-elle proclamée ?|1848|1830|1815|1870|Louis-Philippe est renversé.

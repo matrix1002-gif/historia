@@ -30,9 +30,10 @@
     }
     function addPipe(x) {
       var s = stageOf(st.score);
-      var gap = Math.max(138, 175 - st.score * 0.2);
+      var gap = Math.max(108, 172 - st.score * 0.55);
       var top = 70 + Math.random() * (GY - 70 - gap - 70);
-      st.pipes.push({ x: x, top: top, gap: gap, passed: false, st: s, flag: Math.random() < 0.5 });
+      var amp = st.score < 25 ? 0 : Math.min(70, 14 + (st.score - 25) * 0.6);
+      st.pipes.push({ x: x, base: top, top: top, gap: gap, passed: false, st: s, flag: Math.random() < 0.5, amp: amp, ph: Math.random() * 6.28, fq: 1.2 + Math.min(st.score, 200) * 0.012 });
     }
     function flap() {
       if (dead) return;
@@ -55,12 +56,12 @@
       if (opt.sfx && st.score % 5 === 0) opt.sfx("ok");
       burst(KX + 30, st.y, "#f0c64b", 6);
       var a = stageOf(st.score - 1), b = stageOf(st.score);
-      if (b !== a) {
+      if (b !== a && st.score !== TOTAL) {
         st.banner = { t: 0, s: b };
         if (opt.sfx) opt.sfx("ok");
         if (opt.buzz) opt.buzz(20);
       }
-      if (st.score >= TOTAL) finish(true);
+      if (st.score === TOTAL) { st.banner = { t: 0, s: 7, hunger: true }; burst(W / 2, 200, "#f0c64b", 50); if (opt.sfx) opt.sfx("ok"); }
     }
     function finish(win) {
       st.over = true; st.win = win; st.endT = 0;
@@ -81,19 +82,19 @@
         if (st.endT > (st.win ? 2.6 : 1.1) && !st.done) {
           st.done = true;
           if (st.score > best) best = st.score;
-          opt.onEnd({ score: st.score, win: !!st.win, stage: stageOf(st.score), best: best });
+          opt.onEnd({ score: st.score, win: st.score >= TOTAL, stage: stageOf(st.score), best: best });
         }
         return;
       }
-      var speed = 118 + Math.min(st.score, 120) * 0.35;
+      var speed = 118 + Math.min(st.score, 260) * 0.95;
       if (!st.started) { st.y = 250 + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
       st.vy += 15 * dt * 1.0; if (st.vy > 9) st.vy = 9;
       st.y += st.vy * 60 * dt * 0.62;
       st.rot = Math.max(-0.45, Math.min(0.7, st.vy * 0.07));
       st.scroll += speed * dt;
-      st.pipes.forEach(function (p) { p.x -= speed * dt; });
+      st.pipes.forEach(function (p) { p.x -= speed * dt; if (p.amp) { var lo = 66, hi = GY - 66 - p.gap; p.top = Math.max(lo, Math.min(hi, p.base + Math.sin(t * p.fq + p.ph) * p.amp)); } });
       var lastp = st.pipes[st.pipes.length - 1];
-      if (lastp.x < W - 205) addPipe(W + 40);
+      if (lastp.x < W - Math.max(165, 205 - st.score * 0.2)) addPipe(W + 40);
       st.pipes = st.pipes.filter(function (p) { return p.x > -80; });
       st.pipes.forEach(function (p) {
         if (!p.passed && p.x + 54 < KX - 12) { p.passed = true; point(); }
@@ -212,20 +213,39 @@
       }
     }
     function drawKnight(x, y, rot, tier, flapK) {
-      ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+      ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(0.92, 0.92);
       var gold = tier >= 5;
       var bodyC = tier >= 5 ? "#e6c14a" : tier >= 2 ? "#aab4c2" : "#8a5a3a";
-      var horseC = tier >= 6 ? "#f4f0e6" : tier >= 4 ? "#6a4a32" : "#8a6a48";
+      var horseC = tier >= 6 ? "#f4f0e6" : tier >= 4 ? "#241a1a" : tier >= 2 ? "#3a2a22" : "#6a4a32";
       var leg = Math.sin(t * 14) * 5 * (st.started ? 1 : 0.4) + flapK * 4;
-      // cheval
+      // cheval de guerre : puissant, crinière en flammes, œil rouge
+      var bob = Math.sin(t * 14) * 1.2;
+      var dark = tier >= 6 ? "#d8d2c4" : "#2c1c14";
+      // jambes (galop)
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      function legp(x0, k, col) { ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x0, 14); ctx.lineTo(x0 + 8 + leg * k, 22); ctx.lineTo(x0 + 2 + leg * k * 1.6, 31); ctx.stroke(); ctx.lineWidth = 7; ctx.strokeStyle = "#1a1210"; ctx.beginPath(); ctx.moveTo(x0 + 2 + leg * k * 1.6, 31); ctx.lineTo(x0 + 3 + leg * k * 1.6, 32); ctx.stroke(); }
+      legp(-14, 1, dark); legp(14, -1, dark);
+      // queue
+      ctx.strokeStyle = "#b02a37"; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-22, 2); ctx.quadraticCurveTo(-38, -2 + Math.sin(t * 12) * 4, -42, 10 + Math.sin(t * 12 + 1) * 5); ctx.stroke();
+      ctx.strokeStyle = "#f0902a"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-22, 3); ctx.quadraticCurveTo(-34, 2 + Math.sin(t * 12) * 4, -37, 12 + Math.sin(t * 12 + 1) * 5); ctx.stroke();
+      // corps musclé
       ctx.fillStyle = horseC;
-      ctx.beginPath(); ctx.ellipse(0, 8, 21, 11, 0, 0, 7); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(21, -2, 6, 11, 0.6, 0, 7); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(28, -10, 8, 5, 0.4, 0, 7); ctx.fill();
-      ctx.strokeStyle = horseC; ctx.lineWidth = 5; ctx.lineCap = "round";
-      ctx.beginPath(); ctx.moveTo(-12, 14); ctx.lineTo(-16 + leg, 26); ctx.moveTo(-5, 16); ctx.lineTo(-4 - leg, 27); ctx.moveTo(10, 16); ctx.lineTo(12 + leg, 27); ctx.moveTo(17, 14); ctx.lineTo(22 - leg, 25); ctx.stroke();
-      ctx.strokeStyle = "#2a1c10"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-20, 4); ctx.quadraticCurveTo(-30, 8 + leg, -28, 18); ctx.stroke();
-      rect(24, -17, 3, 4, "#2a1c10");
+      ctx.beginPath(); ctx.moveTo(-24, 4); ctx.quadraticCurveTo(-26, -8 + bob, -8, -6 + bob); ctx.quadraticCurveTo(8, -9 + bob, 20, -6); ctx.quadraticCurveTo(28, 0, 24, 12); ctx.quadraticCurveTo(0, 22, -22, 14); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.beginPath(); ctx.ellipse(-4, -1, 14, 4, 0, 0, 7); ctx.fill();
+      legp(-4, -1, horseC); legp(22, 1, horseC);
+      // encolure + tête
+      ctx.fillStyle = horseC; ctx.beginPath(); ctx.moveTo(14, -6); ctx.quadraticCurveTo(26, -22, 30, -24); ctx.lineTo(36, -16); ctx.quadraticCurveTo(28, -6, 26, 6); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(28, -26); ctx.quadraticCurveTo(40, -30, 48, -16); ctx.lineTo(44, -11); ctx.quadraticCurveTo(38, -16, 33, -14); ctx.closePath(); ctx.fill();
+      // chanfrein d'acier
+      ctx.fillStyle = tier >= 5 ? "#e6c14a" : "#9aa4b2"; ctx.beginPath(); ctx.moveTo(34, -28); ctx.lineTo(48, -17); ctx.lineTo(45, -13); ctx.lineTo(32, -22); ctx.closePath(); ctx.fill();
+      poly([33, -29, 36, -36, 38, -29], tier >= 5 ? "#f0d060" : "#b8c0cc");
+      // œil rouge + naseau
+      ctx.fillStyle = "#ff3b2a"; ctx.beginPath(); ctx.arc(37, -21, 2.2, 0, 7); ctx.fill();
+      ctx.fillStyle = "#1a1210"; ctx.beginPath(); ctx.arc(45, -14, 1.3, 0, 7); ctx.fill();
+      // crinière de flammes
+      for (var mi = 0; mi < 5; mi++) { var fx = 14 + mi * 4, fy = -8 - mi * 3.4; ctx.fillStyle = mi % 2 ? "#f0902a" : "#d9322b"; ctx.beginPath(); ctx.moveTo(fx, fy); ctx.quadraticCurveTo(fx - 12, fy - 4 + Math.sin(t * 14 + mi) * 4, fx - 18, fy + 5 + Math.sin(t * 14 + mi * 2) * 5); ctx.lineTo(fx - 3, fy + 5); ctx.closePath(); ctx.fill(); }
+      // sabots en feu / poussière
+      if (st.started && !st.over) { ctx.fillStyle = "rgba(240,144,42," + (0.35 + 0.25 * Math.sin(t * 20)) + ")"; ctx.beginPath(); ctx.ellipse(-34, 14 + Math.sin(t * 18) * 2, 9, 4, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(-46, 10 + Math.sin(t * 16) * 2, 6, 3, 0, 0, 7); ctx.fill(); }
       // housse du cheval
       if (tier >= 3) { poly([-14, 2, 14, 2, 17, 18, -16, 18], tier >= 5 ? "#b02a37" : "#2f5a9a"); rect(-14, 2, 28, 3, "#f0c64b"); }
       // cape
@@ -252,11 +272,11 @@
       var s = stageOf(st.score);
       ctx.fillStyle = "rgba(30,18,6,0.55)"; ctx.fillRect(0, 0, W, 44);
       ctx.fillStyle = "#f4e6c0"; ctx.font = "700 16px Georgia, serif"; ctx.textAlign = "left";
-      ctx.fillText((FR ? "Territoires " : "Territories ") + st.score + " / " + TOTAL, 12, 20);
+      ctx.fillText((FR ? "Territoires " : "Territories ") + st.score + (st.score < TOTAL ? " / " + TOTAL : " ★"), 12, 20);
       ctx.fillStyle = "#e6c36a"; ctx.font = "13px Georgia, serif";
       ctx.fillText(FR ? STAGES[s].fr : STAGES[s].en, 12, 37);
       ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fillRect(W - 112, 14, 100, 10);
-      ctx.fillStyle = "#f0c64b"; ctx.fillRect(W - 112, 14, 100 * st.score / TOTAL, 10);
+      ctx.fillStyle = "#f0c64b"; ctx.fillRect(W - 112, 14, 100 * Math.min(1, st.score / TOTAL), 10);
       ctx.strokeStyle = "#f4e6c0"; ctx.lineWidth = 1; ctx.strokeRect(W - 112.5, 13.5, 101, 11);
       ctx.textAlign = "center";
       if (!st.started && !st.over) {
@@ -272,9 +292,9 @@
         ctx.fillStyle = "rgba(90,20,30,0.88)"; ctx.fillRect(14, 96, W - 28, 74);
         ctx.strokeStyle = "#f0c64b"; ctx.lineWidth = 2; ctx.strokeRect(14, 96, W - 28, 74);
         ctx.fillStyle = "#ffd98a"; ctx.font = "700 20px Georgia, serif";
-        ctx.fillText(FR ? STAGES[b.s].fr : STAGES[b.s].en, W / 2, 126);
+        ctx.fillText(b.hunger ? (FR ? "Victoire ! 200 territoires" : "Victory! 200 territories") : (FR ? STAGES[b.s].fr : STAGES[b.s].en), W / 2, 126);
         ctx.fillStyle = "#fff3d6"; ctx.font = "14px Georgia, serif";
-        wrap(FR ? STAGES[b.s].line[0] : STAGES[b.s].line[1], W / 2, 148, W - 56, 17);
+        wrap(b.hunger ? (FR ? "Un guerrier a toujours plus faim… la chevauchée continue !" : "A warrior is always hungrier… the ride goes on!") : (FR ? STAGES[b.s].line[0] : STAGES[b.s].line[1]), W / 2, 148, W - 56, 17);
         ctx.globalAlpha = 1;
       }
       ctx.textAlign = "left";
@@ -298,7 +318,7 @@
       ctx.restore();
       hud();
       if (st.flash > 0) { ctx.fillStyle = "rgba(255,255,255," + Math.max(0, st.flash * 0.6) + ")"; ctx.fillRect(0, 0, W, H); }
-      if (st.over && st.win) { ctx.fillStyle = "#ffd98a"; ctx.font = "700 26px Georgia, serif"; ctx.textAlign = "center"; ctx.fillText(FR ? "200 territoires !" : "200 territories!", W / 2, 250); ctx.textAlign = "left"; }
+      if (false) { ctx.fillStyle = "#ffd98a"; ctx.font = "700 26px Georgia, serif"; ctx.textAlign = "center"; ctx.fillText(FR ? "200 territoires !" : "200 territories!", W / 2, 250); ctx.textAlign = "left"; }
     }
 
     function loop(ts) {

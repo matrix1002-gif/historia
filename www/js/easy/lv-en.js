@@ -9,11 +9,9 @@ gaule|2|What was the ancient Greek name of Marseille?|Massalia|Lugdunum|Nemausus
 gaule|2|How did Greek merchants travel to Gaul?|By ship|By plane|By train|By car|Marseille is a port on the Mediterranean.
 gaule|3|What are the wise priests of the Gauls called?|Druids|Monks|Pharaohs|Samurai|Druids taught, judged and prayed.
 gaule|3|Which sacred plant did druids cut with a golden sickle?|Mistletoe|Ivy|The rose|Wheat|Gathering mistletoe became famous.
-gaule|3|Under which sacred tree did the druids gather?|The oak|The palm|The cactus|The baobab|The oak was the druids' tree.
 gaule|3|What is the great Gaulish festival that gave rise to Halloween?|Samhain|Christmas|Easter|Carnival|Samhain marked the start of winter.
 gaule|4|Which Roman general arrived in Gaul in 58 BC?|Julius Caesar|Nero|Augustus|Trajan|He stayed eight years.
 gaule|4|What is the book in which Caesar tells of his war called?|The Gallic War|The Iliad|The Bible|The Odyssey|Caesar wrote it himself.
-gaule|4|Which language did Caesar write in?|Latin|Gaulish|Greek only|French|Latin was the Romans' language.
 gaule|4|Which peoples were divided in the face of Caesar?|The Gaulish tribes|The Egyptians|The Mongols|The Vikings|The Gauls were not united.
 gaule|5|Who was the Gaulish chief who united the tribes in 52 BC?|Vercingetorix|Asterix|Clovis|Attila|He came from the Arverni people.
 gaule|5|Where did Vercingetorix win a victory against Caesar?|Gergovia|Waterloo|Marathon|Alesia|At Gergovia Caesar had to retreat.
@@ -24,8 +22,6 @@ gaule|6|Which emperor was born in Lugdunum?|Claudius|Nero|Augustus|Hadrian|Claud
 gaule|6|Which Roman monument still stands in Lyon, on Fourvière hill?|An ancient theatre|A skyscraper|A castle|A Gothic cathedral|The Fourvière theatre is still used for shows.
 gaule|6|Which two rivers meet at Lyon?|The Rhône and the Saône|The Seine and the Loire|The Rhine and the Danube|The Garonne and the Dordogne|Lugdunum was a crossroads.
 gaule|7|What does an aqueduct carry?|Water|Wine|Soldiers|Goods|The Pont du Gard is an aqueduct.
-gaule|7|Which region is famous for the Pont du Gard?|The south of France|Brittany|Alsace|Normandy|It is near Nîmes.
-gaule|7|What are Roman roads?|Paved roads|Canals|Tunnels|Wooden bridges|The Romans built them to link towns.
 gaule|7|What heating system did wealthy Romans use?|Underfloor heating (hypocaust)|Electric heating|Gas|A modern wood stove|Hot air flowed under the floor.
 gaule|8|What did the Gauls become after the conquest?|Gallo-Romans|Vikings|Franks|Goths|They blended Gaulish and Roman customs.
 gaule|8|Which language did the Gauls gradually adopt?|Latin|Greek|Arabic|Russian|Latin would become French.
@@ -63,17 +59,12 @@ evangelisation|6|Which pope sent Augustine of Canterbury to England?|Gregory the
 evangelisation|6|Which Anglo-Saxon king welcomed Augustine in 597?|Æthelberht of Kent|Alfred the Great|Arthur|Richard the Lionheart|His wife Bertha was Christian.
 evangelisation|6|In which English city did Augustine set up his see?|Canterbury|London|Oxford|York|Canterbury is still the centre of the Church of England.
 evangelisation|6|Which people lived in England at the time?|The Anglo-Saxons|The Gauls|The Romans|The Vikings|They were pagans.
-evangelisation|7|Which country did Boniface, the “apostle of the Germans”, come from?|England|France|Italy|Spain|He was an Anglo-Saxon monk.
 evangelisation|7|What did Boniface do at the Oak of Geismar?|He had it cut down|He decorated it|He preached to animals there|He rested there|He showed that pagan gods were powerless.
-evangelisation|7|Which town in Germany is linked to Boniface?|Fulda|Paris|Lyon|Rome|He founded an abbey there.
 evangelisation|7|In which region was Boniface killed in 754?|Frisia|Gaul|Egypt|Brittany|He died there with his companions.
 evangelisation|8|Which two brothers evangelised the Slavs?|Cyril and Methodius|Peter and Paul|James and John|Romulus and Remus|They came from Thessalonica.
 evangelisation|8|What did Cyril and Methodius invent for the Slavs?|An alphabet|A sword|A cathedral|A law|The Cyrillic alphabet descends from it.
 evangelisation|8|Into which language did they translate the Bible?|Old Slavonic|Latin|French|Chinese|They wanted everyone to understand.
-evangelisation|8|From which great empire did Cyril and Methodius come?|The Byzantine Empire|The Western Roman Empire|The Mongol Empire|The Inca Empire|They came from Thessalonica.
-evangelisation|9|Which Frankish king was baptised at Reims?|Clovis|Charlemagne|Pepin|Hugh Capet|Around 496.
 evangelisation|9|Which Anglo-Saxon king defended England against the Vikings in the 9th century?|Alfred the Great|Arthur|Richard|Harold|Alfred defended England against the Vikings.
-evangelisation|9|Which country did King Stephen christianise in the year 1000?|Hungary|Norway|Spain|England|Saint Stephen was Hungary's first Christian king.
 evangelisation|9|Which people received Christianity under Vladimir of Kiev?|The Russians|The Chinese|The Arabs|The Incas|Vladimir was baptised around 988.
 evangelisation|10|In what year was the great schism between Rome and Constantinople?|1054|476|800|1789|The two Churches separated.
 evangelisation|10|What are the two great Churches that came out of the schism?|Catholic and Orthodox|Protestant and Anglican|Jewish and Muslim|Neither|The pope and the patriarch excommunicated each other.
@@ -83,9 +74,7 @@ carolingiens|1|Which Frankish king was baptised at Reims around 496?|Clovis|Char
 carolingiens|1|Which victory of Clovis in 486 opened northern Gaul to him?|Soissons|Poitiers|Tolbiac|Verdun|The story of the vase of Soissons is told.
 carolingiens|1|What was Clovis's dynasty?|The Merovingians|The Carolingians|The Capetians|The Valois|The name comes from Merovech.
 carolingiens|1|Which city did Clovis choose as his capital?|Paris|Reims|Marseille|Rome|He is buried there.
-carolingiens|2|What are the Merovingian kings without real power called?|Do-nothing kings|Wise kings|Soldier kings|Poor kings|Power passed to the mayors of the palace.
 carolingiens|2|What was the role of the mayors of the palace?|Running the kingdom in place of the king|Cooking at the palace|Keeping the keys|Hunting|They were the real leaders.
-carolingiens|2|Which Frankish queen was famous for her cruelty, Brunhilda or Clotilde?|Brunhilda|Clotilde|Genevieve|Blanche|Brunhilda and Fredegund waged war on each other.
 carolingiens|2|What is the family of Pepin and Charles Martel called?|The Pippinids|The Capetians|The Valois|The Bourbons|This family became very powerful.
 carolingiens|3|In what year did Charles Martel beat the Arabs at Poitiers?|732|476|800|1066|The battle stopped their advance in Gaul.
 carolingiens|3|What nickname did Charles, victor over the Arabs, have?|Martel (the hammer)|The Bald|The Fat|The Simple|He struck like a hammer.
@@ -105,7 +94,6 @@ carolingiens|6|What title did Charlemagne receive?|Emperor|Duke|Count|Pope|He re
 carolingiens|6|In which city did his coronation take place?|Rome|Paris|Reims|Aachen|It is the pope's city.
 carolingiens|7|Which English scholar led the palace school?|Alcuin|Colbert|Richelieu|Bede|He organised the revival of learning.
 carolingiens|7|Which script was created at this time?|Carolingian minuscule|Hieroglyphs|Cuneiform|Runes|It is the origin of our letters.
-carolingiens|7|Which books did the monks copy?|Books from Antiquity|Newspapers|Magazines|Modern textbooks|They thus saved many texts.
 carolingiens|7|Who was educated at the palace school?|Sons of nobles and great men|Only peasants|Only women|All children|Charlemagne wanted educated people.
 carolingiens|8|What are the emperor's envoys called?|The missi dominici|The troubadours|The knights|The druids|They inspected the empire.
 carolingiens|8|What is a large Carolingian farming estate called?|A villa|A cathedral|An abbey|A fortress|It included fields and workshops.
@@ -113,11 +101,9 @@ carolingiens|8|What were the divisions of the empire called?|Counties|Department
 carolingiens|8|Which animal was important for Frankish warriors?|The horse|The camel|The elephant|The tiger|Cavalry became decisive.
 carolingiens|9|Which treaty split the empire in 843?|The Treaty of Verdun|The Treaty of Paris|The Treaty of Rome|The Treaty of Versailles|It divided the empire into three.
 carolingiens|9|How many grandsons of Charlemagne shared the empire?|Three|Two|Ten|Just one|Lothair, Louis and Charles.
-carolingiens|9|Which grandson received the western part, the future France?|Charles the Bald|Lothair|Louis the German|Pepin|He ruled West Francia.
 carolingiens|9|What became of the eastern part of the empire?|The future Germany|The future England|The future Spain|The future Russia|It went to Louis the German.
 carolingiens|10|Which northern people attacked France in the 9th century?|The Vikings|The Arabs|The Romans|The Gauls|They came from Scandinavia.
 carolingiens|10|Which city was besieged by the Vikings in 885?|Paris|Marseille|Lyon|Reims|Count Odo defended it.
-carolingiens|10|Which treaty of 911 gave Normandy to the Vikings?|Saint-Clair-sur-Epte|Verdun|Troyes|Utrecht|Rollo became Duke of Normandy.
 carolingiens|10|How did the Vikings come to France?|On longships|By plane|By train|By camel|Their boats were fast.
 moines|1|Which saint is the father of Western monks?|Benedict of Nursia|Martin|Francis|Dominic|He wrote a famous Rule.
 moines|1|What is the Rule of the Benedictine monks called?|The Rule of Saint Benedict|The Rule of Saint Louis|The Rule of Saint Martin|The King's Rule|It organises life in abbeys.
@@ -144,7 +130,6 @@ moines|6|What colour were the Cluny monks' habits?|Black|White|Red|Blue|They wer
 moines|6|What is the head of a great abbey called?|The abbot|The baron|The duke|The mayor|The abbot of Cluny was very influential.
 moines|6|Which order did Cluny belong to?|The Benedictine order|The Templars|The Franciscans|The Jesuits|They followed the Rule of Saint Benedict.
 moines|7|Which famous monk preached the Second Crusade?|Bernard of Clairvaux|Benedict|Martin|Louis|He founded Clairvaux.
-moines|7|What colour is the Cistercian habit?|White|Black|Red|Blue|They were called the white monks.
 moines|7|What is the style of Cistercian abbeys?|Very plain|Very decorated|Very colourful|Very tall|They refused luxury.
 moines|7|Which region is Cîteaux in?|Burgundy|Brittany|Alsace|Provence|Cîteaux is near Dijon.
 moines|8|What is the style of abbeys with round arches called?|Romanesque art|Gothic art|Modern art|Baroque art|It is massive and plain.
@@ -156,7 +141,6 @@ moines|9|In which country did Hildegard of Bingen live?|Germany|France|Italy|Spa
 moines|9|Why is Hildegard famous?|For her visions, songs and remedies|For her wars|For her travels|For her tournaments|She wrote many treatises.
 moines|9|What kind of music did Hildegard compose?|Religious chants|Operas|Rock|Waltzes|She composed many chants.
 moines|10|Which order lives in silence and solitude, in the Chartreuse?|The Carthusians|The Dominicans|The Franciscans|The Templars|Their monastery is in the Alps.
-moines|10|Which saint founded the Franciscan friars?|Francis of Assisi|Dominic|Benedict|Louis|He chose poverty.
 moines|10|What do mendicant friars do to live?|They beg|They hunt|They make war|They sell weapons|They live on gifts.
 moines|10|Which other mendicant order was founded by Dominic?|The Dominicans|The Jesuits|The Benedictines|The Templars|They preach and study.
 chevaliers|1|What are the three orders of the Middle Ages?|Those who pray, fight and work|Kings, queens, princes|North, south, west|Cities, villages, hamlets|Clergy, nobility and peasants.
@@ -169,7 +153,6 @@ chevaliers|2|Which ceremony makes a squire a knight?|The dubbing|Baptism|Coronat
 chevaliers|2|What does the knight receive at his dubbing?|A sword|A crown|A book|A staff|He swears to protect the weak.
 chevaliers|3|What is the main tower of a castle called?|The keep|The chapel|The cellar|The gate|The lord often lived there.
 chevaliers|3|What is the water-filled ditch around a castle called?|The moat|The cellar|The wall walk|The bridge|It protects against attackers.
-chevaliers|3|What lets people enter the castle?|The drawbridge|The lift|The tunnel|The cable car|It is raised during an attack.
 chevaliers|3|What are arrow slits for?|Shooting arrows while protected|Letting in air|Giving light|Passing the post|They are narrow openings.
 chevaliers|4|What is mail armour made of?|Iron rings|Leather|Wool|Cloth|It protects the body.
 chevaliers|4|What is the knight's war horse called?|The destrier|The pony|The donkey|The mule|It is big and strong.
@@ -177,10 +160,8 @@ chevaliers|4|Which object protects the knight's head?|The great helm|The hat|The
 chevaliers|4|Which saddle item helps the knight stay on his horse?|Stirrups|Only the reins|Bells|Gloves|Stirrups give stability.
 chevaliers|5|What is a mounted combat with lances called?|A joust|A duel|A battle|A race|It takes place in a tournament.
 chevaliers|5|Where do jousts take place?|In the lists|At the castle|At the abbey|In the baths|The lists are surrounded by barriers.
-chevaliers|5|What is the set of combats and games between knights called?|The tournament|The carnival|The banquet|The market|Nobles came from far away.
 chevaliers|5|What does the winner of a joust win?|Honours and prizes|A castle|An empire|Nothing|Sometimes the loser's horse and armour.
 chevaliers|6|Which institution protected the weak during private wars?|The Peace of God|The Peace of the Brave|The Roman Peace|The Peace of Paris|The Church limited violence.
-chevaliers|6|What must the knight do according to his oath?|Protect the weak and the Church|Plunder villages|Become king|Travel alone|It is a code of honour.
 chevaliers|6|When does the Truce of God forbid fighting?|From Wednesday evening to Monday morning|Every day|Only on Mondays|Only in summer|It strongly limited fighting.
 chevaliers|6|Who were the Church's allies in the Peace of God?|Lords and bishops|The Vikings|Pirates|Bandits|They swore to respect the peace.
 chevaliers|7|Which legendary king has a Round Table?|Arthur|Charlemagne|Louis IX|Clovis|The Round Table gathers his knights.
@@ -200,12 +181,9 @@ chevaliers|10|Which king still surrounded himself with knights at Marignano?|Fra
 chevaliers|10|Which Spanish writer mocked an old knight?|Cervantes|Molière|Rabelais|Shakespeare|Don Quixote is his hero.
 chevaliers|10|Which was the last fatal royal tournament in France?|Henry II's in 1559|Louis IX's|Charlemagne's|Clovis's|The king died wounded in the eye.
 croisades|1|In which French town did Urban II launch the appeal?|Clermont|Paris|Reims|Lyon|It was in 1095.
-croisades|1|Which cry did the crowd shout at Clermont?|“God wills it!”|“Long live the king!”|“To Rome!”|“Long live freedom!”|The cry became famous.
-croisades|1|What was the aim of the First Crusade?|To free Jerusalem|To conquer England|To plunder Rome|To drive out the Vikings|The crusaders wanted to retake the holy city.
 croisades|1|What is a pope?|The head of the Catholic Church|A king|An emperor|A general|Urban II was pope.
 croisades|2|Which preacher led the popular crusade?|Peter the Hermit|Saint Louis|Saladin|Hugh Capet|He gathered crowds of poor people.
 croisades|2|Which French prince left with his army?|Godfrey of Bouillon|Louis XIV|Napoleon|Clovis|He became “Defender of the Holy Sepulchre”.
-croisades|2|Which city was the first great stop on the way east?|Constantinople|London|Paris|Madrid|The crusaders arrived in 1096.
 croisades|2|How did the crusaders travel?|On foot, on horseback and by ship|By plane|By train|By car|The journey lasted months.
 croisades|3|Which city did the crusaders besiege before Jerusalem?|Antioch|Paris|Lyon|Rome|It fell in 1098.
 croisades|3|In what year did the crusaders take Jerusalem?|1099|476|800|1204|The city fell after a siege.
@@ -225,7 +203,6 @@ croisades|6|Which queen accompanied her husband on crusade?|Eleanor of Aquitaine
 croisades|6|What was the result of the Second Crusade?|A failure|A great victory|The taking of Rome|The end of the crusades|The crusaders failed before Damascus.
 croisades|7|Which sultan retook Jerusalem in 1187?|Saladin|Suleiman|Genghis Khan|Mehmed|He won at Hattin.
 croisades|7|Which battle of 1187 was a defeat for the crusaders?|Hattin|Agincourt|Poitiers|Bouvines|It opened Jerusalem to Saladin.
-croisades|7|Which people did Saladin lead?|The Ayyubids|The Romans|The Franks|The Vikings|He was a Kurdish leader.
 croisades|7|Which quality did even his enemies recognise in Saladin?|Generosity|Cruelty|Cowardice|Wealth|He was respected.
 croisades|8|Which king of England left for the Third Crusade?|Richard the Lionheart|Henry VIII|Edward III|William|He was a great warrior.
 croisades|8|Which king of France left with him?|Philip Augustus|Louis IX|Charles V|Henry IV|The two kings quarrelled.
@@ -253,11 +230,9 @@ capetiens|3|Which fortress did Philip Augustus have built in Paris?|The Louvre|T
 capetiens|3|What did Philip Augustus do for Paris?|He paved and fortified it|He destroyed it|He left it|He sold it|He surrounded it with a wall.
 capetiens|4|What is Louis IX called?|Saint Louis|Louis the Fat|Louis the Pious|Louis the Do-nothing|He was canonised in 1297.
 capetiens|4|Where did he dispense justice according to tradition?|Under an oak at Vincennes|At the Louvre|At Versailles|In a cathedral|The scene is famous.
-capetiens|4|Which chapel did he have built for the Crown of Thorns?|The Sainte-Chapelle|Notre-Dame|The Madeleine|Saint-Denis|It is adorned with stained glass.
 capetiens|4|On which crusade did he die?|The eighth|The first|The third|The fourth|He died of illness at Tunis.
 capetiens|5|What is the style of the great cathedrals?|Gothic|Romanesque|Baroque|Modern|It uses the pointed arch.
 capetiens|5|What are stained-glass windows?|Windows of coloured glass|Wall paintings|Mosaics|Tapestries|They tell stories.
-capetiens|5|What is the Paris cathedral begun in 1163 called?|Notre-Dame|Saint-Denis|Chartres|Reims|It took several centuries.
 capetiens|5|What are flying buttresses?|Outside supports that hold up the walls|Windows|Statues|Bells|They let builders go very high.
 capetiens|6|Which event attracted merchants from all over Europe?|Fairs|Tournaments|Crusades|Trials|The Champagne fairs are famous.
 capetiens|6|Which group grew in the towns?|The townspeople (bourgeois)|The serfs|The monks|The knights|They lived from trade.
@@ -279,7 +254,6 @@ capetiens|10|Which young girl relieved Orléans?|Joan of Arc|Eleanor|Blanche|Mar
 capetiens|10|Where was Joan of Arc burned?|At Rouen|At Paris|At Orléans|At Reims|It was in 1431.
 capetiens|10|Which king was crowned at Reims thanks to Joan?|Charles VII|Louis XI|Charles VI|Henry IV|The coronation took place in 1429.
 capetiens|10|Which battle of 1453 ended the Hundred Years' War?|Castillon|Poitiers|Crécy|Agincourt|It was the last battle.
-renaissance|1|Which king of France left to conquer Italy in 1494?|Charles VIII|Francis I|Henry IV|Louis XIV|He wanted Naples.
 renaissance|1|What was the aim of the Italian Wars?|To conquer territory|To find oil|To seek gold in the New World|To defend the Church|Kings dreamed of Italy.
 renaissance|1|What did the French discover in Italy?|Renaissance art|Gunpowder|Chocolate|Electricity|They brought back artists.
 renaissance|1|Which Italian city was a great centre of art?|Florence|Berlin|Madrid|London|It was ruled by the Medici.
@@ -301,7 +275,6 @@ renaissance|5|Which reformer settled in Geneva?|Calvin|Luther|Zwingli|Henry VIII
 renaissance|5|What are Christians who follow Luther called?|Protestants|Catholics|Orthodox|Druids|Their movement divided Europe.
 renaissance|6|Which navigator discovered America in 1492?|Christopher Columbus|Magellan|Cartier|Vasco da Gama|He thought he had reached India.
 renaissance|6|Which French explorer reached Canada in 1534?|Jacques Cartier|Champlain|La Salle|Marquette|He explored the St Lawrence.
-renaissance|6|Whose expedition made the first voyage around the world?|Magellan|Columbus|Cartier|Vespucci|He died along the way.
 renaissance|6|Which new vegetable came from America?|The potato|Wheat|The artichoke|The cabbage|It would change diets.
 renaissance|7|Which king died in a tournament in 1559?|Henry II|Francis I|Charles IX|Henry IV|He was wounded in the eye.
 renaissance|7|Which poet was the leader of the Pléiade?|Ronsard|Molière|Hugo|Baudelaire|He wrote for Cassandra.
@@ -321,7 +294,6 @@ renaissance|10|What is Henry IV said to have answered before abjuring?|“Paris 
 renaissance|10|What is the war between extreme Catholics and Henry IV called?|The League|The Fronde|The Terror|The Commune|It opposed a Protestant king.
 grand-siecle|1|Which king is nicknamed “the good King Henry”?|Henry IV|Louis XIV|Francis I|Charles IX|He wanted everyone to have “a chicken in the pot”.
 grand-siecle|1|Which minister advised Henry IV on the economy?|Sully|Colbert|Richelieu|Mazarin|He developed agriculture.
-grand-siecle|1|How did Henry IV die in 1610?|Assassinated by Ravaillac|In a battle|Of illness|In an accident|He was stabbed in his coach.
 grand-siecle|1|Which explorer founded Quebec in 1608?|Champlain|Cartier|Columbus|La Salle|He founded New France.
 grand-siecle|2|How old was Louis XIII when his father died?|Nine|Twenty|Thirty|Forty|His mother Marie de' Medici was regent.
 grand-siecle|2|Which queen was regent during Louis XIII's youth?|Marie de' Medici|Anne of Austria|Catherine de' Medici|Marie Antoinette|She governed in his name.
@@ -345,7 +317,6 @@ grand-siecle|6|What did Colbert do for the navy?|He developed it|He abolished it
 grand-siecle|6|Which luxury product made France's reputation?|Gobelins tapestries|Cars|Plastic|Sportswear|The manufactures were royal.
 grand-siecle|7|Which château did Louis XIV have enlarged?|Versailles|Chambord|Amboise|Blois|He settled the court there in 1682.
 grand-siecle|7|Which famous gallery at Versailles is lined with mirrors?|The Hall of Mirrors|The Medici Gallery|The Battles Gallery|The Armour Gallery|It is very famous.
-grand-siecle|7|Who designed the gardens of Versailles?|Le Nôtre|Mansart|Le Vau|Vauban|They are very geometric.
 grand-siecle|7|Why did the king settle the court at Versailles?|To control the nobility|To hide|To hunt|To flee Paris|The nobles depended on the king.
 grand-siecle|8|Which author wrote “The Imaginary Invalid”?|Molière|Racine|La Fontaine|Hugo|He died on stage.
 grand-siecle|8|Which author wrote “Phèdre”?|Racine|Corneille|Molière|Voltaire|It is a tragedy.
@@ -381,7 +352,6 @@ revolution|5|Where did they take an oath on 20 June 1789?|In the Tennis Court|In
 revolution|5|Which king first refused reform?|Louis XVI|Louis XV|Louis XIV|Louis XIII|He hesitated.
 revolution|6|Which prison was stormed on 14 July 1789?|The Bastille|The Louvre|The Conciergerie|Vincennes|It symbolised arbitrary rule.
 revolution|6|Which text of 26 August 1789 proclaimed the rights of man?|The Declaration of the Rights of Man|The Civil Code|The Constitution|The Charter|It says “men are born free”.
-revolution|6|Which night saw the abolition of privileges?|4 August|14 July|20 June|1 January|Nobles gave up their rights.
 revolution|6|What happened to the Bastille afterwards?|It was demolished|It became a museum|It became a castle|It became a palace|Its stones were sold.
 revolution|7|Where did the king try to flee in 1791?|Eastwards, stopped at Varennes|Westwards|To Rome|To London|He was recognised.
 revolution|7|What did the Civil Constitution of the Clergy decide?|Priests were elected and paid by the State|Priests were expelled|The pope was king|The Church was abolished|It divided Catholics.
@@ -413,11 +383,9 @@ empire|3|What did Napoleon create to train the elite?|Lycées|Medieval universit
 empire|3|Which new stable currency was created?|The germinal franc|The euro|The dollar|The pound|It stayed stable for a century.
 empire|4|In what year was Napoleon crowned emperor?|1804|1789|1815|1799|At Notre-Dame in Paris.
 empire|4|Which naval battle of 1805 was lost?|Trafalgar|Austerlitz|Jena|Eylau|Nelson was killed there.
-empire|4|Which battle of 1805 was the most famous victory?|Austerlitz|Waterloo|Trafalgar|Leipzig|The “Battle of the Three Emperors”.
 empire|4|Where is Austerlitz?|In Moravia (present-day Czech Republic)|In France|In Spain|In Italy|Napoleon beat the Russians and Austrians.
 empire|5|Against which country was the 1812 campaign launched?|Russia|England|Spain|Austria|Napoleon wanted to punish the tsar.
 empire|5|Which Russian city was taken then burned?|Moscow|Saint Petersburg|Kiev|Warsaw|The army had to retreat.
-empire|5|Which river saw the tragedy of the Berezina?|The Berezina|The Volga|The Rhine|The Danube|Thousands of soldiers died there.
 empire|5|What destroyed the Grande Armée?|Cold and hunger|Plague|Dragons|Vikings|Few soldiers came back.
 empire|6|Which battle of 1813 was a great defeat?|Leipzig|Austerlitz|Jena|Wagram|It was the “Battle of the Nations”.
 empire|6|To which island was Napoleon exiled in 1814?|Elba|Saint Helena|Corsica|Malta|He returned from it in 1815.
@@ -428,7 +396,6 @@ empire|7|Which king was overthrown in 1830?|Charles X|Louis XVIII|Louis-Philippe
 empire|7|How many days did the Three Glorious Days last?|Three days|One day|Ten days|A month|From 27 to 29 July 1830.
 empire|7|Which flag was taken up again in 1830?|The tricolour|The white flag|The red flag|The black flag|It returned with Louis-Philippe.
 empire|8|Which king reigned from 1830 to 1848?|Louis-Philippe|Charles X|Louis XVIII|Napoleon III|He was called the citizen king.
-empire|8|Which means of transport appeared in the 1830s?|The railway|The plane|The car|The metro|The first lines opened.
 empire|8|What is the Industrial Revolution?|The use of machines in factories|The return to the fields|The end of towns|A war|It changed life.
 empire|8|Which resource powered the machines?|Coal|The sun|Wind|Nuclear|Coal ran the steam engines.
 empire|9|In what year was the Republic proclaimed?|1848|1830|1815|1870|Louis-Philippe was overthrown.

@@ -10,30 +10,23 @@ gaule|Quelle grande ville française s'appelait Lugdunum à l'époque romaine ?|
 gaule|Quel empereur romain a donné son nom au mois d'août ?|Auguste|Néron|Trajan|Constantin|Le mois d'août, ou « augustus », rend hommage au premier empereur.
 gaule|Quelle ville était la capitale de l'Empire romain ?|Rome|Athènes|Carthage|Alexandrie|De Rome, les Romains gouvernaient un empire qui entourait la Méditerranée.
 evangelisation|Quel est le livre sacré des chrétiens ?|La Bible|Le Coran|Le Talmud|Les Védas|La Bible comprend l'Ancien et le Nouveau Testament.
-evangelisation|Quel personnage est à l'origine du christianisme ?|Jésus de Nazareth|Moïse|Mahomet|Bouddha|Les chrétiens croient en Jésus, mort et ressuscité.
 evangelisation|Quel empereur romain autorise le christianisme en 313 ?|Constantin|Néron|Jules César|Charlemagne|C'est l'édit de Milan, signé avec Licinius.
-evangelisation|Quelle fête chrétienne célèbre la naissance de Jésus ?|Noël|Pâques|La Pentecôte|La Toussaint|Noël est fêté le 25 décembre.
-evangelisation|Quel roi des Francs se fait baptiser vers 496 ?|Clovis|Charlemagne|Louis XIV|Napoléon|Son baptême à Reims marque un tournant pour la Gaule.
 evangelisation|Dans quelle ville se trouve le pape ?|À Rome|À Paris|À Jérusalem|À Athènes|Le Vatican est un petit État au cœur de Rome.
 evangelisation|Quel saint a évangélisé l'Irlande ?|Saint Patrick|Saint Louis|Saint Nicolas|Saint Michel|On le fête le 17 mars, avec le trèfle comme symbole.
 evangelisation|Comment appelle-t-on celui qui part annoncer l'Évangile dans un pays lointain ?|Un missionnaire|Un croisé|Un notaire|Un forgeron|Les missionnaires ont voyagé à pied et en bateau.
 evangelisation|Quel symbole représente les chrétiens ?|La croix|Le croissant|Le trident|La lune|La croix rappelle la mort de Jésus.
 evangelisation|Que célèbrent les chrétiens à Pâques ?|La résurrection de Jésus|La naissance de Jésus|L'arrivée des Rois mages|La fin du monde|Pâques est la plus grande fête des chrétiens.
 carolingiens|Qui est couronné empereur à Noël de l'an 800 ?|Charlemagne|Clovis|Napoléon|Louis XIV|Le pape Léon III le couronne à Rome.
-carolingiens|Qu'est-ce que la légende attribue à Charlemagne ?|L'invention de l'école|Celle du téléphone|Celle de l'imprimerie|Celle du château fort|Il encouragea la création d'écoles, d'où la chanson.
 carolingiens|Quel peuple a donné son nom à la France ?|Les Francs|Les Gaulois|Les Romains|Les Vikings|« France » vient de « Francia », le pays des Francs.
 carolingiens|Comment s'appelle la dynastie de Charlemagne ?|Les Carolingiens|Les Capétiens|Les Mérovingiens|Les Bourbons|Le nom vient de « Carolus », Charles en latin.
 carolingiens|Quelle ville est la capitale préférée de Charlemagne ?|Aix-la-Chapelle|Paris|Marseille|Madrid|Il y fait bâtir son palais et sa chapelle.
 carolingiens|Quel peuple venu de Scandinavie attaque les côtes françaises dès le IXe siècle ?|Les Vikings|Les Mongols|Les Aztèques|Les Gaulois|Ils remontent les fleuves sur leurs drakkars.
 carolingiens|Qui est Charles Martel ?|Le vainqueur de la bataille de Poitiers en 732|Un roi de France moderne|Un pape|Un explorateur|Il arrête l'avancée des armées venues d'Espagne.
 carolingiens|Quelle écriture est à l'origine de nos lettres minuscules ?|La minuscule caroline|Les hiéroglyphes|Le cunéiforme|Les runes|Elle est créée sous Charlemagne pour être lisible partout.
-carolingiens|Qui est Roland, héros d'une célèbre chanson ?|Un chevalier de Charlemagne|Un roi de Pologne|Un pape|Un chef viking|« La Chanson de Roland » raconte sa mort à Roncevaux.
 carolingiens|Comment s'appelle la dynastie des Francs avant les Carolingiens ?|Les Mérovingiens|Les Capétiens|Les Valois|Les Tudors|Clovis appartenait aux Mérovingiens.
 moines|Comment s'appelle le lieu où vivent des moines ?|Un monastère|Une mairie|Un château|Une gare|On dit aussi une abbaye.
 moines|Quel saint est le père des moines d'Occident ?|Saint Benoît|Saint Louis|Saint Nicolas|Saint Christophe|Sa Règle est suivie dans toute l'Europe.
-moines|Avant l'imprimerie, comment fabriquait-on les livres ?|On les copiait à la main|On les photocopiait|On les imprimait en série|On les gravait sur pierre|Un livre demandait parfois des mois de travail.
 moines|Quelle devise résume la vie des moines bénédictins ?|Prie et travaille|Combats et conquiers|Vends et achète|Dors et mange|« Ora et labora » en latin.
-moines|Quels vœux font les moines ?|Pauvreté, chasteté, obéissance|Richesse, gloire, pouvoir|Voyage, commerce, guerre|Chasse, pêche, danse|Ils renoncent à posséder et à se marier.
 moines|Dans quelle région de France se trouve le Mont-Saint-Michel ?|En Normandie|En Alsace|En Provence|En Corse|Une abbaye est construite sur ce rocher dans la mer.
 moines|Quel ordre de moines est lié à l'abbaye de Cîteaux ?|Les cisterciens|Les jésuites|Les templiers|Les mousquetaires|Bernard de Clairvaux fut un célèbre cistercien.
 moines|Comment appelle-t-on un livre orné de dessins colorés, fait par les moines ?|Un manuscrit enluminé|Une bande dessinée|Un journal|Un magazine|On y utilisait même de l'or.
@@ -43,12 +36,10 @@ chevaliers|Comment s'appelle l'habit de métal d'un chevalier ?|L'armure|La toge
 chevaliers|Comment appelle-t-on la tour principale d'un château fort ?|Le donjon|Le clocher|Le phare|Le minaret|C'est la dernière défense et la demeure du seigneur.
 chevaliers|Comment s'appelle le jeune noble qui apprend le métier de chevalier ?|Un écuyer|Un moine|Un marchand|Un bouffon|Il a d'abord été page, vers sept ans.
 chevaliers|Comment appelle-t-on le combat entre deux chevaliers à cheval ?|Une joute|Un match de foot|Une régate|Un tournoi de tennis|Les chevaliers s'affrontent à la lance.
-chevaliers|Que protège un pont-levis ?|L'entrée du château|Le puits|La cave|Le jardin|On le relève en cas d'attaque.
 chevaliers|Comment s'appelle la cérémonie qui fait d'un jeune homme un chevalier ?|L'adoubement|Le baptême|Le couronnement|Le mariage|Le seigneur lui remet l'épée.
 chevaliers|Quel animal est le compagnon indispensable du chevalier ?|Le cheval|Le chameau|L'éléphant|Le zèbre|Un bon destrier coûtait très cher.
 chevaliers|Dans la société féodale : ceux qui prient, ceux qui combattent et ceux qui…|Travaillent|Voyagent|Dansent|Chantent|C'étaient les paysans, les plus nombreux.
 chevaliers|Comment appelle-t-on un paysan attaché à la terre d'un seigneur ?|Un serf|Un consul|Un sénateur|Un pharaon|Il ne pouvait pas quitter la terre sans autorisation.
-chevaliers|À quoi servent les douves autour d'un château ?|À ralentir les attaquants|À pêcher|À arroser les champs|À décorer|Ce fossé plein d'eau protège les murs.
 croisades|Quelle ville les croisés veulent-ils reprendre ?|Jérusalem|Rome|Paris|Londres|Elle est sainte pour les chrétiens, les juifs et les musulmans.
 croisades|Quel signe les croisés cousent-ils sur leurs vêtements ?|Une croix|Un croissant|Une étoile|Un lion|Le mot « croisé » vient de cette croix.
 croisades|Quel sultan reprend Jérusalem en 1187 ?|Saladin|Soliman|Hannibal|Attila|Il est admiré, même par ses ennemis, pour sa générosité.
@@ -74,7 +65,6 @@ renaissance|Quelle invention de Gutenberg permet de diffuser les livres ?|L'impr
 renaissance|Quel navigateur atteint l'Amérique en 1492 ?|Christophe Colomb|Marco Polo|Magellan|Vasco de Gama|Il croyait arriver aux Indes.
 renaissance|Quel roi de France fait construire Chambord et accueille Léonard de Vinci ?|François Ier|Louis XIV|Louis XVI|Henri IV|Léonard finit sa vie près d'Amboise.
 renaissance|Quel moine allemand lance la Réforme protestante ?|Martin Luther|Saint François|Charlemagne|Galilée|Il affiche ses thèses en 1517.
-renaissance|Qui affirme que la Terre tourne autour du Soleil ?|Copernic|Aristote|Homère|Néron|Son livre paraît en 1543.
 renaissance|Que veut dire le mot « Renaissance » ?|Un renouveau des arts et des idées|La naissance d'un roi|La fin du monde|Le retour des Romains|On redécouvre alors l'Antiquité.
 renaissance|Quel massacre de protestants a lieu à Paris en 1572 ?|La Saint-Barthélemy|Les Vêpres siciliennes|La Terreur|La Commune|Il se déroule en août 1572.
 renaissance|Quel roi signe l'édit de Nantes en 1598 ?|Henri IV|Louis XIII|Charles IX|Henri III|Il accorde la liberté de culte aux protestants.
@@ -92,7 +82,6 @@ grand-siecle|Comment appelle-t-on les nobles qui vivent à la cour du roi ?|Les 
 revolution|Quel événement a lieu le 14 juillet 1789 ?|La prise de la Bastille|Le sacre de Napoléon|La bataille de Waterloo|La fin de la guerre de Cent Ans|C'est aujourd'hui notre fête nationale.
 revolution|Quel roi est guillotiné en janvier 1793 ?|Louis XVI|Louis XIV|Henri IV|Charles X|Il est exécuté place de la Révolution.
 revolution|Quelle reine est guillotinée en octobre 1793 ?|Marie-Antoinette|Catherine de Médicis|Aliénor d'Aquitaine|Joséphine|Elle était l'épouse de Louis XVI.
-revolution|Quelle est la devise de la République française ?|Liberté, Égalité, Fraternité|Dieu et mon droit|Travail, Famille, Patrie|L'union fait la force|Elle est inscrite sur les mairies.
 revolution|Quel instrument sert à exécuter les condamnés à partir de 1792 ?|La guillotine|Le canon|La hache|Le glaive|Elle porte le nom du docteur Guillotin.
 revolution|Quel chant devient l'hymne national français ?|La Marseillaise|L'Ode à la joie|God Save the King|Le Chant des partisans|Il a été composé à Strasbourg en 1792.
 revolution|Quel texte de 1789 proclame les droits de tous ?|La Déclaration des droits de l'homme et du citoyen|Le Code civil|La Bible|La Magna Carta|Elle commence par « Les hommes naissent libres et égaux en droits ».
