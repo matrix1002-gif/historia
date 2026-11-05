@@ -492,8 +492,8 @@
     closeSheet();
     if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "defense" || st.name === "run") {
       T = null;
-      view = { name: "home" };
-      history.replaceState({ name: "home" }, "");
+      view = (st.name === "defense" || st.name === "run") ? { name: "jeux" } : { name: "home" };
+      history.replaceState({ name: view.name }, "");
     } else {
       view = st;
     }
@@ -504,6 +504,7 @@
   const TABS = [
     { v: "home", label: "Apprendre", ico: () => ICONS.book },
     { v: "tresor", label: "Quiz", ico: () => ICONS.scroll },
+    { v: "jeux", label: "Jeux", ico: () => ICONS.sword },
     { v: "gallery", label: "Personnages", ico: () => ICONS.helmet },
     { v: "medals", label: "Médailles", ico: () => ICONS.crown }
   ];
@@ -527,18 +528,21 @@
     document.documentElement.dataset.era = e ? e.scene : view.name === "tgame" || view.name === "tresor" || view.name === "tresult" ? "tresor" : "";
   };
 
+  const applyMusic = () => { if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "fuite" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor"); };
+
   const render = () => {
     if (view.name !== "defense" && DF) { if (DF.game) DF.game.destroy(); DF = null; }
     if (view.name !== "run" && RN) { if (RN.game) RN.game.destroy(); RN = null; }
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
-    if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "revolution" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor");
+    applyMusic();
     if (window.HistoriaAds) window.HistoriaAds.screen(view.name);
     if (view.name === "era" && eraById(view.id)) { $app.innerHTML = eraScreen(eraById(view.id)); return animateBars(); }
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
+    if (view.name === "jeux") { $app.innerHTML = withTabs(jeuxMenu(), "jeux"); return; }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
     if (view.name === "defense" && DF) { $app.innerHTML = defenseScreen(); return dfAttach(); }
     if (view.name === "run" && RN) { $app.innerHTML = runScreen(); return rnAttach(); }
@@ -655,6 +659,7 @@
       <p>${L2("Chevalier d'Orient, ouvre-toi un royaume : franchis les obstacles, chaque porte te donne un territoire. Vise les 200 !", "Knight of the East, carve out a kingdom: clear the obstacles, every gate wins you a territory. Aim for 200!")}</p>
       <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Ça s'accélère, puis les obstacles se mettent à bouger. Après 200, la course continue…", "It speeds up, then the obstacles start to move. After 200, the ride goes on…")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
       <button class="btn btn-gold" data-act="dfgo">${L2("En selle !", "Ride!")}</button>
+      <button class="btn btn-line" data-act="dfquit">${L2("Retour", "Back")}</button>
       ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : ""}</div>`;
   }
   function dfEnd(r) {
@@ -695,7 +700,7 @@
     DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     DF.game.start();
   }
-  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="icon-btn df-close" data-act="dfquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button>
+  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="df-back" data-act="dfquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button><button class="icon-btn snd-btn df-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button>
     <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : conquête de territoires", "Game: conquer territories")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function defenseCard() {
     const st = (S.stats && S.stats.defense) || { plays: 0, wins: 0, best: 0 };
@@ -719,8 +724,9 @@
     const st = rnStats();
     return `<div class="df-card"><h2>${L2("La Fuite !", "The Escape!")}</h2>
       <p>${L2("Paris, 1789. Tu as osé crier « Vive la Nation ! » : la garde royale est à tes trousses. Cours, esquive, ne te laisse pas rattraper !", "Paris, 1789. You dared to shout “Long live the Nation!”: the royal guard is on your heels. Run, dodge, don't get caught!")}</p>
-      <ul class="df-how"><li><b>${L2("Glisse à gauche / à droite", "Swipe left / right")}</b> ${L2("pour changer de voie.", "to change lane.")}</li><li><b>${L2("Vers le haut", "Swipe up")}</b> ${L2("pour sauter les caisses, ", "to jump crates, ")}<b>${L2("vers le bas", "down")}</b> ${L2("pour passer sous les poutres.", "to slide under beams.")}</li><li>${L2("Un obstacle heurté rapproche la garde : un deuxième faux pas rapproché et tu es arrêté. Paris, villages, forêts, campagne : la course ne s'arrête jamais et ne fait que s'accélérer…", "Hitting an obstacle lets the guards close in: a second slip soon after and you're arrested. Paris, villages, forests, countryside: the chase never ends and only gets faster…")}</li></ul>
+      <ul class="df-how"><li><b>${L2("Glisse à gauche / à droite", "Swipe left / right")}</b> ${L2("pour changer de voie.", "to change lane.")}</li><li><b>${L2("Vers le haut", "Swipe up")}</b> ${L2("pour sauter les caisses, ", "to jump crates, ")}<b>${L2("vers le bas", "down")}</b> ${L2("pour passer sous les poutres.", "to slide under beams.")}</li><li>${L2("Un obstacle heurté rapproche la garde : un deuxième faux pas dans les 8 secondes et tu es arrêté. Paris, villages, forêts, campagne : la course ne s'arrête jamais et ne fait que s'accélérer…", "Hitting an obstacle lets the guards close in: a second slip within 8 seconds and you are arrested. Paris, villages, forests, countryside: the chase never ends and only gets faster…")}</li></ul>
       <button class="btn btn-gold" data-act="rngo">${L2("Courir !", "Run!")}</button>
+      <button class="btn btn-line" data-act="rnquit">${L2("Retour", "Back")}</button>
       ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : ""}</div>`;
   }
   function rnEnd(r) {
@@ -761,7 +767,7 @@
     RN.game = rnMake();
     RN.game.start();
   }
-  const runScreen = () => `<div class="screen dfscreen" id="run"><button class="icon-btn df-close" data-act="rnquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button>
+  const runScreen = () => `<div class="screen dfscreen" id="run"><button class="df-back" data-act="rnquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button><button class="icon-btn snd-btn df-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button>
     <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : fuir la garde royale", "Game: escape the royal guard")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function runCard() {
     const st = (S.stats && S.stats.run) || { plays: 0, best: 0 };
@@ -1245,7 +1251,17 @@
   }
 
   /* ===== Écrans : Trésor, personnages, médailles ===== */
-  const topBar = (title) => `<div class="top"><h1 class="page-title">${esc(title)}</h1></div>`;
+  const topBar = (title) => `<div class="top"><h1 class="page-title">${esc(title)}</h1><button class="icon-btn snd-btn top-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button></div>`;
+  const allMuted = () => S.music === false && !S.sound;
+
+  function jeuxMenu() {
+    return `<div class="screen">
+      ${topBar(L2("Jeux", "Games"))}
+      <p class="intro-line quiz-intro">${L2("Des mini-jeux pour te détendre en traversant l'Histoire. Les quiz, eux, sont dans l'onglet « Quiz ».", "Mini-games to unwind while travelling through history. Quizzes are in the “Quiz” tab.")}</p>
+      ${defenseCard()}
+      ${runCard()}
+    </div>`;
+  }
 
   function tresorMenu() {
     const all = S.rec.all || { rung: 0, earn: 0 };
@@ -1264,8 +1280,6 @@
     <div class="screen">
       ${topBar("Quiz")}
       <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
-      ${defenseCard()}
-      ${runCard()}
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1479,6 +1493,7 @@
       case "tab": { const v = el.dataset.v; if (v !== view.name) go(v, {}, "replace"); sfx("tap"); break; }
       case "tresor": go("tresor", {}, view.name === "tresult" ? "replace" : "push"); break;
       case "dfstart": startDefense(); break;
+      case "tmuteall": { const m = allMuted(); S.music = m; S.sound = m; save(); applyMusic(); document.querySelectorAll(".snd-btn").forEach((b) => { b.innerHTML = UI.sound(!allMuted()); }); if (!m) {} else sfx("tap"); break; }
       case "dfgo": dfGo(); break;
       case "rnstart": startRun(); break;
       case "rngo": rnGo(); break;

@@ -707,7 +707,7 @@ body {
 .lv:not(:last-child)::after { display: none; }
 
 /* Navigation en onglets */
-.tabbar { position: fixed; left: 0; right: 0; bottom: var(--ad-h, 0px); z-index: 8; display: grid; grid-template-columns: repeat(4, 1fr); max-width: 520px; margin: 0 auto; padding: 6px 6px max(8px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255, 249, 232, 0.94), rgba(240, 228, 196, 36, 0.98)); border-top: 1px solid var(--gold-500); box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: var(--ad-h, 0px); z-index: 8; display: grid; grid-template-columns: repeat(5, 1fr); max-width: 520px; margin: 0 auto; padding: 6px 6px max(8px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255, 249, 232, 0.94), rgba(240, 228, 196, 36, 0.98)); border-top: 1px solid var(--gold-500); box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4); }
 .tab { display: grid; justify-items: center; gap: 2px; padding: 6px 2px; border: 0; background: none; border-radius: 10px; color: var(--parch-dim); font-family: var(--display); font-size: 11px; letter-spacing: 0.05em; }
 .tab-ico { width: 26px; height: 26px; display: grid; place-items: center; }
 .tab-ico svg { width: 24px; height: 24px; }
@@ -966,3 +966,12 @@ h2.section { color: #8a5a14; }
 .dfscreen { display: block; }
 .dfscreen .df-wrap { position: absolute; inset: 0; }
 .dfscreen .df-close { position: absolute !important; left: 10px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; }
+
+/* ===== onglet Jeux, retour et son dans les jeux ===== */
+.top-snd { margin-left: auto; }
+.df-back { position: absolute; left: 10px; top: calc(10px + env(safe-area-inset-top, 0px)); z-index: 6; display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 14px 0 8px; border-radius: 99px; border: 1px solid rgba(244, 230, 192, 0.5); background: rgba(30, 18, 10, 0.72); color: #f4e6c0; font-family: var(--display); font-size: 14px; letter-spacing: 0.04em; }
+.df-back svg { width: 20px; height: 20px; }
+.df-snd { position: absolute !important; left: 10px; top: calc(58px + env(safe-area-inset-top, 0px)); z-index: 6; width: 40px; height: 40px; background: rgba(30, 18, 10, 0.72); color: #f4e6c0; border-color: rgba(244, 230, 192, 0.5); }
+.tab { font-size: 10.5px; }
+.dfscreen .df-back { position: absolute !important; z-index: 20 !important; }
+.dfscreen .df-snd { position: absolute !important; z-index: 20 !important; }

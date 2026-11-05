@@ -11,8 +11,8 @@
   ];
   var SKY = [[0, "#2a2350", "#f6a86b"], [0.2, "#6fa8e0", "#f4e7c4"], [0.5, "#78b6ea", "#f1efd8"], [0.74, "#5a4a8c", "#f39a5c"], [0.9, "#1f1c48", "#8a4e72"], [1, "#2a2350", "#f6a86b"]];
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 10 + 10 * (1 - Math.exp(-t / 45)) + Math.min(t, 300) * 0.035; }
-  function rowTime(t) { return Math.max(0.6, 1.35 - t * 0.0085); }
+  function speedAt(t) { return 10.5 + 11 * (1 - Math.exp(-t / 28)) + Math.min(t, 240) * 0.04; }
+  function rowTime(t) { return Math.max(0.56, 1.15 - t * 0.014); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function hex(c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); }
@@ -44,7 +44,7 @@
     function spawnD() { return st.dist + (FAR + 10) * 1.4; }
 
     function reset() {
-      st = { t: 0, dist: 0, coins: 0, lane: 0, px: 0, jump: 0, slide: 0, over: false, ct: 0, done: false, guard: 0, stumble: 0, imm: 0,
+      st = { t: 0, dist: 0, coins: 0, lane: 0, px: 0, jump: 0, slide: 0, over: false, ct: 0, done: false, guard: 0, warn: 0, stumble: 0, imm: 0,
         obs: [], coinsL: [], scn: [], ppl: [], parts: [], nextRow: 0, lastFree: 0, banner: null, bio: 0, scroll: 0, step: 0, shake: 0, flash: 0, rowN: 0, warm: 0, bz: 0, pz: 0, ctp: null };
       for (var z = 4; z < FAR + 12; z += 5.5) { st.bz = z; spawnChunk(z); }
       st.bz = FAR + 10 + 5.5;
@@ -87,20 +87,24 @@
     /* ---------- rangées d'obstacles ---------- */
     function addRow(z0) {
       var z = z0 || FAR + 4, n = ++st.rowN;
-      var diff = Math.min(1, st.t / 90), b = bioAt(st.dist + z * 1.4), pool = POOL[b];
+      var diff = Math.min(1, st.t / 40), b = bioAt(st.dist + z * 1.4), pool = POOL[b];
       var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
-      var rt = rowTime(st.t), r = rnd();
-      var kind = n > 2 && r < 0.12 + diff * 0.08 ? "alllow" : n > 4 && r < 0.22 + diff * 0.1 ? "allhigh" : "lanes";
+      var rtPrev = st.gapT || 1.2, rt = Math.max(0.5, rowTime(st.t) * (n > 3 && rnd() < diff * 0.4 ? 0.78 : 1)), r = rnd();
+      if (st.lastKind && st.lastKind !== "lanes") rt = Math.max(rt, 0.72);
+      st.gapT = rt;
+      var kind = n > 2 && r < 0.12 + diff * 0.1 ? "alllow" : n > 4 && r < 0.24 + diff * 0.12 ? "allhigh" : "lanes";
+      if (st.lastKind !== "lanes" || rtPrev < 0.7) kind = "lanes";
+      st.lastKind = kind;
       if (kind === "alllow") { var tl = pick(pool.low); for (var l = -1; l <= 1; l++) st.obs.push({ type: tl, cat: "low", lane: l, z: z, hit: false }); }
       else if (kind === "allhigh") { var th = pick(pool.high); for (var l2 = -1; l2 <= 1; l2++) st.obs.push({ type: th, cat: "high", lane: l2, z: z, hit: false }); }
       else {
         var shift = rnd() < 0.5 ? 0 : (rnd() < 0.5 ? -1 : 1);
-        if (rt >= 0.8 && rnd() < 0.3 + diff * 0.2) shift = st.lastFree === 0 ? (rnd() < 0.5 ? -2 : 2) : -2 * st.lastFree;
+        if (rtPrev >= 0.78 && rnd() < 0.3 + diff * 0.25) shift = st.lastFree === 0 ? (rnd() < 0.5 ? -2 : 2) : -2 * st.lastFree;
         var free = Math.max(-1, Math.min(1, st.lastFree + shift));
         st.lastFree = free;
         for (var ln = -1; ln <= 1; ln++) {
           if (ln === free) { if (rnd() < 0.6) { var cn = 3 + Math.floor(rnd() * 3); for (var ci = 0; ci < cn; ci++) st.coinsL.push({ lane: ln, z: z - 3 + ci * 1.8, got: false }); } continue; }
-          if (n < 4 && rnd() < 0.5) continue;
+          if (n < 3 && rnd() < 0.5) continue;
           var q = rnd(), cat = q < 0.38 ? "low" : q < 0.68 ? "block" : "high";
           st.obs.push({ type: pick(pool[cat]), cat: cat, lane: ln, z: z, hit: false });
         }
@@ -153,7 +157,9 @@
       st.px += (st.lane - st.px) * Math.min(1, dt * 13);
       if (st.jump > 0) { st.jump += dt / 0.72; if (st.jump >= 1 || st.vdrop) { st.jump = 0; st.vdrop = false; } }
       if (st.slide > 0) { st.slide += dt / 0.62; if (st.slide >= 1) st.slide = 0; }
-      st.guard = Math.max(0, st.guard - dt * 0.05);
+      st.warn = Math.max(0, st.warn - dt);
+      var gt = st.warn > 0 ? 0.85 : 0;
+      st.guard += (gt - st.guard) * Math.min(1, dt * (gt > st.guard ? 7 : 1.2));
       var b = bioAt(st.dist);
       if (b !== st.bio || (st.bio === 0 && st.banner === null && st.dist > 5 && st.dist < 6 && false)) { st.bio = b; if (st.dist > 20) { st.banner = { t: 0, s: [BIO[b].fr, BIO[b].en] }; if (opt.sfx) opt.sfx("good"); } }
       [st.obs, st.coinsL, st.scn, st.ppl].forEach(function (a) { a.forEach(function (o) { o.z -= v * dt; }); });
@@ -173,13 +179,14 @@
         else if (o.cat === "high") safe = st.slide > 0;
         if (safe) return;
         o.hit = true;
-        if (st.imm > 0 && o.cat !== "block") return;
-        st.guard += o.cat === "block" ? 0.7 : 0.6;
+        if (st.imm > 0) return;
+        var second = st.warn > 0;
+        st.warn = 8;
         st.stumble = 0.9; st.shake = 0.3; st.flash = 0.5; st.imm = 0.5;
         burst(xOf(o.lane, o.z), yOf(o.z) - 30, "#a87a3c", 14);
         if (opt.buzz) opt.buzz(25);
         if (opt.sfx) opt.sfx("bad");
-        if (st.guard >= 1) caught();
+        if (second) caught();
       });
       st.coinsL.forEach(function (c) {
         if (c.got || Math.abs(c.z - PD) > 0.7 || Math.abs(c.lane - st.px) > 0.6 || py > 60) return;
@@ -486,7 +493,7 @@
       ctx.fillText(Math.floor(st.dist) + " m  ·  " + st.coins + " ●", W / 2, 66);
       var gx = W - 24, gh = 120, gy0 = 24;
       ctx.fillStyle = "rgba(20,10,14,0.55)"; ctx.fillRect(gx - 8, gy0 - 6, 16, gh + 12);
-      var g = Math.min(1, st.guard);
+      var g = st.warn > 0 ? st.warn / 8 : 0;
       ctx.fillStyle = g > 0.55 ? "#e24a4a" : "#d9a548"; ctx.fillRect(gx - 5, gy0 + gh - gh * g, 10, gh * g);
       ctx.strokeStyle = "#e7d7b0"; ctx.lineWidth = 1; ctx.strokeRect(gx - 5, gy0, 10, gh);
       ctx.fillStyle = "#e7d7b0"; ctx.font = "9px Georgia, serif"; ctx.fillText(FR ? "GARDE" : "GUARD", gx, gy0 + gh + 18);
@@ -509,8 +516,8 @@
 
     /* ---------- dessin ---------- */
     function cineGuardPos(i, ct) { // positions (lane, z) des gardes pendant l'arrestation
-      var starts = [[-0.9, 1.8], [0, 1.8], [0.9, 1.8], [0.45, 1.8]];
-      var ends = [[st.px - 0.62, PD - 0.35], [st.px + 0.62, PD - 0.35], [st.px - 0.4, PD - 1.3], [st.px + 0.4, PD - 1.3]];
+      var starts = [[-1, 1.5], [0, 1.5], [1, 1.5]];
+      var ends = [[st.px - 0.62, PD - 0.35], [st.px + 0.62, PD - 0.35], [st.px, PD - 1.2]];
       var e = Math.max(0, Math.min(1, (ct - 0.2 - i * 0.12) / 1.0)); e = e * e * (3 - 2 * e);
       return [starts[i][0] + (ends[i][0] - starts[i][0]) * e, starts[i][1] + (ends[i][1] - starts[i][1]) * e, e];
     }
@@ -525,12 +532,12 @@
       st.coinsL.forEach(function (c) { items.push({ z: c.z, f: function () { drawCoin(c); } }); });
       if (!st.over) {
         var gz = 0.5 + 1.3 * (1 - Math.min(1, st.guard));
-        [-0.9, 0, 0.9].forEach(function (l, i) { items.push({ z: gz + i * 0.01, f: function () { drawGuardBack(xOf(l * 0.9 + st.px * 0.4, gz), yOf(gz), kOf(gz) * 0.98, st.step * 2.2 + i * 1.4, 0); } }); });
+        [-1, 0, 1].forEach(function (l, i) { items.push({ z: gz + i * 0.01, f: function () { drawGuardBack(xOf(l, gz), yOf(gz), kOf(gz) * 0.98, st.step * 2.2 + i * 1.4, 0); } }); });
         items.push({ z: PD, f: function () { drawRunner(xOf(st.px, PD), yOf(PD), kOf(PD), "run"); } });
       } else {
         var fall = Math.min(1, ct / 0.5);
         items.push({ z: PD, f: function () { drawRunner(xOf(st.px, PD), yOf(PD) + fall * 6, kOf(PD), ct < 1.9 ? "kneel" : "captive", ct < 0.5 ? fall : 1); if (ct > 0.25) { var cx = xOf(st.px, PD) + 24 * kOf(PD), cy = yOf(PD) - 4 * kOf(PD); circ(cx, cy, 5, "#fff"); circ(cx, cy, 3, "#2f4fa8"); circ(cx, cy, 1.4, "#c8323c"); } } });
-        for (var gi = 0; gi < 4; gi++) (function (i) { var p = cineGuardPos(i, ct); items.push({ z: p[1], f: function () { drawGuardBack(xOf(p[0], p[1]), yOf(p[1]), kOf(p[1]) * 0.98, ct * 8 + i, p[2] > 0.9 ? (i % 2 ? -1 : 1) : 0); } }); })(gi);
+        for (var gi = 0; gi < 3; gi++) (function (i) { var p = cineGuardPos(i, ct); items.push({ z: p[1], f: function () { drawGuardBack(xOf(p[0], p[1]), yOf(p[1]), kOf(p[1]) * 0.98, ct * 8 + i, p[2] > 0.9 ? (i === 0 ? 1 : -1) : 0); } }); })(gi);
         var oz = PD + 1.5, oe = Math.max(0, Math.min(1, (ct - 0.6) / 0.8));
         items.push({ z: oz, f: function () { ctx.globalAlpha = oe; drawOfficer(xOf(st.px * 0.5, oz), yOf(oz) + (1 - oe) * 8, kOf(oz), Math.max(0, ct - 1.2)); ctx.globalAlpha = 1; } });
       }
@@ -539,14 +546,14 @@
       st.parts.forEach(function (p) { ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.s, p.s); });
       ctx.globalAlpha = 1;
       ctx.restore();
-      if (!st.over && st.guard > 0.5) { var a = (st.guard - 0.5) * 0.7 + Math.sin(st.t * 10) * 0.05; var g = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75); g.addColorStop(0, "rgba(200,30,40,0)"); g.addColorStop(1, "rgba(200,30,40," + Math.max(0, a) + ")"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+      if (!st.over && st.guard > 0.4) { var a = (st.guard - 0.4) * 0.9 + Math.sin(st.t * 10) * 0.05; var g = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75); g.addColorStop(0, "rgba(200,30,40,0)"); g.addColorStop(1, "rgba(200,30,40," + Math.max(0, a) + ")"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
       hud();
       if (st.over) {
         // cinématique : bandes noires et légendes
         var bar = Math.min(1, ct / 0.6) * 54;
         ctx.fillStyle = "#0d0810"; ctx.fillRect(0, 0, W, bar * 0.4); ctx.fillRect(0, H - bar, W, bar);
         ctx.textAlign = "center";
-        if (ct > 0.8 && ct < 2.3) { ctx.font = "700 20px Georgia, serif"; ctx.fillStyle = "#ffd98a"; ctx.globalAlpha = Math.min(1, (ct - 0.8) * 4); ctx.fillText(FR ? "« Halte-là, citoyen ! »" : "“Halt, citizen!”", W / 2, H - 22); ctx.globalAlpha = 1; }
+        if (ct > 0.8 && ct < 2.3) { ctx.font = "700 20px Georgia, serif"; ctx.fillStyle = "#ffd98a"; ctx.globalAlpha = Math.min(1, (ct - 0.8) * 4); ctx.fillText(FR ? "« Halte-là, scélérat ! »" : "“Halt, villain!”", W / 2, H - 22); ctx.globalAlpha = 1; }
         else if (ct >= 2.3) { ctx.font = "700 17px Georgia, serif"; ctx.fillStyle = "#ffd98a"; ctx.globalAlpha = Math.min(1, (ct - 2.3) * 3); ctx.fillText(FR ? "« Au nom du Roi, vous êtes arrêté ! »" : "“In the King's name, you are under arrest!”", W / 2, H - 22); ctx.globalAlpha = 1; }
         ctx.textAlign = "left";
         if (ct > 4.4) { ctx.fillStyle = "rgba(13,8,16," + Math.min(1, (ct - 4.4) / 0.9) + ")"; ctx.fillRect(0, 0, W, H); }

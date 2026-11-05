@@ -51,7 +51,7 @@
 
   /* ---------- Dictionnaire (texte complet d'un nœud) ---------- */
   var D = {
-    "Apprendre": "Learn", "Quiz": "Quiz", "Personnages": "Characters", "Médailles": "Medals", "Navigation": "Navigation",
+    "Apprendre": "Learn", "Quiz": "Quiz", "Jeux": "Games", "Personnages": "Characters", "Médailles": "Medals", "Navigation": "Navigation",
     "L'histoire de France et de la chrétienté": "The history of France and of Christendom",
     "Voyage à travers les siècles": "A journey through the centuries",
     "Choisis ton époque, découvre ses grandes histoires, puis relève le défi du quiz : chaque étoile gagnée te fait grimper de rang !": "Pick your era, discover its great stories, then take on the quiz challenge: every star you earn moves you up a rank!",
