@@ -280,18 +280,41 @@
   }
   const TIERS = [[0, 2], [3, 6], [7, 9]]; // niveaux utilisés pour les questions 1-5, 6-10, 11-15
 
+  // Questions de culture générale, faciles : on peut y répondre sans avoir lu les fiches.
+  let EASY_LIST = null;
+  const easyList = () => {
+    if (EASY_LIST) return EASY_LIST;
+    EASY_LIST = String(window.HISTORIA_EASY || "").split("\n").map((l) => l.split("|")).filter((p) => p.length === 7 && eraById(p[0]))
+      .map((p, i) => ({ era: p[0], d: { q: p[1], c: p[2], w: [p[3], p[4], p[5]], e: p[6] }, key: `easy:${p[0]}:${i}` }));
+    return EASY_LIST;
+  };
+  const easyPool = (scope) => easyList().filter((x) => !scope || scope === "all" || x.era === scope)
+    .map((x) => prep("qcm", x.d, x.key, eraById(x.era).title, L2("Culture générale", "General knowledge")));
+
   function tresorQuestions(scope) {
     const eras = scope === "all" ? playable : playable.filter((e) => e.id === scope);
     const used = new Set();
     const out = [];
-    TIERS.forEach(([a, b]) => {
+    const levelPool = (a, b) => {
       const pool = [];
       eras.forEach((e) => e.levels.forEach((lv, i) => {
         if (i < a || i > b) return;
         lv.items.forEach((d, k) => { if (d.type === "qcm") pool.push(prep("qcm", d, `${e.id}:${i}:${k}`, e.title, lv.title)); });
       }));
-      shuffle(pool).filter((it) => !used.has(it.q)).slice(0, 5).forEach((it) => { used.add(it.q); out.push(it); });
-    });
+      return pool;
+    };
+    const take = (pool, n) => {
+      const got = [];
+      shuffle(pool).forEach((it) => { if (got.length < n && !used.has(it.q)) { used.add(it.q); got.push(it); } });
+      return got;
+    };
+    const easy = easyPool(scope);
+    const hasEasy = easy.length >= 7;
+    // Questions 1-5 : culture générale. 6-10 : un peu de tout. 11-15 : niveau fiches.
+    const t1 = hasEasy ? take(easy, 5) : take(levelPool(0, 2), 5);
+    const t2 = shuffle((hasEasy ? take(easy, 2) : []).concat(take(levelPool(0, 4), hasEasy ? 3 : 5)));
+    const t3 = take(levelPool(3, 9), 5);
+    t1.concat(t2, t3).forEach((it) => out.push(it));
     return out.length === 15 ? out : null;
   }
 
@@ -398,7 +421,7 @@
   window.addEventListener("popstate", (e) => {
     const st = e.state || { name: "home" };
     closeSheet();
-    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "maze") {
+    if (st.name === "quiz" || st.name === "result" || st.name === "tgame" || st.name === "tresult" || st.name === "maze" || st.name === "intrus") {
       T = null;
       view = { name: "home" };
       history.replaceState({ name: "home" }, "");
@@ -437,6 +460,7 @@
 
   const render = () => {
     if (view.name !== "maze") M = null;
+    if (view.name !== "intrus") IN = null;
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
@@ -448,6 +472,7 @@
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
     if (view.name === "maze" && M) return ($app.innerHTML = mazeScreen());
+    if (view.name === "intrus" && IN) return ($app.innerHTML = intrusScreen());
     if (view.name === "tresult" && TR) { $app.innerHTML = tresultScreen(); return celebrateT(); }
     if (view.name === "gallery") return ($app.innerHTML = withTabs(galleryScreen(), "gallery"));
     if (view.name === "medals") return ($app.innerHTML = withTabs(medalsScreen(), "medals"));
@@ -511,10 +536,21 @@
     if (DAILY_MAP) return DAILY_MAP;
     const D = window.HISTORIA_DAILY || {};
     const parse = (s) => { const o = {}; String(s || "").split("\n").forEach((l) => { const p = l.split("|"); if (p.length > 1) o[p[0]] = p.slice(1); }); return o; };
-    DAILY_MAP = { f: parse(D.figures), s: parse(D.saints) };
+    const more = {};
+    String(window.HISTORIA_MORE || "").split("\n").forEach((l) => { const i = l.indexOf("|"); if (i > 0) more[l.slice(0, i)] = l.slice(i + 1); });
+    DAILY_MAP = { f: parse(D.figures), s: parse(D.saints), m: more };
     return DAILY_MAP;
   };
   const CROSS_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v18M6 9h12"/></svg>';
+  const toRoman = (n) => { const t = [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]; let r = ""; t.forEach(([v, c]) => { while (n >= v) { r += c; n -= v; } }); return r; };
+  const yearContext = (y, now) => {
+    const ago = now.getFullYear() - y;
+    const c = Math.ceil(Math.abs(y) / 100);
+    const cent = EN ? `${c}${c % 10 === 1 && c !== 11 ? "st" : c % 10 === 2 && c !== 12 ? "nd" : c % 10 === 3 && c !== 13 ? "rd" : "th"} century${y < 0 ? " BC" : ""}` : `${toRoman(c)}${c === 1 ? "er" : "e"} siècle${y < 0 ? " av. J.-C." : ""}`;
+    const per = y < 477 ? L2("Antiquité", "Antiquity") : y < 1492 ? L2("Moyen Âge", "Middle Ages") : y < 1789 ? L2("Temps modernes", "Early modern era") : L2("Époque contemporaine", "Modern era");
+    const n = ago.toLocaleString(EN ? "en-US" : "fr-FR");
+    return `${L2(`Il y a ${n} ans`, `${n} years ago`)} · ${cent} · ${per}`;
+  };
   function todayCard() {
     const now = new Date();
     const key = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
@@ -528,7 +564,7 @@
     if (f) {
       const y = fmtYear(Number(f[2]));
       const when = f[0] === "n" ? L2(`Né en ${y}`, `Born in ${y}`) : f[0] === "m" ? L2(`Mort en ${y}`, `Died in ${y}`) : L2(`En ${y}`, `In ${y}`);
-      fig = `<h2 class="today-name">${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p><p class="today-text">${esc(f[3])}</p>`;
+      fig = `<h2 class="today-name">${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p><p class="today-text">${esc(f[3])}</p>${maps.m[key] ? `<p class="today-text today-more">${esc(maps.m[key])}</p>` : ""}<p class="today-ctx">${esc(yearContext(Number(f[2]), now))}</p>`;
     }
     const saint = sn ? `<p class="today-saint">${CROSS_ICO}<span>${L2("Saint du jour", "Saint of the day")} : <b>${esc(sn[0])}</b></span></p>` : "";
     return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}</section>`;
@@ -555,6 +591,11 @@
     return shuffle(pool);
   }
   function mazeNextQ() {
+    // Deux questions sur trois sont de culture générale.
+    if (Math.random() < 0.66) {
+      if (!M.easy || M.ei >= M.easy.length) { M.easy = shuffle(easyPool("all")); M.ei = 0; }
+      if (M.easy.length) return M.easy[M.ei++];
+    }
     if (M.pi >= M.pool.length) { M.pool = mazePool(); M.pi = 0; }
     const [e, lv, d, key] = M.pool[M.pi++];
     return prep(d.type, d, key, e.title, lv.title);
@@ -746,6 +787,102 @@
       <div class="mz-venues"><button class="btn ${last === "chateau" ? "btn-gold" : "btn-line"}" data-act="mzstart" data-v="chateau">${L2("Château fort", "Castle")}</button><button class="btn ${last === "abbaye" ? "btn-gold" : "btn-line"}" data-act="mzstart" data-v="abbaye">${L2("Abbaye", "Abbey")}</button></div>${rec}</section>`;
   }
 
+  /* ---------- Trouve les intrus ---------- */
+  const IN_XP = 15;
+  let IN = null;
+  const tx = (o) => (EN ? o.en : o.fr);
+  function startIntrus(idx) {
+    const H = window.HistoriaIntrus;
+    if (!H) return;
+    const n = H.scenes.length;
+    let i = typeof idx === "number" ? idx : Math.floor(Math.random() * n);
+    if (typeof idx !== "number" && n > 1 && i === S.stats.intrusLast) i = (i + 1 + Math.floor(Math.random() * (n - 1))) % n;
+    S.stats.intrusLast = i;
+    save();
+    IN = { i, found: [], miss: 0, pop: null, hint: null, done: false };
+    sfx("tap");
+    go("intrus", {}, view.name === "intrus" ? "replace" : "push");
+  }
+  const refreshIN = () => { const el = document.getElementById("in-body"); if (el) el.innerHTML = intrusInner(); };
+  function intrusClick(ev, svg) {
+    if (!IN || IN.done || IN.pop !== null) return;
+    const H = window.HistoriaIntrus;
+    const sc = H.scenes[IN.i];
+    const b = svg.getBoundingClientRect();
+    const x = ((ev.clientX - b.left) / b.width) * H.W;
+    const y = ((ev.clientY - b.top) / b.height) * H.H;
+    let hit = -1, best = 1e9;
+    sc.intruders.forEach((o, k) => {
+      if (IN.found.includes(k)) return;
+      const d = Math.hypot(x - o.x, y - o.y);
+      if (d <= o.r && d < best) { best = d; hit = k; }
+    });
+    IN.hint = null;
+    if (hit < 0) { IN.miss++; IN.flash = { x, y }; sfx("bad"); buzz(15); refreshIN(); return; }
+    IN.found.push(hit);
+    IN.pop = hit;
+    IN.flash = null;
+    sfx("good");
+    buzz(25);
+    if (IN.found.length === sc.intruders.length) {
+      IN.done = true;
+      const st = (S.stats.intrus = Object.assign({ scenes: 0 }, S.stats.intrus));
+      st.scenes++;
+      S.xp += IN_XP;
+      save();
+    }
+    refreshIN();
+  }
+  function intrusPop() {
+    if (!IN || IN.pop === null) return;
+    IN.pop = null;
+    if (IN.done) { sfx("fanfare"); Art.confetti(); if (window.HistoriaAds) window.HistoriaAds.quizFinished(); }
+    refreshIN();
+    window.scrollTo(0, 0);
+  }
+  function intrusHint() {
+    if (!IN || IN.done || IN.pop !== null) return;
+    const left = window.HistoriaIntrus.scenes[IN.i].intruders.map((o, k) => k).filter((k) => !IN.found.includes(k));
+    IN.hint = left[Math.floor(Math.random() * left.length)];
+    IN.hints = (IN.hints || 0) + 1;
+    sfx("tap");
+    refreshIN();
+  }
+  function intrusInner() {
+    const H = window.HistoriaIntrus;
+    const sc = H.scenes[IN.i];
+    const total = sc.intruders.length;
+    const rings = IN.found.map((k) => { const o = sc.intruders[k]; return `<circle class="in-ring" cx="${o.x}" cy="${o.y}" r="${o.r}"/>`; }).join("");
+    const hint = IN.hint !== null ? (() => { const o = sc.intruders[IN.hint]; return `<circle class="in-hint" cx="${o.x}" cy="${o.y}" r="${o.r + 26}"/>`; })() : "";
+    const flash = IN.flash ? `<g class="in-miss" transform="translate(${IN.flash.x} ${IN.flash.y})"><path d="M-7-7l14 14M7-7l-14 14"/></g>` : "";
+    const top = `<div class="top"><button class="icon-btn" data-act="inquit" aria-label="${L2("Quitter le jeu", "Leave the game")}">${UI.close}</button><h1 class="page-title mz-title">${L2("Trouve les intrus", "Spot the Intruders")}</h1></div>`;
+    const dots = sc.intruders.map((o, k) => `<span class="in-dot ${IN.found.includes(k) ? "on" : ""}"></span>`).join("");
+    const hud = `<div class="in-hud"><span class="in-scene">${esc(tx(sc.title))}</span><span class="in-count" aria-live="polite">${dots}<b>${IN.found.length}/${total}</b></span></div>`;
+    const svg = `<svg class="in-svg" data-act="inclick" viewBox="0 0 ${H.W} ${H.H}" role="img" aria-label="${esc(tx(sc.title))}">${sc.draw()}${rings}${hint}${flash}</svg>`;
+    let body;
+    if (IN.done && IN.pop === null) {
+      const stars = IN.miss === 0 && !IN.hints ? 3 : IN.miss <= 3 ? 2 : 1;
+      const n = H.scenes.length;
+      body = `<section class="mz-end in-end"><div class="in-stars" aria-label="${stars} / 3">${"★".repeat(stars)}<span>${"★".repeat(3 - stars)}</span></div><h2>${L2("Bravo, œil de lynx !", "Well done, eagle eyes!")}</h2>
+        <p class="mz-sum">${L2(`Les ${total} intrus ont été démasqués`, `All ${total} intruders were unmasked`)} · <b>${IN.miss}</b> ${L2(plural(IN.miss, "clic raté", "clics ratés"), plural(IN.miss, "missed click", "missed clicks"))} · <b>+${IN_XP} XP</b></p></section>
+        <div class="stack"><button class="btn btn-gold" data-act="instart" data-i="${(IN.i + 1) % n}">${L2("Autre scène", "Another scene")}</button><button class="btn btn-line" data-act="inquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div>`;
+    } else {
+      body = `<p class="mz-msg" role="status">${IN.hint !== null ? L2("Regarde dans le cercle en pointillés…", "Look inside the dotted circle…") : L2(`Touche les ${total} objets qui n'ont rien à faire ici.`, `Tap the ${total} objects that do not belong here.`)}${IN.miss ? ` · ${IN.miss} ${L2(plural(IN.miss, "raté", "ratés"), plural(IN.miss, "miss", "misses"))}` : ""}</p>
+        <div class="stack"><button class="btn btn-line" data-act="inhint">${L2("Un indice", "A hint")}</button></div>`;
+    }
+    const o = IN.pop !== null ? sc.intruders[IN.pop] : null;
+    const pop = o ? `<div class="in-pop" role="dialog" aria-modal="true"><div class="in-card"><div class="in-badge">✓</div><h3>${esc(tx(o.name))}</h3><p>${esc(tx(o.text))}</p><button class="btn btn-gold" data-act="inpop" autofocus>${IN.done ? L2("Terminer", "Finish") : L2("Continuer", "Continue")}</button></div></div>` : "";
+    return top + hud + `<div class="in-frame">${svg}</div>` + body + pop;
+  }
+  const intrusScreen = () => `<div class="screen inscreen" id="intrus"><div id="in-body">${intrusInner()}</div></div>`;
+  function intrusCard() {
+    const st = (S.stats && S.stats.intrus) || { scenes: 0 };
+    const rec = st.scenes ? `<small class="mz-rec">${L2(`${st.scenes} scène${st.scenes > 1 ? "s" : ""} résolue${st.scenes > 1 ? "s" : ""}`, `${st.scenes} scene${st.scenes === 1 ? "" : "s"} solved`)}</small>` : "";
+    return `<section class="mz-card in-card-menu"><h2>${L2("Trouve les intrus", "Spot the Intruders")}</h2>
+      <p>${L2("Un banquet, un marché, une abbaye… et trois objets modernes qui n'ont rien à y faire. Trouve-les sans te tromper : chaque intrus démasqué te livre une anecdote amusante. Aucune question, juste ton œil !", "A banquet, a market, an abbey… and three modern objects that have no business being there. Find them: every unmasked intruder comes with a funny story. No questions, just your eyes!")}</p>
+      <div class="mz-venues"><button class="btn btn-gold" data-act="instart">${L2("Jouer", "Play")}</button></div>${rec}</section>`;
+  }
+
   function homeScreen() {
     const idx = rankIndex(S.xp);
     const next = RANKS[idx + 1];
@@ -807,8 +944,12 @@
       </button>
 
       ${todayCard()}
-      <h2 class="section">Apprendre, époque par époque</h2>
-      <p class="learn-note">Choisis une époque, lis la fiche de chaque niveau, puis passe au quiz pour valider ce que tu as appris.</p>
+      <header class="learn-head">
+        <p class="learn-orn" aria-hidden="true"><span></span>✦<span></span></p>
+        <h2 class="learn-title">Voyage à travers les siècles</h2>
+        <p class="learn-sub">Choisis ton époque, découvre ses grandes histoires, puis relève le défi du quiz : chaque étoile gagnée te fait grimper de rang !</p>
+        <ol class="learn-steps"><li><b>1</b> Lis la fiche</li><li><b>2</b> Joue au quiz</li><li><b>3</b> Gagne des étoiles</li></ol>
+      </header>
       <ul class="eras">${eraCards}</ul>
 
       ${noAdsCard()}
@@ -1235,6 +1376,7 @@
       ${topBar("Quiz")}
       <p class="intro-line quiz-intro">Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».</p>
       ${mazeCard()}
+      ${intrusCard()}
       <section class="tresor-hero">
         <div class="coin">${UI.seal}</div>
         <h1>Le Trésor du Royaume</h1>
@@ -1489,7 +1631,8 @@
         if (S.daily === today()) break;
         const pool = [];
         playable.forEach((e) => e.levels.forEach((lv, i) => lv.items.forEach((d, k) => pool.push(prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title)))));
-        const picks = shuffle(pool, seeded("historia-" + today())).slice(0, CONFIG.questionsPerDaily);
+        const rnd = seeded("historia-" + today());
+        const picks = shuffle(shuffle(easyPool("all"), rnd).slice(0, 3).concat(shuffle(pool, rnd).slice(0, CONFIG.questionsPerDaily - 3)), rnd);
         startQuiz(picks, { mode: "daily" });
         break;
       }
@@ -1538,6 +1681,11 @@
           S = defaults(); save(); closeSheet(); render();
         }
         break;
+      case "instart": startIntrus(el.dataset.i !== undefined ? Number(el.dataset.i) : undefined); break;
+      case "inclick": intrusClick(ev, el); break;
+      case "inpop": intrusPop(); break;
+      case "inhint": intrusHint(); break;
+      case "inquit": IN = null; back(); break;
       case "mzstart": startMaze(el.dataset.v); break;
       case "mzmove": mazeMove(Number(el.dataset.dx), Number(el.dataset.dy)); break;
       case "mzpick": mazeAnswer(el.dataset.i !== undefined ? Number(el.dataset.i) : el.dataset.v === "1"); break;

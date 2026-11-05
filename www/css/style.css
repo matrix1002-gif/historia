@@ -954,3 +954,42 @@ img.photo { display: block; width: 100%; height: 100%; object-fit: cover; backgr
 .mz-qtext { font-weight: 400; font-size: 21px; line-height: 1.3; margin-top: 6px; }
 .mz-sum { margin-top: 10px; color: var(--parch-dim); }
 @media (prefers-reduced-motion: reduce) { .mz-c.o-key svg, .mz-grid.bump-a { animation: none !important; } }
+
+/* ---------- Trouve les intrus ---------- */
+.in-card-menu { margin-top: 0; }
+.in-card-menu .mz-venues { grid-template-columns: 1fr; }
+.in-hud { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 10px; gap: 10px; }
+.in-scene { font-family: var(--display); font-weight: 700; font-size: 17px; color: var(--gold-200); }
+.in-count { display: flex; align-items: center; gap: 6px; font-size: 17px; }
+.in-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--gold-500); background: transparent; }
+.in-dot.on { background: #2e9e4f; border-color: #1f7a3a; }
+.in-frame { border: 3px solid var(--gold-500); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 14px rgba(60, 40, 10, 0.35); background: #000; line-height: 0; }
+.in-svg { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.in-ring { fill: rgba(46, 158, 79, 0.18); stroke: #22c55e; stroke-width: 3.5; animation: in-pop 0.45s ease-out; transform-box: fill-box; transform-origin: center; }
+.in-hint { fill: none; stroke: #fff; stroke-width: 2.5; stroke-dasharray: 6 5; animation: in-spin 1.2s ease-in-out infinite alternate; }
+.in-miss path { stroke: #d62828; stroke-width: 3.5; stroke-linecap: round; animation: in-fade 0.9s ease-out forwards; }
+@keyframes in-pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes in-spin { from { opacity: 0.4; } to { opacity: 1; } }
+@keyframes in-fade { from { opacity: 1; } to { opacity: 0; } }
+.in-pop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(30, 18, 5, 0.6); }
+.in-card { max-width: 420px; width: 100%; padding: 22px 20px 20px; border-radius: var(--radius); border: 2px solid var(--gold-500); background: linear-gradient(180deg, #fff9e8, #f1e3bd); text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }
+.in-card h3 { font-family: var(--display); font-size: 21px; margin: 8px 0 6px; }
+.in-card p { font-size: 18px; line-height: 1.45; margin-bottom: 16px; }
+.in-badge { width: 46px; height: 46px; margin: -46px auto 0; border-radius: 50%; background: #22c55e; color: #fff; font-size: 28px; line-height: 46px; border: 3px solid #fff9e8; }
+.in-stars { font-size: 38px; color: #e0a416; letter-spacing: 4px; }
+.in-stars span { color: rgba(0, 0, 0, 0.2); }
+.in-end { margin-top: 14px; }
+@media (prefers-reduced-motion: reduce) { .in-ring, .in-hint, .in-miss path { animation: none; } }
+
+/* ---------- En-tête « Voyage à travers les siècles » ---------- */
+.today-more { margin-top: 10px; }
+.today-ctx { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 14px; letter-spacing: 0.04em; color: var(--gold-500); font-variant: small-caps; }
+.learn-head { margin: 28px 0 16px; padding: 18px 16px 16px; text-align: center; border-radius: var(--radius); border: 2px double var(--gold-500); background: radial-gradient(120% 140% at 50% 0%, rgba(255, 244, 205, 0.9), rgba(240, 222, 178, 0.55)); box-shadow: inset 0 0 0 4px rgba(255, 249, 232, 0.5); }
+.learn-orn { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--gold-500); font-size: 18px; margin: 0 0 4px; }
+.learn-orn span { flex: 0 1 70px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold-500)); }
+.learn-orn span:last-child { background: linear-gradient(270deg, transparent, var(--gold-500)); }
+.learn-title { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.15; letter-spacing: 0.03em; color: var(--gold-200); }
+.learn-sub { margin: 8px auto 0; max-width: 34ch; font-size: 18px; line-height: 1.4; }
+.learn-steps { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 14px 0 0; padding: 0; }
+.learn-steps li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 4px; border-radius: 999px; background: rgba(255, 249, 232, 0.85); border: 1px solid var(--gold-500); font-size: 13.5px; white-space: nowrap; }
+.learn-steps b { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--gold-500); color: #fff9e8; font-size: 13px; }

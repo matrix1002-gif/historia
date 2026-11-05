@@ -21,6 +21,8 @@
   IDS.forEach(function (id) { if (lang === "en" && EN_READY.indexOf(id) < 0) return; document.write('<script src="' + dir + id + '.js" onerror="void 0"><\/script>'); });
 
   document.write('<script src="js/daily/' + lang + '.js"><\/script>'); // personnage et saint du jour
+  document.write('<script src="js/daily/more-' + lang + '.js"><\/script>'); // suite du récit du jour
+  document.write('<script src="js/easy/' + lang + '.js"><\/script>'); // questions de culture générale
 
   if (lang !== "en") return;
   document.documentElement.lang = "en";
@@ -48,6 +50,11 @@
   var D = {
     "Apprendre": "Learn", "Quiz": "Quiz", "Personnages": "Characters", "Médailles": "Medals", "Navigation": "Navigation",
     "L'histoire de France et de la chrétienté": "The history of France and of Christendom",
+    "Voyage à travers les siècles": "A journey through the centuries",
+    "Choisis ton époque, découvre ses grandes histoires, puis relève le défi du quiz : chaque étoile gagnée te fait grimper de rang !": "Pick your era, discover its great stories, then take on the quiz challenge: every star you earn moves you up a rank!",
+    "Lis la fiche": "Read the lesson",
+    "Joue au quiz": "Play the quiz",
+    "Gagne des étoiles": "Earn stars",
     "Apprendre, époque par époque": "Learn, era by era",
     "Choisis une époque, lis la fiche de chaque niveau, puis passe au quiz pour valider ce que tu as appris.": "Pick an era, read the lesson of each level, then take the quiz to check what you have learned.",
     "Bientôt": "Soon", "Cette époque arrive bientôt.": "This era is coming soon to the English edition.",
