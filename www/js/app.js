@@ -719,7 +719,7 @@
     const st = rnStats();
     return `<div class="df-card"><h2>${L2("La Fuite !", "The Escape!")}</h2>
       <p>${L2("Paris, 1789. Tu as osé crier « Vive la Nation ! » : la garde royale est à tes trousses. Cours, esquive, ne te laisse pas rattraper !", "Paris, 1789. You dared to shout “Long live the Nation!”: the royal guard is on your heels. Run, dodge, don't get caught!")}</p>
-      <ul class="df-how"><li><b>${L2("Glisse à gauche / à droite", "Swipe left / right")}</b> ${L2("pour changer de voie.", "to change lane.")}</li><li><b>${L2("Vers le haut", "Swipe up")}</b> ${L2("pour sauter les caisses, ", "to jump crates, ")}<b>${L2("vers le bas", "down")}</b> ${L2("pour passer sous les poutres.", "to slide under beams.")}</li><li>${L2("Un obstacle heurté rapproche la garde : deux faux pas et c'est fini. La course ne s'arrête jamais, elle ne fait que s'accélérer…", "Hitting an obstacle lets the guards close in: two slips and it's over. The chase never ends, it only gets faster…")}</li></ul>
+      <ul class="df-how"><li><b>${L2("Glisse à gauche / à droite", "Swipe left / right")}</b> ${L2("pour changer de voie.", "to change lane.")}</li><li><b>${L2("Vers le haut", "Swipe up")}</b> ${L2("pour sauter les caisses, ", "to jump crates, ")}<b>${L2("vers le bas", "down")}</b> ${L2("pour passer sous les poutres.", "to slide under beams.")}</li><li>${L2("Un obstacle heurté rapproche la garde : un deuxième faux pas rapproché et tu es arrêté. Paris, villages, forêts, campagne : la course ne s'arrête jamais et ne fait que s'accélérer…", "Hitting an obstacle lets the guards close in: a second slip soon after and you're arrested. Paris, villages, forests, countryside: the chase never ends and only gets faster…")}</li></ul>
       <button class="btn btn-gold" data-act="rngo">${L2("Courir !", "Run!")}</button>
       ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} points`, `Best: ${st.best} points`)}</small>` : ""}</div>`;
   }
@@ -736,7 +736,7 @@
     if (rec && r.score > 0) Art.confetti();
     const over = document.getElementById("df-over");
     if (!over) return;
-    over.innerHTML = `<div class="df-card df-end lose"><h2>${L2("Rattrapé par la garde !", "Caught by the guard!")}</h2>
+    over.innerHTML = `<div class="df-card df-end lose"><h2>${L2("Arrêté au nom du Roi !", "Arrested in the King's name!")}</h2>
       <p class="df-big">${r.score} <small>${L2("points", "points")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
       <p>${r.meters} m · ${r.coins} ${L2("cocardes", "cockades")}${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
       <p class="df-fact">${L2("En 1789, la cocarde bleu-blanc-rouge naît à Paris : elle mêle le bleu et le rouge de la ville au blanc de la monarchie.", "In 1789 the blue-white-red cockade was born in Paris: it joined the blue and red of the city to the white of the monarchy.")}</p>

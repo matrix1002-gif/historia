@@ -3,11 +3,11 @@
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;
   /* physique (px et secondes) : bond franc, chute plus violente que la montée */
-  var FLAP = 440, GU = 1560, GD = 2800, VMAX = 860, STEP = 1 / 120;
+  var FLAP = 227, GU = 558, GD = 558, VMAX = 335, STEP = 1 / 120;
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedOf(n) { return 118 + Math.min(n, 200) * 0.8; }
-  function gapOf(n) { return Math.max(130, 182 - n * 0.52); }
-  function spaceOf(n) { return Math.max(185, 218 - n * 0.2); }
+  function speedOf(n) { return 120 + Math.min(n, 150) * 0.65; }
+  function gapOf(n) { return Math.max(142, 182 - n * 0.8); }
+  function spaceOf(n) { return Math.max(188, 222 - n * 0.55); }
   var STAGES = [
     { at: 0, fr: "Campagne de Terre sainte", en: "Holy Land countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
     { at: 20, fr: "Hameau", en: "Hamlet", sky: ["#9fd0ea", "#e8f3df"], far: "#8fb36f", mid: "#6f9a52", ground: ["#7fae52", "#5b8a3a"], pil: ["#b08a5a", "#8a6638", "#5e4220"], line: ["Quelques chaumières : le premier hameau est à toi !", "A few thatched huts: your first hamlet is yours!"] },
@@ -44,14 +44,14 @@
       var speed = speedOf(st.score);
       var space = spaceOf(st.score);
       var T = space / speed; // secondes entre deux portes
-      var fq = 1.2 + Math.min(st.score, 200) * 0.012;
-      var amp = st.score < 25 ? 0 : Math.min(46, 10 + (st.score - 25) * 0.35, 60 / fq);
+      var fq = 1.3 + Math.min(st.score, 150) * 0.016;
+      var amp = st.score < 15 ? 0 : Math.min(34, 10 + (st.score - 15) * 0.4, 56 / fq);
       var lo = 66 + gap / 2 + amp, hi = GY - 66 - gap / 2 - amp;
       var c = lo + rnd() * Math.max(0, hi - lo);
       if (st.lastC != null) {
         // la porte suivante doit rester atteignable : on borne le décalage vertical selon le temps disponible
         var slack = (st.lastAmp || 0) + amp; // les portes mobiles peuvent s'écarter dans le pire sens
-        var up = Math.max(12, 82 * T - slack), down = Math.max(20, 170 * T - slack);
+        var up = Math.max(10, 58 * T - slack * 0.6), down = Math.max(20, 150 * T - slack * 0.6);
         c = Math.max(st.lastC - up, Math.min(st.lastC + down, c));
         c = Math.max(lo, Math.min(hi, c));
       }
@@ -114,7 +114,7 @@
       if (!st.started) { st.y = Math.round(GY * 0.5) + Math.sin(t * 4) * 8; st.scroll += speed * 0.4 * dt; return; }
       st.vy += (st.vy < 0 ? GU : GD) * dt; if (st.vy > VMAX) st.vy = VMAX;
       st.y += st.vy * dt;
-      st.rot = Math.max(-0.45, Math.min(0.7, st.vy / 900));
+      st.rot = Math.max(-0.45, Math.min(0.6, st.vy / 480));
       st.scroll += speed * dt;
       st.pipes.forEach(function (p) { p.x -= speed * dt; if (p.amp) { var lo = 66, hi = GY - 66 - p.gap; p.top = Math.max(lo, Math.min(hi, p.base + Math.sin(t * p.fq + p.ph) * p.amp)); } });
       var lastp = st.pipes[st.pipes.length - 1];
