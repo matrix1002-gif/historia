@@ -14,9 +14,8 @@
 </style>
 </head>
 <body>
-<p style="max-width:640px;margin:0 auto;padding:18px 20px 0"><a href="index.html" id="bk" style="display:inline-block;padding:10px 18px;border:1px solid #d8b565;border-radius:10px;text-decoration:none;font-size:16px">← Retour / Back</a></p>
-<script>document.getElementById("bk").addEventListener("click",function(e){e.preventDefault();if(history.length>1)history.back();else location.href="index.html";});</script>
 <main id="fr">
+<p style="margin:0 0 18px"><a href="index.html" class="bk" style="display:inline-block;padding:10px 18px;border:1px solid #d8b565;border-radius:10px;text-decoration:none;font-size:16px">← Retour</a></p>
   <h1>Politique de confidentialité</h1>
   <p>Dernière mise à jour : octobre 2026</p>
 
@@ -47,6 +46,7 @@
   <p class="todo">À compléter avant publication : votre adresse électronique de contact.</p>
 </main>
 <main id="en" lang="en" hidden>
+<p style="margin:0 0 18px"><a href="index.html" class="bk" style="display:inline-block;padding:10px 18px;border:1px solid #d8b565;border-radius:10px;text-decoration:none;font-size:16px">← Back</a></p>
   <h1>Privacy policy</h1>
   <p>Last updated: November 2026</p>
 
@@ -82,5 +82,6 @@
     document.documentElement.lang = "en"; document.title = "Historia – Privacy policy";
   }
 </script>
+<script>document.querySelectorAll(".bk").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();if(history.length>1)history.back();else location.href="index.html";});});</script>
 </body>
 </html>
