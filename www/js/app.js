@@ -509,7 +509,7 @@
     { v: "medals", label: "Médailles", ico: () => ICONS.crown }
   ];
   const tabBar = (active) => `<nav class="tabbar" aria-label="Navigation">${TABS.map((t) => `<button class="tab ${t.v === active ? "on" : ""}" data-act="tab" data-v="${t.v}" ${t.v === active ? 'aria-current="page"' : ""}><span class="tab-ico">${t.ico()}</span><span>${t.label}</span></button>`).join("")}</nav>`;
-  const withTabs = (html, active) => { document.body.classList.add("has-tabs"); return html + tabBar(active); };
+  const withTabs = (html, active) => { document.body.classList.add("has-tabs"); document.body.dataset.tab = active; return html + tabBar(active); };
 
   // Illustration de la situation : retrouve l'époque et le niveau d'une question.
   const sitOfItem = (it) => {

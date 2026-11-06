@@ -6,9 +6,10 @@
   var TS = 1.28; // le temps s'écoule plus vite : même géométrie, jeu plus nerveux
   var FLAP = 227 * TS, GU = 558 * TS * TS, GD = 558 * TS * TS, VMAX = 335 * TS, STEP = 1 / 120;
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedOf(n) { return (120 + Math.min(n, 150) * 0.7) * TS; }
-  function gapOf(n) { return Math.max(142, 182 - n * 0.8); }
-  function spaceOf(n) { return Math.max(188, 222 - n * 0.55); }
+  function ramp(n) { return 1 - Math.exp(-n / 22); }
+  function speedOf(n) { return (120 + 60 * ramp(n) + Math.min(n, 150) * 0.38) * TS; }
+  function gapOf(n) { return Math.max(140, 184 - 46 * ramp(n)); }
+  function spaceOf(n) { return Math.max(186, 224 - 42 * ramp(n)); }
   var STAGES = [
     { at: 0, fr: "Campagne de Terre sainte", en: "Holy Land countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
     { at: 20, fr: "Hameau", en: "Hamlet", sky: ["#9fd0ea", "#e8f3df"], far: "#8fb36f", mid: "#6f9a52", ground: ["#7fae52", "#5b8a3a"], pil: ["#b08a5a", "#8a6638", "#5e4220"], line: ["Quelques chaumières : le premier hameau est à toi !", "A few thatched huts: your first hamlet is yours!"] },
@@ -45,8 +46,8 @@
       var speed = speedOf(st.score);
       var space = spaceOf(st.score);
       var T = space / speed; // secondes entre deux portes
-      var fq = (1.3 + Math.min(st.score, 150) * 0.016) * TS;
-      var amp = st.score < 15 ? 0 : Math.min(34, 10 + (st.score - 15) * 0.4, 56 / fq);
+      var fq = (1.3 + 0.95 * ramp(st.score) + Math.min(st.score, 150) * 0.004) * TS;
+      var amp = st.score < 7 ? 0 : Math.min(34 * (1 - Math.exp(-(st.score - 6) / 12)), 56 / fq);
       var lo = 66 + gap / 2 + amp, hi = GY - 66 - gap / 2 - amp;
       var c = lo + rnd() * Math.max(0, hi - lo);
       if (st.lastC != null) {

@@ -975,3 +975,26 @@ h2.section { color: #8a5a14; }
 .tab { font-size: 10.5px; }
 .dfscreen .df-back { position: absolute !important; z-index: 20 !important; }
 .dfscreen .df-snd { position: absolute !important; z-index: 20 !important; }
+
+/* ===== Menus plus colorés : une couleur par onglet, cartes et boutons teintés ===== */
+.tab:nth-child(1) { --tc: #2b5aa8; } .tab:nth-child(2) { --tc: #7a3fa8; } .tab:nth-child(3) { --tc: #b3262f; } .tab:nth-child(4) { --tc: #2f8157; } .tab:nth-child(5) { --tc: #c4851a; }
+.tab .tab-ico { color: color-mix(in srgb, var(--tc) 62%, #8a7656); }
+.tab.on, .tab.on .tab-ico { color: var(--tc); }
+.tab.on { background: color-mix(in srgb, var(--tc) 12%, transparent); }
+body[data-tab="home"] { --tint: #2b5aa8; } body[data-tab="tresor"] { --tint: #7a3fa8; } body[data-tab="jeux"] { --tint: #b3262f; } body[data-tab="gallery"] { --tint: #2f8157; } body[data-tab="medals"] { --tint: #c4851a; }
+body.has-tabs { background: radial-gradient(130% 55% at 50% -5%, color-mix(in srgb, var(--tint, #c4851a) 22%, transparent), transparent 70%) fixed, linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--tint, #c4851a) 9%, transparent)) fixed, #f1e6c8; }
+.page-title { color: color-mix(in srgb, var(--tint, #5b2a14) 70%, #2b1d0e); }
+.top { border-bottom: 3px double color-mix(in srgb, var(--tint, #b0862a) 55%, transparent); padding-bottom: 8px; }
+.icon-btn { background: color-mix(in srgb, var(--tint, #c4851a) 10%, #fff8e6); }
+.df-menu:nth-of-type(1) { background: linear-gradient(135deg, #5c1522, #2a0a12); border-color: #8a2a38; }
+.df-menu:nth-of-type(1) .btn-gold { background: linear-gradient(180deg, #e8604a, #b3262f); color: #fff6e6; box-shadow: 0 3px 0 #6a121c, 0 8px 16px rgba(120, 20, 30, 0.35); }
+.df-menu:nth-of-type(2) { background: linear-gradient(135deg, #17307a, #0a1438); border-color: #3556b8; }
+.df-menu:nth-of-type(2) .btn-gold { background: linear-gradient(180deg, #5b86e8, #2a4fb0); color: #fff6e6; box-shadow: 0 3px 0 #14296a, 0 8px 16px rgba(20, 40, 120, 0.35); }
+.df-menu:nth-of-type(1) h2 { color: #ffb4a0; } .df-menu:nth-of-type(2) h2 { color: #a8c4ff; }
+.tresor-hero h2, .tresor-hero h3 { color: #5a2d86; }
+.tt { border-left: 6px solid var(--accent); }
+.era { border-left: 6px solid var(--accent); }
+.gal-era h2 { border-bottom: 2px solid color-mix(in srgb, var(--accent) 60%, transparent); padding-bottom: 4px; }
+.today { border-color: color-mix(in srgb, #2b5aa8 45%, #b0862a); background: linear-gradient(160deg, #fffaea, #eaf0fb); }
+.learn-head { background: linear-gradient(160deg, #fffaea, #e9eefb); }
+body[data-tab="medals"] .medal, body[data-tab="medals"] li { border-left: 5px solid #c4851a; }
