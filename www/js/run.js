@@ -32,7 +32,7 @@
     autumn: { fr: "La forêt d'automne", en: "The autumn forest", keep: 1, au: 1, wx: "leaves", g: ["#a8883c", "#8c7030"], r: ["#a8844c", "#8a6a3a"], tint: ["#6a5a7a", "#f0b060"] }
   };
   var EVIDS = Object.keys(EV);
-  var CHAL = ["#b03a3a", "#3a5aa0", "#d8b040", "#3a8a5a", "#c86a2a"];
+  var CHAL = ["#9a4a3a", "#4a5f7a", "#b9a05a", "#5f7a54", "#a8764a"];
   EVIDS.forEach(function (k) { EV[k].id = k; });
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function speedAt(t) { return 21 + 25 * (1 - Math.exp(-t / 22)) + Math.min(t, 150) * 0.06; }
@@ -110,22 +110,22 @@
       }
       if (id === "market") {
         P({ z: zz, side: side, off: 0.0, type: "stall", v: v, aw: CHAL[Math.floor(rnd() * 5)] }); P({ z: zz + 2.8, side: side, off: 0.0, type: "stall", v: rnd(), aw: CHAL[Math.floor(rnd() * 5)] });
-        P({ z: zz + 1.5, side: side, off: 1.0, type: "house", v: v, h: 140 + rnd() * 100, w: 130, kind: "stone" });
+        P({ z: zz + 1.5, side: side, off: 1.0, type: "house", v: v, h: 109 + rnd() * 70, w: 130, kind: "stone" });
         pplAdd(zz, side, 3 + Math.floor(rnd() * 3), { off: 0.05 }); return true;
       }
       if (id === "fire") {
-        P({ z: zz, side: side, off: 0.1, type: "bhouse", v: v, h: 150 + rnd() * 120, w: 140, kind: "stone" }); P({ z: zz + 2.8, side: side, off: 0.1, type: "bhouse", v: rnd(), h: 130 + rnd() * 120, w: 130, kind: "stone" });
+        P({ z: zz, side: side, off: 0.1, type: "bhouse", v: v, h: 117 + rnd() * 84, w: 140, kind: "stone" }); P({ z: zz + 2.8, side: side, off: 0.1, type: "bhouse", v: rnd(), h: 101 + rnd() * 84, w: 130, kind: "stone" });
         pplAdd(zz, side, 1 + Math.floor(rnd() * 3), { off: 0.1, act: 0 }); return true;
       }
       if (id === "barricade") {
-        P({ z: zz, side: side, off: 0.0, type: "barr", v: v }); P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: v, h: 150 + rnd() * 100, w: 130, kind: "stone" });
+        P({ z: zz, side: side, off: 0.0, type: "barr", v: v }); P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: v, h: 117 + rnd() * 70, w: 130, kind: "stone" });
         P({ z: zz + 1.4, side: side, off: 0.55, type: "flag", v: v, c: [["#2a4aa0", "#f2f2f2", "#c8283a"]] });
         pplAdd(zz, side, 3, { off: 0.0, act: 0, kind: 1 }); return true;
       }
       if (id === "guillotine") {
         if (r < 0.4 && si === 0) P({ z: zz, side: side, off: 0.15, type: "gui", v: v });
-        else P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 150 + rnd() * 110, w: 130, kind: "stone" });
-        P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: rnd(), h: 140 + rnd() * 100, w: 130, kind: "stone" });
+        else P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 117 + rnd() * 77, w: 130, kind: "stone" });
+        P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: rnd(), h: 109 + rnd() * 70, w: 130, kind: "stone" });
         P({ z: zz + 1.4, side: side, off: 0.1, type: "flag", v: v });
         pplAdd(zz, side, 4, { off: 0.0 }); return true;
       }
@@ -168,8 +168,8 @@
           if (d > 120 && r < 0.09) P({ z: zz, side: side, off: 0.1, type: "prison", v: v });
           else if (d > 150 && r < 0.17) P({ z: zz, side: side, off: 0.1, type: "church", v: v });
           else {
-            P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 150 + rnd() * 140, w: 130 + rnd() * 40, kind: "stone" });
-            P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: rnd(), h: 130 + rnd() * 150, w: 130 + rnd() * 40, kind: "stone" });
+            P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 117 + rnd() * 98, w: 130 + rnd() * 40, kind: rnd() < 0.4 ? "timber" : "stone" });
+            P({ z: zz + 2.8, side: side, off: 0.1, type: "house", v: rnd(), h: 101 + rnd() * 105, w: 130 + rnd() * 40, kind: "stone" });
             if (r > 0.8) P({ z: zz + 2.6, side: side, off: 0, type: "lamp", v: v });
           }
         } else if (b === 1) {
@@ -256,6 +256,7 @@
       st.t += dt;
       if (st.banner) { st.banner.t += dt; if (st.banner.t > 2.8) st.banner = null; }
       if (st.over) {
+        if (!st.sig) { st.sig = 1; if (opt.onOver) opt.onOver({ score: st.finalScore, meters: Math.floor(st.dist) }); }
         st.ct += dt;
         if (st.ct > 5.4 && !st.done) {
           st.done = true;
@@ -426,7 +427,7 @@
       var zn = it.z + (o.dz || 0), d = o.d, zf = zn + d, xi = 1.5 * LW + 8 + (o.off != null ? o.off : it.off) * LW, xo = xi + o.w, xc = (xi + xo) / 2, h = o.h, kn = kOf(zn);
       face(it, o.ws, [[xi, zn, 0], [xi, zn, h], [xi, zf, h], [xi, zf, 0]]);
       if (o.win) for (var j = 0; j < o.win[0]; j++) for (var r = 0; r < o.win[1]; r++) {
-        var za = zn + d * (0.1 + j * 0.86 / o.win[0]), zb = za + d * 0.42 / o.win[0], ha = 16 + r * (o.wh || 46), lit = (r + j + Math.floor(it.v * 9)) % 3 === 0;
+        var za = zn + d * (0.1 + j * 0.86 / o.win[0]), zb = za + d * 0.42 / o.win[0], ha = 16 + r * (o.wh || 46), lit = (r + j + Math.floor(it.v * 9)) % 5 === 0;
         face(it, o.bars ? "#15121a" : o.dim ? "#241d17" : lit ? "#f3d98a" : "#40364f", [[xi, za, ha], [xi, zb, ha], [xi, zb, ha + (o.wk || 26)], [xi, za, ha + (o.wk || 26)]]);
         if (o.bars) { var zm = (za + zb) / 2; face(it, "#8a8a92", [[xi, zm - 0.01, ha], [xi, zm + 0.01, ha], [xi, zm + 0.01, ha + (o.wk || 26)], [xi, zm - 0.01, ha + (o.wk || 26)]]); }
       }
@@ -435,7 +436,7 @@
       face(it, o.wf, [[xi, zn, 0], [xo, zn, 0], [xo, zn, h], [xi, zn, h]]);
       if (o.timber) { var tc = "#4e3820"; face(it, tc, [[xi, zn, h * 0.5], [xo, zn, h * 0.5], [xo, zn, h * 0.5 + 4], [xi, zn, h * 0.5 + 4]]); face(it, tc, [[xc - 2, zn, 0], [xc + 2, zn, 0], [xc + 2, zn, h], [xc - 2, zn, h]]); for (var tj = 0; tj < 4; tj++) { var zt = zn + d * (0.1 + tj * 0.26); face(it, tc, [[xi, zt, 0], [xi, zt + 0.04, 0], [xi, zt + 0.04, h], [xi, zt, h]]); } face(it, tc, [[xi, zn, h * 0.5], [xi, zf, h * 0.5], [xi, zf, h * 0.5 + 4], [xi, zn, h * 0.5 + 4]]); }
       if (o.fw) for (var fc = 0; fc < o.fw[0]; fc++) for (var fr = 0; fr < o.fw[1]; fr++) {
-        var fx = xi + 10 + fc * ((o.w - 40) / Math.max(1, o.fw[0] - 1 || 1)), fh = (o.fh0 || 52) + fr * (o.wh || 46), flit = (fr + fc + Math.floor(it.v * 7)) % 3 === 0;
+        var fx = xi + 10 + fc * ((o.w - 40) / Math.max(1, o.fw[0] - 1 || 1)), fh = (o.fh0 || 52) + fr * (o.wh || 46), flit = (fr + fc + Math.floor(it.v * 7)) % 5 === 0;
         face(it, o.bars ? "#15121a" : o.dim ? "#241d17" : flit ? "#f3d98a" : "#40364f", [[fx, zn, fh], [fx + 18, zn, fh], [fx + 18, zn, fh + 26], [fx, zn, fh + 26]]);
         if (!o.bars) { face(it, "#4e6a58", [[fx - 5, zn, fh], [fx, zn, fh], [fx, zn, fh + 26], [fx - 5, zn, fh + 26]]); face(it, "#4e6a58", [[fx + 18, zn, fh], [fx + 23, zn, fh], [fx + 23, zn, fh + 26], [fx + 18, zn, fh + 26]]); }
       }

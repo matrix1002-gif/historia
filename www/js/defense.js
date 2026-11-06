@@ -102,6 +102,7 @@
       st.parts.forEach(function (p) { p.x += p.vx * dt * 60; p.y += p.vy * dt * 60; p.vy += 0.12 * dt * 60; p.life -= dt * 1.3; });
       st.parts = st.parts.filter(function (p) { return p.life > 0; });
       if (st.over) {
+        if (!st.sig) { st.sig = 1; if (opt.onOver) opt.onOver({ score: st.score, win: st.score >= TOTAL }); }
         st.endT += dt;
         if (!st.win) { st.vy += 0.5 * dt * 60 * 60; st.y = Math.min(GY - 14, st.y + st.vy * dt); st.rot += dt * 6; }
         if (st.endT > (st.win ? 2.6 : 1.1) && !st.done) {

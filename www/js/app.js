@@ -531,8 +531,8 @@
   const applyMusic = () => { if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "fuite" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor"); };
 
   const render = () => {
-    if (view.name !== "defense" && DF) { if (DF.game) DF.game.destroy(); DF = null; }
-    if (view.name !== "run" && RN) { if (RN.game) RN.game.destroy(); RN = null; }
+    if (view.name !== "defense" && DF) { flushGames(); if (DF.game) DF.game.destroy(); DF = null; }
+    if (view.name !== "run" && RN) { flushGames(); if (RN.game) RN.game.destroy(); RN = null; }
     window.scrollTo(0, 0);
     document.body.classList.remove("has-tabs");
     setTint();
@@ -647,6 +647,15 @@
   const DF_XP = 30;
   let DF = null;
   const dfStats = () => (S.stats.defense = Object.assign({ plays: 0, wins: 0, best: 0 }, S.stats.defense));
+  function dfRec(r) {
+    const st = dfStats(), g = DF && DF.game;
+    if (g && g._c) return;
+    if (g) g._c = 1;
+    st.plays++;
+    if (r.score > st.best) { st.best = r.score; if (g) g._rec = 1; }
+    if (r.win) st.wins++;
+    save();
+  }
   function startDefense() {
     if (!window.HistoriaDefense) return;
     sfx("tap");
@@ -664,10 +673,8 @@
   }
   function dfEnd(r) {
     const st = dfStats();
-    st.plays++;
-    const rec = r.score > st.best;
-    if (rec) st.best = r.score;
-    if (r.win) st.wins++;
+    dfRec(r);
+    const rec = !!(DF && DF.game && DF.game._rec);
     const xp = Math.min(40, Math.floor(r.score / 5)) + (r.score > 200 ? Math.min(20, Math.floor((r.score - 200) / 5)) : 0);
     S.xp += xp;
     save();
@@ -680,13 +687,13 @@
       <p class="df-big">${r.score} <small>${L2("territoires", "territories")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
       <p>${L2("Tu t'es arrêté en :", "You stopped in:")} <b>${EN ? SG.en : SG.fr}</b>${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
       <p class="df-fact">${L2("Les seigneurs du Moyen Âge s'agrandissaient par la guerre, mais aussi par le mariage et l'héritage.", "Medieval lords grew their lands by war, but also by marriage and inheritance.")}</p>
-      <div class="stack"><button class="btn btn-gold" data-act="dfgo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="dfquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div></div>`;
+      <div class="stack"><button class="btn btn-gold" data-act="dfgo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="dfquit">${L2("Retour au menu Jeux", "Back to the Games menu")}</button></div></div>`;
     over.hidden = false;
   }
   function dfAttach() {
     const canvas = document.getElementById("df-canvas");
     if (!canvas || !DF) return;
-    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
+    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onOver: (r) => { if (DF) dfRec(r); }, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     const over = document.getElementById("df-over");
     if (over) { over.innerHTML = dfIntro(); over.hidden = false; }
   }
@@ -697,7 +704,7 @@
     DF.phase = "play";
     DF.game.destroy();
     const canvas = document.getElementById("df-canvas");
-    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
+    DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onOver: (r) => { if (DF) dfRec(r); }, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     DF.game.start();
   }
   const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="df-back" data-act="dfquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button><button class="icon-btn snd-btn df-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button>
@@ -714,6 +721,23 @@
   /* ===== La Fuite (course du révolutionnaire) ===== */
   let RN = null;
   const rnStats = () => (S.stats.run = Object.assign({ plays: 0, best: 0, far: 0 }, S.stats.run));
+  function rnRec(r) {
+    const st = rnStats(), g = RN && RN.game;
+    if (g && g._c) return;
+    if (g) g._c = 1;
+    st.plays++;
+    if (r.score > st.best) { st.best = r.score; if (g) g._rec = 1; }
+    if (r.meters > st.far) st.far = r.meters;
+    save();
+  }
+  function flushGames() {
+    try {
+      if (DF && DF.game && DF.game._state) { const s0 = DF.game._state(); if (s0.over) dfRec({ score: s0.score, win: s0.score >= 200 }); }
+      if (RN && RN.game && RN.game._state) { const s1 = RN.game._state(); if (s1.over) rnRec({ score: s1.finalScore, meters: Math.floor(s1.dist) }); }
+    } catch (e) { /* ignoré */ }
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flushGames(); });
+  window.addEventListener("pagehide", flushGames);
   function startRun() {
     if (!window.HistoriaRun) return;
     sfx("tap");
@@ -731,10 +755,8 @@
   }
   function rnEnd(r) {
     const st = rnStats();
-    st.plays++;
-    const rec = r.score > st.best;
-    if (rec) st.best = r.score;
-    if (r.meters > st.far) st.far = r.meters;
+    rnRec(r);
+    const rec = !!(RN && RN.game && RN.game._rec);
     const xp = Math.min(40, Math.floor(r.score / 25));
     S.xp += xp;
     save();
@@ -746,11 +768,11 @@
       <p class="df-big">${r.score} <small>${L2("points", "points")}</small>${rec ? ` <em>${L2("Nouveau record !", "New record!")}</em>` : ""}</p>
       <p>${r.meters} m · ${r.coins} ${L2("cocardes", "cockades")}${xp ? ` · <b>+${xp} XP</b>` : ""}</p>
       <p class="df-fact">${L2("En 1789, la cocarde bleu-blanc-rouge naît à Paris : elle mêle le bleu et le rouge de la ville au blanc de la monarchie.", "In 1789 the blue-white-red cockade was born in Paris: it joined the blue and red of the city to the white of the monarchy.")}</p>
-      <div class="stack"><button class="btn btn-gold" data-act="rngo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="rnquit">${L2("Retour au menu Quiz", "Back to the Quiz menu")}</button></div></div>`;
+      <div class="stack"><button class="btn btn-gold" data-act="rngo">${L2("Rejouer", "Play again")}</button><button class="btn btn-line" data-act="rnquit">${L2("Retour au menu Jeux", "Back to the Games menu")}</button></div></div>`;
     over.hidden = false;
   }
   function rnMake() {
-    return window.HistoriaRun.create(document.getElementById("df-canvas"), { lang: EN ? "en" : "fr", sfx, buzz, best: rnStats().best, onEnd: (r) => { if (RN) { RN.phase = "end"; rnEnd(r); } } });
+    return window.HistoriaRun.create(document.getElementById("df-canvas"), { lang: EN ? "en" : "fr", sfx, buzz, best: rnStats().best, onOver: (r) => { if (RN) rnRec(r); }, onEnd: (r) => { if (RN) { RN.phase = "end"; rnEnd(r); } } });
   }
   function rnAttach() {
     if (!document.getElementById("df-canvas") || !RN) return;
@@ -1497,8 +1519,8 @@
       case "dfgo": dfGo(); break;
       case "rnstart": startRun(); break;
       case "rngo": rnGo(); break;
-      case "rnquit": if (!RN || RN.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { if (RN && RN.game) RN.game.destroy(); RN = null; back(); } break;
-      case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
+      case "rnquit": if (!RN || RN.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (RN && RN.game) RN.game.destroy(); RN = null; back(); } break;
+      case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
       case "medals": go("medals"); break;
@@ -1591,7 +1613,7 @@
           S = defaults(); save(); closeSheet(); render();
         }
         break;
-      case "privacy": window.open(EN ? "privacy.html?lang=en" : "privacy.html", "_blank", "noopener"); break;
+      case "privacy": location.href = EN ? "privacy.html?lang=en" : "privacy.html"; break;
       case "lang": window.HI.set(EN ? "fr" : "en"); break;
       case "setlang": if (el.dataset.l !== (EN ? "en" : "fr")) window.HI.set(el.dataset.l); break;
       case "noads": buyNoAds(el); break;
