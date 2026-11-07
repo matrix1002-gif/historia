@@ -467,6 +467,7 @@
     touchStreak();
     const medals = checkMedals();
     save();
+    if (scope === "all" && window.HistoriaBoard && window.HistoriaBoard.enabled()) window.HistoriaBoard.submit(rec.earn);
     TR = { kind, reached, earn, newRecord, scope, xp, medals, league: leagueOf(rec.earn), rankUp: rankIndex(S.xp) > rankBefore ? RANKS[rankIndex(S.xp)].name : null, lastQ: T.qs[Math.min(T.i, 14)], celebrated: false };
     T = null;
     go("tresult", {}, "replace");
@@ -542,6 +543,7 @@
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
+    if (view.name === "board") { $app.innerHTML = withTabs(boardScreen(), "tresor"); return; }
     if (view.name === "jeux") { $app.innerHTML = withTabs(jeuxMenu(), "jeux"); return; }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
     if (view.name === "defense" && DF) { $app.innerHTML = defenseScreen(); return dfAttach(); }
@@ -1317,8 +1319,69 @@
       <ul class="tlist">${rows}</ul>
       <h2 class="section">Les paliers</h2>
       <ol class="ladder">${ladder}</ol>
-      <p class="mix-note">Un classement en ligne entre joueurs viendra plus tard. Pour l'instant, bats tes propres records et monte dans les titres.</p>
+      <button class="btn btn-line" data-act="bdopen">${L2("Classement des joueurs", "Player leaderboard")}</button>
     </div>`;
+  }
+
+
+  /* ---- Classement en ligne (top 10, quiz « Tous les thèmes ») ---- */
+  let BD = { mode: "in", list: null, msg: "", busy: false };
+  const fbErr = (e) => {
+    const c = (e && (e.code || e.message)) || "";
+    if (/name/.test(c)) return L2("Choisis un pseudo de 3 à 16 caractères.", "Choose a nickname of 3 to 16 characters.");
+    if (/email-already/.test(c)) return L2("Cet e-mail a déjà un compte.", "This e-mail already has an account.");
+    if (/weak-password/.test(c)) return L2("Mot de passe trop court (6 caractères minimum).", "Password too short (6 characters minimum).");
+    if (/invalid-email/.test(c)) return L2("Adresse e-mail invalide.", "Invalid e-mail address.");
+    if (/credential|password|user-not-found/.test(c)) return L2("E-mail ou mot de passe incorrect.", "Wrong e-mail or password.");
+    if (/network|net/.test(c)) return L2("Connexion impossible : vérifie ta connexion internet.", "Cannot connect: check your internet connection.");
+    return L2("Une erreur est survenue. Réessaie.", "Something went wrong. Try again.");
+  };
+  function boardScreen() {
+    const B = window.HistoriaBoard, u = B && B.enabled() ? B.user() : null;
+    const best = (S.rec.all || {}).earn || 0;
+    let body;
+    if (!B || !B.enabled()) {
+      body = `<p class="mix-note">${L2("Le classement en ligne n'est pas encore disponible.", "The online leaderboard is not available yet.")}</p>`;
+    } else {
+      const list = BD.list ? (BD.list.length ? `<ol class="bd-list">${BD.list.map((r, i) => `<li class="${u && u.uid === r.uid ? "me" : ""}"><b>${i + 1}</b><span>${esc(r.name)}</span><em>${fmtEcus(r.score)}</em></li>`).join("")}</ol>` : `<p class="mix-note">${L2("Personne n'est encore classé. Sois le premier !", "Nobody is ranked yet. Be the first!")}</p>`) : `<p class="mix-note">${L2("Chargement…", "Loading…")}</p>`;
+      const acct = u ? `<p class="mix-note">${L2("Connecté :", "Signed in:")} <b>${esc(u.name)}</b> · ${L2("ton record", "your record")} ${fmtEcus(best)}</p>
+        <div class="bd-row"><button class="btn btn-gold" data-act="bdsend">${L2("Envoyer mon record", "Submit my record")}</button></div>
+        <div class="bd-row"><button class="btn btn-line" data-act="bdout">${L2("Se déconnecter", "Sign out")}</button><button class="btn btn-line" data-act="bddel">${L2("Supprimer mon compte", "Delete my account")}</button></div>`
+        : `<div class="bd-form"><input id="bd-mail" type="email" autocomplete="email" placeholder="${L2("E-mail", "E-mail")}" aria-label="E-mail">
+          ${BD.mode === "up" ? `<input id="bd-name" type="text" maxlength="16" autocomplete="nickname" placeholder="${L2("Pseudo (visible dans le classement)", "Nickname (shown in the ranking)")}" aria-label="${L2("Pseudo", "Nickname")}">` : ""}
+          <input id="bd-pass" type="password" autocomplete="${BD.mode === "up" ? "new-password" : "current-password"}" placeholder="${L2("Mot de passe", "Password")}" aria-label="${L2("Mot de passe", "Password")}">
+          <button class="btn btn-gold" data-act="bdgo">${BD.mode === "up" ? L2("Créer mon compte", "Create my account") : L2("Me connecter", "Sign in")}</button>
+          <button class="btn btn-line" data-act="bdmode">${BD.mode === "up" ? L2("J'ai déjà un compte", "I already have an account") : L2("Créer un compte", "Create an account")}</button>
+          ${BD.mode === "in" ? `<button class="btn btn-line" data-act="bdreset">${L2("Mot de passe oublié", "Forgot password")}</button>` : ""}</div>`;
+      body = `<h2 class="section">${L2("Les 10 meilleurs — Tous les thèmes", "Top 10 — All themes")}</h2>${list}${BD.msg ? `<p class="mix-note bd-msg">${esc(BD.msg)}</p>` : ""}${acct}
+        <p class="mix-note">${L2("Un compte (e-mail + pseudo) est nécessaire, et une connexion internet. Seuls ton pseudo et ton record sont publics.", "An account (e-mail + nickname) and an internet connection are required. Only your nickname and record are public.")}</p>`;
+    }
+    return `<div class="screen">${topBar(L2("Classement", "Leaderboard"))}${body}<button class="btn btn-line" data-act="back">${L2("Retour", "Back")}</button></div>`;
+  }
+  function boardRefresh(msg) { if (msg !== undefined) BD.msg = msg; if (view.name === "board") render(); }
+  function boardLoad() {
+    const B = window.HistoriaBoard; if (!B || !B.enabled()) return;
+    B.top().then((l) => { BD.list = l; boardRefresh(); }).catch((e) => { BD.list = BD.list || []; boardRefresh(fbErr(e)); });
+  }
+  function boardAct(act) {
+    const B = window.HistoriaBoard, v = (id) => ((document.getElementById(id) || {}).value || "").trim();
+    const run = (p, ok) => { BD.busy = true; p.then(() => { BD.busy = false; ok && ok(); }).catch((e) => { BD.busy = false; boardRefresh(fbErr(e)); }); };
+    if (act === "bdmode") { BD.mode = BD.mode === "up" ? "in" : "up"; BD.msg = ""; return render(); }
+    if (BD.busy) return;
+    if (act === "bdgo") {
+      const m = v("bd-mail"), p = (document.getElementById("bd-pass") || {}).value || "";
+      run(BD.mode === "up" ? B.signUp(m, p, v("bd-name")) : B.signIn(m, p), () => { BD.msg = ""; B.submit(((S.rec.all || {}).earn) || 0).then(() => { boardRefresh(); boardLoad(); }); });
+    } else if (act === "bdreset") {
+      const m = v("bd-mail"); if (!m) return boardRefresh(L2("Entre ton e-mail puis appuie à nouveau.", "Enter your e-mail then press again."));
+      run(B.reset(m), () => boardRefresh(L2("E-mail de réinitialisation envoyé.", "Reset e-mail sent.")));
+    } else if (act === "bdsend") {
+      run(B.submit(((S.rec.all || {}).earn) || 0), () => { boardRefresh(L2("Record envoyé.", "Record submitted.")); boardLoad(); });
+    } else if (act === "bdout") {
+      run(B.signOut(), () => boardRefresh(""));
+    } else if (act === "bddel") {
+      if (!confirm(L2("Supprimer définitivement ton compte et ton score du classement ?", "Permanently delete your account and your leaderboard score?"))) return;
+      run(B.deleteAccount(), () => { BD.list = null; boardRefresh(L2("Compte supprimé.", "Account deleted.")); boardLoad(); });
+    }
   }
 
   const refreshT = () => { const el = document.getElementById("tgame-body"); if (el) el.innerHTML = tgameInner(); };
@@ -1521,6 +1584,8 @@
       case "rngo": rnGo(); break;
       case "rnquit": if (!RN || RN.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (RN && RN.game) RN.game.destroy(); RN = null; back(); } break;
       case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
+      case "bdopen": BD.msg = ""; BD.list = null; go("board"); if (window.HistoriaBoard && window.HistoriaBoard.enabled()) window.HistoriaBoard.init().then(() => { render(); boardLoad(); }).catch((e) => boardRefresh(fbErr(e))); break;
+      case "bdmode": case "bdgo": case "bdreset": case "bdsend": case "bdout": case "bddel": boardAct(act); break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
       case "medals": go("medals"); break;

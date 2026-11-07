@@ -1,4 +1,4 @@
-/* Historia — « Conquête » : un chevalier bondit de porte en porte, façon Flappy Bird.
+/* Historia — « Conquête » : un chevalier bondit de porte en porte.
    Chaque porte franchie = un territoire conquis (jusqu'à 200). Le paysage et le chevalier changent avec la conquête. */
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;

@@ -1,5 +1,5 @@
 /* Historia — « La Fuite » : un révolutionnaire échappe à la garde royale à travers Paris, les villages, les forêts et la campagne.
-   Course sans fin façon Temple Run : 3 voies. Glisser gauche/droite (voie), haut (sauter), bas (se baisser).
+   Course sans fin à 3 voies : 3 voies. Glisser gauche/droite (voie), haut (sauter), bas (se baisser).
    Décor d'Ancien Régime : pavés puis chemins de terre, églises, moulins, forêts, villageois qui regardent. Aucun rail. */
 (function () {
   var W = 360, H = 640, HY = 240, F = 7, PD = 4.5, LW = 112, STEP = 1 / 60, FAR = 84, BLEN = 800;
@@ -34,8 +34,8 @@
   var CHAL = ["#9a4a3a", "#4a5f7a", "#b9a05a", "#5f7a54", "#a8764a"];
   EVIDS.forEach(function (k) { EV[k].id = k; });
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 21 + 25 * (1 - Math.exp(-t / 22)) + Math.min(t, 150) * 0.06; }
-  function rowTime(t) { return Math.max(0.5, 1.05 - t * 0.016); }
+  function speedAt(t) { return 15 + 32 * (1 - Math.exp(-t / 20)) + Math.min(t, 150) * 0.07; }
+  function rowTime(t) { return Math.max(0.5, 1.4 - t * 0.026); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function mixx(c, h, t) { var a = c.indexOf("rgb") === 0 ? c.match(/\d+/g).map(Number) : hex(c), b = hex(h); return "rgb(" + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
@@ -207,7 +207,9 @@
       var diff = Math.min(1, st.t / 40), b = bioAt(st.dist + z * 1.4), pool = (evAt(st.dist + z * 1.4) || {}).pool || POOL[b];
       var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
       var rtPrev = st.gapT || 1.1, r = rnd();
-      var fx = Math.min(1.6, 0.15 + st.t / 32), kind = n < 5 ? "lanes" : r < 0.14 * fx ? "alllow" : r < 0.28 * fx ? "allhigh" : r < 0.46 * fx ? "mix" : r < 0.62 * fx ? "mixb" : "lanes";
+      var fx = Math.min(1.6, 0.05 + st.t / 22), kind = n < 5 ? "lanes" : r < 0.14 * fx ? "alllow" : r < 0.28 * fx ? "allhigh" : r < 0.46 * fx ? "mix" : r < 0.62 * fx ? "mixb" : "lanes";
+      if (kind !== "lanes" && kind === st.lastKindRow && (st.runLen || 1) >= 2) kind = "lanes";
+      st.runLen = kind === st.lastKindRow ? (st.runLen || 1) + 1 : 1;
       var rt = Math.max(0.5, rowTime(st.t) * (n > 3 && rnd() < diff * 0.35 ? 0.8 : 1));
       if (kind !== "lanes") rt = Math.max(rt, st.t > 30 ? 0.8 : 0.86);
       st.gapT = rt; st.lastKind = kind;
