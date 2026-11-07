@@ -167,16 +167,18 @@
           if (d > 120 && r < 0.09) P({ z: zz, side: side, off: 0.1, type: "prison", v: v });
           else if (d > 150 && r < 0.17) P({ z: zz, side: side, off: 0.1, type: "church", v: v });
           else {
-            P({ z: zz, side: side, off: 0.1 + rnd() * 0.45, type: "house", v: v, h: 90 + rnd() * 95, w: 110 + rnd() * 40, kind: rnd() < 0.65 ? "timber" : "stone" });
-            if (rnd() < 0.4) P({ z: zz + 2.8, side: side, off: 0.2 + rnd() * 0.4, type: ["tree", "fence", "well", "haystack"][Math.floor(rnd() * 4)], v: rnd() });
-            else P({ z: zz + 2.8, side: side, off: 0.1 + rnd() * 0.5, type: "house", v: rnd(), h: 80 + rnd() * 100, w: 105 + rnd() * 40, kind: rnd() < 0.65 ? "timber" : "stone" });
+            var slot = function (z0, pr) { var q = rnd(); if (q < pr) P({ z: z0, side: side, off: 0.1 + rnd() * 0.5, type: "house", v: rnd(), h: 85 + rnd() * 95, w: 105 + rnd() * 40, kind: rnd() < 0.65 ? "timber" : "stone" }); else if (q < pr + 0.28) P({ z: z0, side: side, off: 0.2 + rnd() * 0.6, type: ["tree", "tree", "bush", "fence", "well", "haystack"][Math.floor(rnd() * 6)], v: rnd() }); };
+            slot(zz, 0.5); slot(zz + 2.8, 0.3);
             if (r > 0.8) P({ z: zz + 2.6, side: side, off: 0, type: "lamp", v: v });
           }
         } else if (b === 1) {
           if (r < 0.14) P({ z: zz, side: side, off: 0.15, type: "church", v: v });
           else if (r < 0.22) { P({ z: zz, side: side, off: 0.1, type: "well", v: v }); P({ z: zz + 2.8, side: side, off: 0.4, type: "house", v: v, h: 100, w: 120, kind: "timber" }); }
-          else if (r < 0.34) { P({ z: zz, side: side, off: 0.15, type: "tree", v: v }); P({ z: zz + 2.5, side: side, off: 0.6, type: "house", v: v, h: 100, w: 120, kind: "timber" }); }
-          else { P({ z: zz, side: side, off: 0.1, type: "house", v: v, h: 100 + rnd() * 80, w: 115 + rnd() * 30, kind: "timber" }); P({ z: zz + 2.8, side: side, off: 0.2 + rnd() * 0.5, type: rnd() < 0.5 ? "house" : "tree", v: rnd(), h: 90 + rnd() * 70, w: 115, kind: "timber" }); }
+          else if (r < 0.34) { P({ z: zz, side: side, off: 0.15, type: "tree", v: v }); P({ z: zz + 2.5, side: side, off: 0.6, type: "bush", v: v }); }
+          else {
+            if (rnd() < 0.55) P({ z: zz, side: side, off: 0.1 + rnd() * 0.4, type: "house", v: v, h: 100 + rnd() * 70, w: 110 + rnd() * 30, kind: "timber" }); else P({ z: zz, side: side, off: 0.2 + rnd() * 0.6, type: ["tree", "fence", "bush", "haystack"][Math.floor(rnd() * 4)], v: v });
+            if (rnd() < 0.3) P({ z: zz + 2.8, side: side, off: 0.2 + rnd() * 0.5, type: "house", v: rnd(), h: 90 + rnd() * 60, w: 110, kind: "timber" }); else if (rnd() < 0.5) P({ z: zz + 2.8, side: side, off: 0.3 + rnd() * 0.7, type: "tree", v: rnd() });
+          }
         } else if (b === 2) {
           for (var q = 0; q < 4; q++) P({ z: zz + q * 1.35, side: side, off: 0.02 + rnd() * 0.5 + q * 0.5, type: rnd() < 0.55 ? "pine" : "tree", v: rnd() });
           if (rnd() < 0.5) P({ z: zz + 0.7, side: side, off: 0.0, type: "bush", v: v });
