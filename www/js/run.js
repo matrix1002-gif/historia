@@ -24,7 +24,6 @@
     barricade: { fr: "Les barricades du peuple", en: "The people's barricades", g: ["#6e6058", "#584a44"], r: ["#8d7f78", "#6f625c"], cob: 1 },
     guillotine: { fr: "La place de la Révolution", en: "Revolution Square", g: ["#7a6c60", "#625248"], r: ["#9a8c80", "#7c6e62"], cob: 1, tint: ["#5a4a60", "#c88a70"] },
     fireworks: { fr: "Nuit de fête sur la ville", en: "A night of celebration", keep: 1, wx: "fw", tint: ["#0e0c2a", "#3a2a6a"] },
-    cavalry: { fr: "La cavalerie royale à tes trousses", en: "The royal cavalry on your tail", keep: 1 },
     vine: { fr: "Les vignes de la vendange", en: "The harvest vineyards", g: ["#6f8a3c", "#5d7832"], r: ["#b49a68", "#957d52"] },
     cemetery: { fr: "Le vieux cimetière", en: "The old graveyard", g: ["#5c6650", "#4a543f"], r: ["#8a8478", "#6e695e"], wx: "fog", tint: ["#4a4a58", "#9a96a0"] },
     port: { fr: "Le port et ses navires", en: "The harbour and its ships", g: ["#3b7099", "#2f5f86"], r: ["#9a7a52", "#7e6140"], cob: 1 },
@@ -610,70 +609,109 @@
     }
 
     /* ---------- personnages ---------- */
-    function legs(x, y, k, ph, c1, c2, s) {
-      var a = Math.sin(ph) * 14 * s, b = -a;
-      ctx.lineCap = "round"; ctx.lineWidth = 9 * k; ctx.strokeStyle = c1;
-      ctx.beginPath(); ctx.moveTo(x - 7 * k, y - 34 * k); ctx.lineTo(x - 7 * k + a * k * 0.6, y - 4 * k - Math.max(0, -a) * 0.4 * k); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x + 7 * k, y - 34 * k); ctx.lineTo(x + 7 * k + b * k * 0.6, y - 4 * k - Math.max(0, -b) * 0.4 * k); ctx.stroke();
-      ctx.strokeStyle = c2; ctx.lineWidth = 10 * k;
-      ctx.beginPath(); ctx.moveTo(x - 7 * k + a * k * 0.6, y - 4 * k - Math.max(0, -a) * 0.4 * k); ctx.lineTo(x - 7 * k + a * k * 0.75, y - 2 * k - Math.max(0, -a) * 0.4 * k); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x + 7 * k + b * k * 0.6, y - 4 * k - Math.max(0, -b) * 0.4 * k); ctx.lineTo(x + 7 * k + b * k * 0.75, y - 2 * k - Math.max(0, -b) * 0.4 * k); ctx.stroke();
+    /* ---------- personnages volumétriques (dégradés, membres articulés, ombres douces) ---------- */
+    function ball(x, y, r, c1, c2) { var g = ctx.createRadialGradient(x - r * 0.38, y - r * 0.42, r * 0.08, x, y, r * 1.05); g.addColorStop(0, c1); g.addColorStop(1, c2); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, Math.max(0.3, r), 0, 7); ctx.fill(); }
+    function tube(x1, y1, x2, y2, w, c1, c2) {
+      w = Math.max(1.2, w); ctx.lineCap = "round"; ctx.strokeStyle = c2; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.strokeStyle = c1; ctx.lineWidth = w * 0.52; ctx.beginPath(); ctx.moveTo(x1 - w * 0.17, y1); ctx.lineTo(x2 - w * 0.17, y2); ctx.stroke();
     }
-    // pose : "run" | "kneel" | "captive"
+    function shaded(pts, x0, x1, c1, c2) { var g = ctx.createLinearGradient(x0, 0, x1, 0); g.addColorStop(0, c1); g.addColorStop(1, c2); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (var i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]); ctx.closePath(); ctx.fill(); }
+    function softShadow(x, y, rx, ry) { var g = ctx.createRadialGradient(x, y, 1, x, y, rx); g.addColorStop(0, "rgba(0,0,0,0.42)"); g.addColorStop(1, "rgba(0,0,0,0)"); ctx.save(); ctx.translate(x, y); ctx.scale(1, ry / rx); ctx.translate(-x, -y); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rx, 0, 7); ctx.fill(); ctx.restore(); }
+    // jambes à deux segments (cuisse, mollet), bottes
+    function legs(x, y, k, ph, c1, c2, s, c1l, c2l) {
+      var cl = c1l || "#6a72b8", bl = c2l || "#4a3a2c";
+      for (var i = 0; i < 2; i++) {
+        var sg = i ? 1 : -1, a = Math.sin(ph + (i ? Math.PI : 0)) * s, hx = x + sg * 7 * k, lift = Math.max(0, -Math.cos(ph + (i ? Math.PI : 0))) * s;
+        var kx = hx + a * 6 * k, ky = y - 19 * k - lift * 6 * k, fx = hx + a * 11 * k, fy = y - 3 * k - lift * 11 * k;
+        tube(hx, y - 35 * k, kx, ky, 10 * k, cl, c1); tube(kx, ky, fx, fy, 8.5 * k, cl, c1);
+        tube(fx, fy - 4 * k, fx + a * 1.5 * k, fy + 0.5 * k, 10.5 * k, "#5a4638", c2);
+        ell(fx + a * 1.5 * k, fy + 3 * k, 7 * k, 3 * k, c2);
+      }
+    }
     function drawRunner(x, y, k, pose, e) {
       var jh = pose === "run" && st.jump > 0 ? 4 * st.jump * (1 - st.jump) * 80 * k : 0;
       var sl = pose === "run" && st.slide > 0 ? Math.sin(Math.min(1, st.slide) * Math.PI) : 0;
-      var ph = st.step * 2.2;
-      ell(x, y, (22 - jh * 0.1) * k, 6 * k, "rgba(0,0,0,0.3)");
+      var ph = st.step * 2.2, run = pose === "run";
+      softShadow(x, y, (26 - jh * 0.08) * k, 7 * k);
       y -= jh;
       ctx.save();
-      var sy = 1 - sl * 0.42 - (pose !== "run" ? 0.38 * (e || 1) : 0);
+      var sy = 1 - sl * 0.42 - (!run ? 0.38 * (e || 1) : 0);
       ctx.translate(x, y); ctx.scale(1, sy); ctx.translate(-x, -y);
-      var lean = sl * 6 * k + (pose === "kneel" ? -3 * k : 0);
-      if (pose === "run") legs(x, y, k, ph, "#3a3f78", "#2a1d12", st.jump > 0 ? 0.3 : 1); else { rect(x - 14 * k, y - 18 * k, 12 * k, 18 * k, "#3a3f78"); rect(x + 2 * k, y - 18 * k, 12 * k, 18 * k, "#3a3f78"); }
-      poly([x - 17 * k + lean, y - 70 * k, x + 17 * k + lean, y - 70 * k, x + 20 * k, y - 28 * k, x - 20 * k, y - 28 * k], "#2f4fa8");
-      poly([x - 17 * k + lean, y - 70 * k, x + 17 * k + lean, y - 70 * k, x + 19 * k, y - 60 * k, x - 19 * k, y - 60 * k], "#3a5fc4");
-      line(x - 15 * k + lean, y - 68 * k, x + 17 * k, y - 32 * k, "#f2efe6", 4 * k);
-      var sw = Math.sin(ph) * 10 * k;
-      if (pose === "run") {
-        line(x - 17 * k + lean, y - 66 * k, x - 22 * k, y - 46 * k + sw, "#2f4fa8", 8 * k); line(x + 17 * k + lean, y - 66 * k, x + 22 * k, y - 46 * k - sw, "#2f4fa8", 8 * k);
-        circ(x - 22 * k, y - 45 * k + sw, 4 * k, "#e8b890"); circ(x + 22 * k, y - 45 * k - sw, 4 * k, "#e8b890");
-      } else { // mains levées
-        line(x - 17 * k, y - 66 * k, x - 26 * k, y - 98 * k, "#2f4fa8", 8 * k); line(x + 17 * k, y - 66 * k, x + 26 * k, y - 98 * k, "#2f4fa8", 8 * k);
-        circ(x - 26 * k, y - 100 * k, 4.5 * k, "#e8b890"); circ(x + 26 * k, y - 100 * k, 4.5 * k, "#e8b890");
+      var lean = sl * 6 * k + (pose === "kneel" ? -3 * k : 0), sw = Math.sin(ph) * 11 * k;
+      if (run) legs(x, y, k, ph, "#262c66", "#1c1410", st.jump > 0 ? 0.35 : 1, "#4a54a0");
+      else { tube(x - 7 * k, y - 34 * k, x - 9 * k, y - 3 * k, 10 * k, "#4a54a0", "#262c66"); tube(x + 7 * k, y - 34 * k, x + 9 * k, y - 3 * k, 10 * k, "#4a54a0", "#262c66"); ell(x - 9 * k, y - 1 * k, 7 * k, 3 * k, "#1c1410"); ell(x + 9 * k, y - 1 * k, 7 * k, 3 * k, "#1c1410"); }
+      // pans de la redingote (volent derrière)
+      var fl = run ? Math.sin(ph * 1.2) * 4 * k : 0;
+      shaded([x - 18 * k + lean, y - 40 * k, x + 18 * k + lean, y - 40 * k, x + 22 * k + fl, y - 18 * k, x + 4 * k + fl * 0.5, y - 12 * k, x - 4 * k - fl * 0.5, y - 14 * k, x - 22 * k - fl, y - 19 * k], x - 22 * k, x + 22 * k, "#3a58c0", "#1a2870");
+      // torse
+      shaded([x - 15 * k + lean, y - 72 * k, x + 15 * k + lean, y - 72 * k, x + 19 * k, y - 38 * k, x - 19 * k, y - 38 * k], x - 19 * k, x + 19 * k, "#5478e0", "#1f3484");
+      ell(x + lean, y - 71 * k, 16 * k, 4.5 * k, "#6a8ae8");          // épaules (dessus)
+      rect(x - 19 * k, y - 42 * k, 38 * k, 6 * k, "#b02a37");         // ceinture rouge
+      line(x - 13 * k + lean, y - 69 * k, x + 15 * k, y - 38 * k, "#f4f0e4", 4.5 * k);
+      line(x - 12 * k + lean, y - 69 * k, x + 15 * k, y - 38 * k, "rgba(0,0,0,0.12)", 1.2 * k);
+      // bras
+      if (run) {
+        tube(x - 16 * k + lean, y - 68 * k, x - 21 * k, y - 54 * k + sw * 0.5, 8 * k, "#4a6ad0", "#1f3484"); tube(x - 21 * k, y - 54 * k + sw * 0.5, x - 19 * k, y - 42 * k + sw, 7 * k, "#4a6ad0", "#1f3484"); ball(x - 19 * k, y - 40 * k + sw, 4.2 * k, "#f0c8a0", "#c08a60");
+        tube(x + 16 * k + lean, y - 68 * k, x + 21 * k, y - 54 * k - sw * 0.5, 8 * k, "#4a6ad0", "#1f3484"); tube(x + 21 * k, y - 54 * k - sw * 0.5, x + 19 * k, y - 42 * k - sw, 7 * k, "#4a6ad0", "#1f3484"); ball(x + 19 * k, y - 40 * k - sw, 4.2 * k, "#f0c8a0", "#c08a60");
+      } else {
+        tube(x - 16 * k, y - 68 * k, x - 24 * k, y - 84 * k, 8 * k, "#4a6ad0", "#1f3484"); tube(x - 24 * k, y - 84 * k, x - 26 * k, y - 100 * k, 7 * k, "#4a6ad0", "#1f3484"); ball(x - 26 * k, y - 102 * k, 4.6 * k, "#f0c8a0", "#c08a60");
+        tube(x + 16 * k, y - 68 * k, x + 24 * k, y - 84 * k, 8 * k, "#4a6ad0", "#1f3484"); tube(x + 24 * k, y - 84 * k, x + 26 * k, y - 100 * k, 7 * k, "#4a6ad0", "#1f3484"); ball(x + 26 * k, y - 102 * k, 4.6 * k, "#f0c8a0", "#c08a60");
       }
-      circ(x + lean, y - 82 * k, 11 * k, "#e8b890");
-      ctx.fillStyle = "#4a3320"; ctx.beginPath(); ctx.arc(x + lean, y - 80 * k, 11 * k, 0.1, Math.PI - 0.1); ctx.fill();
-      if (pose === "run") {
-        poly([x - 12 * k + lean, y - 86 * k, x + 12 * k + lean, y - 86 * k, x + 10 * k + lean, y - 100 * k, x + 20 * k + lean, y - 100 * k + Math.sin(ph) * 3 * k, x + 22 * k + lean, y - 92 * k, x - 6 * k + lean, y - 104 * k], "#c8323c");
-        rect(x - 12 * k + lean, y - 90 * k, 24 * k, 5 * k, "#a82430"); circ(x + 9 * k + lean, y - 88 * k, 3.4 * k, "#fff"); circ(x + 9 * k + lean, y - 88 * k, 1.8 * k, "#2f4fa8");
-      } // en cinématique, le bonnet est tombé
+      // cou, tête (vue de dos : cheveux), bonnet phrygien
+      tube(x + lean, y - 74 * k, x + lean, y - 78 * k, 8 * k, "#f0c8a0", "#c08a60");
+      ball(x + lean, y - 83 * k, 11 * k, "#6a4a30", "#2a1a10");
+      ell(x - 10.5 * k + lean, y - 82 * k, 2.2 * k, 3.4 * k, "#d8a880"); ell(x + 10.5 * k + lean, y - 82 * k, 2.2 * k, 3.4 * k, "#b88a60");
+      if (run) {
+        var tw = Math.sin(ph) * 3 * k;
+        shaded([x - 11.5 * k + lean, y - 88 * k, x + 11.5 * k + lean, y - 88 * k, x + 9 * k + lean, y - 100 * k, x + 18 * k + lean, y - 106 * k + tw, x + 24 * k + lean, y - 99 * k + tw, x + 14 * k + lean, y - 110 * k + tw * 0.5, x - 6 * k + lean, y - 108 * k], x - 12 * k, x + 24 * k, "#e04a56", "#962030");
+        shaded([x - 12.5 * k + lean, y - 91 * k, x + 12.5 * k + lean, y - 91 * k, x + 12 * k + lean, y - 86 * k, x - 12 * k + lean, y - 86 * k], x - 12 * k, x + 12 * k, "#c42c3a", "#7a1824");
+      }
       ctx.restore();
     }
     function drawGuardBack(x, y, k, ph, aim) {
-      ell(x, y, 22 * k, 6 * k, "rgba(0,0,0,0.3)");
-      legs(x, y, k, ph, "#efe9da", "#1c1a1a", aim ? 0.2 : 1);
-      poly([x - 18 * k, y - 70 * k, x + 18 * k, y - 70 * k, x + 21 * k, y - 28 * k, x - 21 * k, y - 28 * k], "#b32632");
-      rect(x - 21 * k, y - 36 * k, 42 * k, 8 * k, "#efe9da");
-      line(x - 15 * k, y - 68 * k, x + 17 * k, y - 34 * k, "#efe9da", 4 * k);
-      circ(x, y - 82 * k, 10.5 * k, "#e8b890");
-      poly([x - 17 * k, y - 88 * k, x, y - 100 * k, x + 17 * k, y - 88 * k, x + 12 * k, y - 84 * k, x - 12 * k, y - 84 * k], "#1c1a24");
-      rect(x - 2 * k, y - 94 * k, 4 * k, 4 * k, "#efe9da");
-      if (aim) { line(x + 20 * k, y - 56 * k, x + 8 * k * aim, y - 98 * k, "#4a3320", 4 * k); line(x + 8 * k * aim, y - 98 * k, x + 5 * k * aim, y - 116 * k, "#cfd6dd", 2.5 * k); }
-      else { line(x + 24 * k, y - 42 * k, x + 26 * k, y - 108 * k, "#4a3320", 4 * k); line(x + 26 * k, y - 108 * k, x + 26 * k, y - 124 * k, "#cfd6dd", 2.5 * k); }
+      softShadow(x, y, 27 * k, 7 * k);
+      legs(x, y, k, ph, "#a8a294", "#16141a", aim ? 0.2 : 1, "#efe9da");
+      var br = Math.sin(ph * 2) * 1.2 * k;
+      // sac et buffleteries (volume du dos)
+      shaded([x - 18 * k, y - 72 * k, x + 18 * k, y - 72 * k, x + 22 * k, y - 36 * k, x - 22 * k, y - 36 * k], x - 22 * k, x + 22 * k, "#e04450", "#7a1220");
+      shaded([x - 22 * k, y - 36 * k, x + 22 * k, y - 36 * k, x + 25 * k, y - 22 * k + br, x - 25 * k, y - 22 * k + br], x - 25 * k, x + 25 * k, "#d03a46", "#6a1020");
+      shaded([x - 10 * k, y - 64 * k, x + 10 * k, y - 64 * k, x + 9 * k, y - 42 * k, x - 9 * k, y - 42 * k], x - 10 * k, x + 9 * k, "#7a5a3a", "#3a281a");
+      line(x - 16 * k, y - 70 * k, x + 17 * k, y - 38 * k, "#f4f0e4", 4 * k); line(x + 16 * k, y - 70 * k, x - 17 * k, y - 38 * k, "#e0dccf", 3.4 * k);
+      ell(x, y - 71 * k, 18 * k, 4.8 * k, "#ec5662");
+      rect(x - 22 * k, y - 38 * k, 44 * k, 4 * k, "#2a2420");
+      tube(x - 17 * k, y - 68 * k, x - 24 * k, y - 50 * k, 8.5 * k, "#d8404c", "#7a1220");
+      ball(x - 24 * k, y - 47 * k, 4 * k, "#f0c8a0", "#c08a60");
+      tube(x, y - 73 * k, x, y - 77 * k, 8 * k, "#f0c8a0", "#c08a60");
+      ball(x, y - 83 * k, 10.5 * k, "#f0c8a0", "#c08a60");
+      ball(x, y - 81 * k, 10.5 * k, "#d8d0c0", "#8a8478");  // perruque poudrée vue de dos
+      ell(x, y - 74 * k, 4 * k, 6 * k, "#2a2430");           // catogan
+      // bicorne
+      shaded([x - 20 * k, y - 90 * k, x - 3 * k, y - 102 * k, x + 3 * k, y - 102 * k, x + 20 * k, y - 90 * k, x + 13 * k, y - 85 * k, x - 13 * k, y - 85 * k], x - 20 * k, x + 20 * k, "#3a3646", "#14121c");
+      poly([x - 20 * k, y - 90 * k, x - 3 * k, y - 102 * k, x - 3 * k, y - 100 * k, x - 18 * k, y - 89 * k], "#e8e0c8"); poly([x + 20 * k, y - 90 * k, x + 3 * k, y - 102 * k, x + 3 * k, y - 100 * k, x + 18 * k, y - 89 * k], "#e8e0c8");
+      circ(x, y - 96 * k, 2.6 * k, "#f4f0e4");
+      // mousquet
+      if (aim) { tube(x + 20 * k, y - 56 * k, x + 8 * k * aim, y - 98 * k, 5 * k, "#8a6440", "#4a3320"); tube(x + 8 * k * aim, y - 98 * k, x + 5 * k * aim, y - 118 * k, 3 * k, "#e4eaf0", "#8a95a0"); }
+      else { tube(x + 24 * k, y - 42 * k, x + 26 * k, y - 108 * k, 5 * k, "#8a6440", "#4a3320"); tube(x + 26 * k, y - 108 * k, x + 26 * k, y - 128 * k, 3 * k, "#e4eaf0", "#8a95a0"); tube(x + 24 * k, y - 66 * k, x + 21 * k, y - 62 * k, 8 * k, "#d8404c", "#7a1220"); }
     }
     function drawOfficer(x, y, k, tt) { // vu de face
-      ell(x, y, 24 * k, 6 * k, "rgba(0,0,0,0.3)");
-      rect(x - 13 * k, y - 34 * k, 11 * k, 34 * k, "#efe9da"); rect(x + 2 * k, y - 34 * k, 11 * k, 34 * k, "#efe9da"); rect(x - 14 * k, y - 10 * k, 13 * k, 10 * k, "#1c1a1a"); rect(x + 1 * k, y - 10 * k, 13 * k, 10 * k, "#1c1a1a");
-      poly([x - 19 * k, y - 72 * k, x + 19 * k, y - 72 * k, x + 22 * k, y - 28 * k, x - 22 * k, y - 28 * k], "#a52a36");
-      poly([x - 6 * k, y - 72 * k, x + 6 * k, y - 72 * k, x + 4 * k, y - 36 * k, x - 4 * k, y - 36 * k], "#efe9da");
-      for (var i = 0; i < 4; i++) circ(x, y - 66 * k + i * 9 * k, 1.8 * k, "#d9b24a");
-      line(x - 19 * k, y - 66 * k, x - 28 * k, y - 44 * k, "#a52a36", 8 * k);
-      var up = Math.min(1, tt * 1.5); line(x + 19 * k, y - 66 * k, x + 28 * k, y - (60 + 34 * up) * k, "#a52a36", 8 * k);
-      line(x + 28 * k, y - (60 + 34 * up) * k, x + 28 * k, y - (96 + 20 * up) * k, "#cfd6dd", 3 * k);
-      circ(x, y - 83 * k, 11 * k, "#e8b890"); circ(x - 4 * k, y - 85 * k, 1.4 * k, "#2a2a2a"); circ(x + 4 * k, y - 85 * k, 1.4 * k, "#2a2a2a"); line(x - 4 * k, y - 78 * k, x + 4 * k, y - 78 * k, "#6a3a2a", 1.4 * k);
-      poly([x - 20 * k, y - 90 * k, x, y - 104 * k, x + 20 * k, y - 90 * k, x + 14 * k, y - 86 * k, x - 14 * k, y - 86 * k], "#1c1a24");
-      line(x - 12 * k, y - 99 * k, x - 20 * k, y - 114 * k, "#efe9da", 3 * k);
+      softShadow(x, y, 28 * k, 7 * k);
+      tube(x - 7 * k, y - 34 * k, x - 8 * k, y - 4 * k, 11 * k, "#fffaf0", "#b8b2a2"); tube(x + 7 * k, y - 34 * k, x + 8 * k, y - 4 * k, 11 * k, "#fffaf0", "#b8b2a2");
+      tube(x - 8 * k, y - 11 * k, x - 8 * k, y - 3 * k, 12 * k, "#4a4650", "#16141a"); tube(x + 8 * k, y - 11 * k, x + 8 * k, y - 3 * k, 12 * k, "#4a4650", "#16141a");
+      shaded([x - 18 * k, y - 72 * k, x + 18 * k, y - 72 * k, x + 23 * k, y - 28 * k, x - 23 * k, y - 28 * k], x - 23 * k, x + 23 * k, "#d8404c", "#6a1020");
+      shaded([x - 6 * k, y - 72 * k, x + 6 * k, y - 72 * k, x + 4 * k, y - 34 * k, x - 4 * k, y - 34 * k], x - 6 * k, x + 6 * k, "#fffaf0", "#cfc9b8");
+      ell(x, y - 71 * k, 19 * k, 4.8 * k, "#ec5662"); rect(x - 23 * k, y - 38 * k, 46 * k, 5 * k, "#d9b24a");
+      for (var i = 0; i < 4; i++) ball(x, y - 66 * k + i * 8 * k, 2 * k, "#ffe38a", "#b8902a");
+      ell(x - 20 * k, y - 71 * k, 6 * k, 3 * k, "#e8c456"); ell(x + 20 * k, y - 71 * k, 6 * k, 3 * k, "#e8c456");
+      tube(x - 19 * k, y - 68 * k, x - 27 * k, y - 46 * k, 8.5 * k, "#d8404c", "#6a1020"); ball(x - 27 * k, y - 43 * k, 4 * k, "#f0c8a0", "#c08a60");
+      var up = Math.min(1, tt * 1.5);
+      tube(x + 19 * k, y - 68 * k, x + 28 * k, y - (60 + 34 * up) * k, 8.5 * k, "#d8404c", "#6a1020"); ball(x + 28 * k, y - (62 + 34 * up) * k, 4 * k, "#f0c8a0", "#c08a60");
+      tube(x + 28 * k, y - (60 + 34 * up) * k, x + 28 * k, y - (100 + 20 * up) * k, 3 * k, "#f2f6fa", "#8a95a0");
+      tube(x, y - 74 * k, x, y - 78 * k, 8 * k, "#f0c8a0", "#c08a60");
+      ball(x, y - 84 * k, 11.5 * k, "#f6d2ac", "#c08a60");
+      circ(x - 4 * k, y - 85 * k, 1.5 * k, "#2a2a2a"); circ(x + 4 * k, y - 85 * k, 1.5 * k, "#2a2a2a"); line(x - 4.5 * k, y - 88.5 * k, x - 1.5 * k, y - 88 * k, "#3a2a20", 1.2 * k); line(x + 4.5 * k, y - 88.5 * k, x + 1.5 * k, y - 88 * k, "#3a2a20", 1.2 * k); line(x - 4 * k, y - 77.5 * k, x + 4 * k, y - 77.5 * k, "#8a3a2a", 1.5 * k);
+      shaded([x - 22 * k, y - 91 * k, x, y - 106 * k, x + 22 * k, y - 91 * k, x + 15 * k, y - 87 * k, x - 15 * k, y - 87 * k], x - 22 * k, x + 22 * k, "#3a3646", "#14121c");
+      poly([x - 22 * k, y - 91 * k, x, y - 106 * k, x, y - 103 * k, x - 19 * k, y - 90 * k], "#d9b24a"); poly([x + 22 * k, y - 91 * k, x, y - 106 * k, x, y - 103 * k, x + 19 * k, y - 90 * k], "#d9b24a");
+      tube(x - 12 * k, y - 99 * k, x - 21 * k, y - 116 * k, 3.4 * k, "#ffffff", "#c8c8d0");
     }
 
     /* ---------- HUD ---------- */

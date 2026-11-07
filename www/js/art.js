@@ -262,7 +262,8 @@
   };
   // La Fuite : poursuite effrénée, tambours rapides, arpèges tendus
   // La Fuite : poursuite tendue en ré mineur (galop de timbales, caisse claire roulante, cordes graves, cuivres qui montent), Paris 1789
-  THEMES.fuite = { beat: 0.34, chords: [[50, 53, 57], [51, 55, 58], [43, 46, 50], [45, 49, 52], [50, 53, 57], [46, 50, 53], [45, 49, 52], [45, 49, 52]], mel: [62, 65, 69], pad: ["sawtooth", 320, 0.03], drone: [[26, 0.09], [38, 0.05]],
+  THEMES.fuite = { beat: 0.48, file: "audio/fuite.ogg", fallback: "fuiteSynth" };
+  THEMES.fuiteSynth = { beat: 0.34, chords: [[50, 53, 57], [51, 55, 58], [43, 46, 50], [45, 49, 52], [50, 53, 57], [46, 50, 53], [45, 49, 52], [45, 49, 52]], mel: [62, 65, 69], pad: ["sawtooth", 320, 0.03], drone: [[26, 0.09], [38, 0.05]],
     k: pat({ 0: 0.42, 2: 0.2, 4: 0.36, 6: 0.2, 8: 0.42, 10: 0.2, 12: 0.36, 14: 0.24 }), t: pat({ 1: 0.1, 3: 0.12, 5: 0.1, 7: 0.15, 9: 0.1, 11: 0.12, 13: 0.1, 14: 0.1, 15: 0.16 }), bass: 1,
     pl: { type: "sawtooth", decay: 0.16, vol: 0.032, p: [1, 0.8], chord: 1, arp: 1, cut: 700 }, fb: 0.22,
     lead: { type: "sawtooth", cut: 2300, att: 0.02, decay: 0.34, vol: 0.05, vib: 0.4, send: 0.2, bars: BARS(
@@ -359,15 +360,27 @@
         step++; nextT += B / 2;
       }
     }
-    function start(id) {
+    const bufs = {};
+    let fileSrc = null;
+    function loadBuf(url) { if (bufs[url]) return bufs[url]; return (bufs[url] = fetch(url).then((r) => { if (!r.ok) throw new Error("audio"); return r.arrayBuffer(); }).then((ab) => new Promise((ok, ko) => ctx.decodeAudioData(ab, ok, ko))).catch((e) => { delete bufs[url]; throw e; })); }
+    function start(id, over) {
       if (on || !ensure()) return;
-      cfg = THEMES[id] || THEMES.moines; theme = id;
+      cfg = over || THEMES[id] || THEMES.moines; theme = id;
       try {
         if (ctx.state === "suspended") ctx.resume();
         on = true;
         master = ctx.createGain(); master.gain.setValueAtTime(0.0001, ctx.currentTime);
         master.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 3);
         master.connect(ctx.destination);
+        if (cfg.file) {
+          const mine = master, fb = cfg.fallback;
+          loadBuf(cfg.file).then((buf) => {
+            if (!on || master !== mine) return;
+            const src = ctx.createBufferSource(), gg = ctx.createGain();
+            src.buffer = buf; src.loop = true; gg.gain.value = 1.15; src.connect(gg).connect(mine); src.start(); fileSrc = src;
+          }).catch(() => { if (on && master === mine && fb) { stop(); start(id, THEMES[fb]); } });
+          return;
+        }
         echo = ctx.createDelay(1); echo.delayTime.value = cfg.beat * 0.75;
         const fb = ctx.createGain(); fb.gain.value = cfg.fb || 0.38;
         const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
@@ -381,12 +394,12 @@
     function stop() {
       if (!on) return;
       on = false; clearInterval(timer); theme = "";
-      const m = master, d = drone;
+      const m = master, d = drone, fs0 = fileSrc; fileSrc = null;
       try {
         m.gain.cancelScheduledValues(ctx.currentTime);
         m.gain.setValueAtTime(m.gain.value, ctx.currentTime);
         m.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
-        setTimeout(() => { d.forEach((o) => { try { o.stop(); } catch (e) {} }); try { m.disconnect(); } catch (e) {} }, 1500);
+        setTimeout(() => { try { if (fs0) fs0.stop(); } catch (e) {} d.forEach((o) => { try { o.stop(); } catch (e) {} }); try { m.disconnect(); } catch (e) {} }, 1500);
       } catch (e) { /* rien */ }
       master = null; drone = [];
     }
