@@ -160,19 +160,45 @@
     if (!a.length || !a.every((w) => txt.includes(w))) return false;
     return keyWords(x.d.q).some((w) => w.length >= 5 && txt.includes(w));
   };
+  const TSTOP = new Set("quelle quelles quel quels était étaient entre depuis pendant avant après lorsque comment pourquoi laquelle lequel dans leur leurs cette selon aussi appelé appelée nommé vrai faux année siècle roi reine france français française".split(" "));
+  const topicSig = (it) => {
+  const txt = (it.q + " " + ((it.opts || []).find((o) => o.ok) || {}).t || "" + " " + (it.e || "")).toLowerCase();
+  const nums = new Set(txt.match(/\d{3,4}/g) || []);
+  const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !TSTOP.has(w)));
+    return { nums, words };
+  };
+  const topicClash = (a, b) => {
+    let n = 0, w = 0;
+    a.nums.forEach((x) => { if (b.nums.has(x)) n++; });
+    a.words.forEach((x) => { if (b.words.has(x)) w++; });
+    return (n > 0 && w > 0) || w >= 3;
+  };
+
   const levelItems = (e, i) => {
     const lv = e.levels[i];
-    const items = shuffle(lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title)));
-    // Pour varier d'une partie à l'autre : jusqu'à 6 questions de la fiche sont remplacées par des questions simples de la même époque.
+    const own = lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title));
+    const fixed = own.filter((it) => it.type !== "qcm" && it.type !== "tf");
+    const flex = own.filter((it) => it.type === "qcm" || it.type === "tf");
+    let cand = [];
     try {
-      // Seules les questions dont la réponse se trouve dans la fiche (le cours) de ce chapitre peuvent être ajoutées.
-      const hand = easyList().filter((x) => x.era === e.id && !isGen(x) && inLesson(x, lv));
-      const near = shuffle(hand.filter((x) => x.lv === i)).concat(shuffle(hand.filter((x) => x.lv !== i)));
-      const swap = near.slice(0, 6);
-      const slots = shuffle(items.map((it, k) => (it.type === "qcm" ? k : -1)).filter((k) => k >= 0)).slice(0, swap.length);
-      slots.forEach((k, n) => { items[k] = prep("qcm", swap[n].d, swap[n].key, e.title, lv.title); });
+      // Questions simples de la même époque, uniquement celles qui portent sur CE chapitre (écrites pour lui, ou dont la réponse figure dans sa fiche).
+      const hand = easyList().filter((x) => x.era === e.id && !isGen(x));
+      const mine = hand.filter((x) => x.lv === i || (x.lv === undefined && inLesson(x, lv)));
+      cand = mine.map((x) => prep("qcm", x.d, x.key, e.title, lv.title));
     } catch (err) { /* les questions de la fiche suffisent */ }
-    return items;
+    const need = flex.length;
+    // Révision : 2 ou 3 questions de chapitres déjà vus de la même époque.
+    const rev = [];
+    for (let j = 0; j < i; j++) e.levels[j].items.forEach((d, k) => { if (d.type === "qcm" || d.type === "tf") rev.push(prep(d.type, d, `${e.id}:${j}:${k}`, e.title, e.levels[j].title)); });
+    const kRev = i > 0 ? Math.min(rev.length, 2 + Math.floor(Math.random() * 2)) : 0;
+    const chosen = [], sigs = [];
+    const add = (it) => { const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need - kRev) add(it); });
+    shuffle(rev).forEach((it) => { if (chosen.length < need) add(it); });
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) add(it); });
+    // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
+    shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) chosen.push(it); });
+    return shuffle(fixed.concat(chosen));
   };
 
   const displayStreak = () => (S.streak.last === today() || S.streak.last === yesterday() ? S.streak.count : 0);
@@ -372,26 +398,13 @@
       }));
       return pool;
     };
-    const STOP = new Set("quelle quelles quel quels était étaient entre depuis pendant avant après lorsque comment pourquoi laquelle lequel dans leur leurs cette selon aussi appelé appelée nommé vrai faux année siècle roi reine france français française".split(" "));
-    const sig = (it) => {
-      const txt = (it.q + " " + (it.opts.find((o) => o.ok) || {}).t + " " + (it.e || "")).toLowerCase();
-      const nums = new Set(txt.match(/\d{3,4}/g) || []);
-      const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !STOP.has(w)));
-      return { nums, words };
-    };
-    const clash = (a, b) => {
-      let n = 0, w = 0;
-      a.nums.forEach((x) => { if (b.nums.has(x)) n++; });
-      a.words.forEach((x) => { if (b.words.has(x)) w++; });
-      return (n > 0 && w > 0) || w >= 3;
-    };
     const chosen = [];
     const take = (pool, n) => {
       const got = [];
       shuffle(pool).forEach((it) => {
         if (got.length >= n || used.has(it.q)) return;
-        const sg = sig(it);
-        if (chosen.some((c) => clash(c, sg))) return;
+        const sg = topicSig(it);
+        if (chosen.some((c) => topicClash(c, sg))) return;
         used.add(it.q); chosen.push(sg); got.push(it);
       });
       return got;
@@ -1259,15 +1272,15 @@
     let buttons = "";
     if (R.mode === "level") {
       if (failed) {
-        buttons = `<button class="btn btn-gold" data-act="replay">Réessayer le niveau</button>
+        buttons = `<button class="btn btn-gold" data-act="replay">Recommencer le quiz</button>
           <button class="btn btn-line with-icon" data-act="lesson" data-id="${e.id}" data-lv="${R.lvl}"><span class="bi">${UI.book}</span>Lire la fiche</button>`;
       } else {
-        buttons = (R.nextOpen ? `<button class="btn btn-gold" data-act="next-level">Niveau suivant : la fiche</button>` : "")
-          + `<button class="btn ${R.nextOpen ? "btn-line" : "btn-gold"}" data-act="replay">${R.stars < 3 ? "Viser 3 étoiles" : "Rejouer le niveau"}</button>`;
+        buttons = (R.nextOpen ? `<button class="btn btn-gold" data-act="next-level">Étape suivante : la fiche</button>` : "")
+          + `<button class="btn ${R.nextOpen ? "btn-line" : "btn-gold"}" data-act="replay">${R.stars < 3 ? "Recommencer le quiz (viser 3 étoiles)" : "Recommencer le quiz"}</button>`;
       }
-      buttons += `<button class="btn btn-line" data-act="era" data-id="${e.id}">Carte de l'époque</button>`;
+      buttons += `<button class="btn btn-line" data-act="era" data-id="${e.id}">Carte de l'époque</button><button class="btn btn-line" data-act="home">Menu principal</button>`;
     } else {
-      buttons = '<button class="btn btn-gold" data-act="home">Retour aux époques</button>';
+      buttons = '<button class="btn btn-gold" data-act="home">Menu principal</button>';
     }
     return `
     <div class="screen result" ${e ? `style="--accent:${e.accent}"` : ""}>

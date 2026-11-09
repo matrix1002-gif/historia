@@ -81,7 +81,7 @@
     "Nouveau rang": "New rank", "Nouveau personnage": "New character", "Nouveau personnage légendaire": "New legendary character",
     "Médaille obtenue": "Medal earned", "Médailles obtenues": "Medals earned", "À retenir": "To remember",
     "Réessayer le niveau": "Retry the level", "Lire la fiche": "Read the lesson", "Niveau suivant : la fiche": "Next level: the lesson",
-    "Viser 3 étoiles": "Aim for 3 stars", "Rejouer le niveau": "Replay the level", "Carte de l'époque": "Era map", "Menu principal": "Main menu", "Retour aux époques": "Back to the eras",
+    "Viser 3 étoiles": "Aim for 3 stars", "Rejouer le niveau": "Replay the level", "Carte de l'époque": "Era map", "Menu principal": "Main menu", "Recommencer le quiz": "Restart the quiz", "Recommencer le quiz (viser 3 étoiles)": "Restart the quiz (aim for 3 stars)", "Étape suivante : la fiche": "Next step: the lesson", "Retour aux époques": "Back to the eras",
     "Teste-toi sur toutes les époques ou sur un seul thème. Pour apprendre d'abord, va dans « Apprendre ».": "Test yourself on every era or on a single theme. To learn first, go to “Learn”.",
     "Le Trésor du Royaume": "The Kingdom's Treasure",
     "15 questions, de plus en plus ardues. Gagne jusqu'à": "15 questions, harder and harder. Win up to",
