@@ -219,14 +219,14 @@
     const PLACE = /(?:^|\s)(?:à|en|au|aux|dans|vers|près de|depuis|de)\s$/i, PERS = /(?:roi|reine|duc|duchesse|comte|empereur|impératrice|pape|évêque|abbé|saint|sainte|chef|général|cardinal|marquis|prince|princesse|nommé|nommée|appelé|appelée|dit|surnommé|ministre|moine|maréchal|chevalier|philosophe|écrivain|Mme|Madame|Monsieur)\s$/i;
     const cls = {}; const names = [];
     const okS = (st) => /^[A-ZÉÈÀÂÎÔÛ«]/.test(st) && /[.!?»]$/.test(st);
-    sents.filter(okS).forEach((st) => { let m; NAME.lastIndex = 0; while ((m = NAME.exec(st))) { const n = m[0].trim(); if (m.index === 0 || BAD.has(n) || n.length < 4) continue; const before = st.slice(0, m.index); const c = PERS.test(before) ? "p" : /(?:\s|^)(?:à|en|au|aux|dans|vers)\s$/i.test(before) ? "l" : null; if (c && !cls[n]) { cls[n] = c; names.push(n); } } });
+    sents.filter(okS).forEach((st) => { let m; NAME.lastIndex = 0; while ((m = NAME.exec(st))) { const n = m[0].trim(); if (m.index === 0 || BAD.has(n) || n.length < 4) continue; const before = st.slice(0, m.index); const c = PERS.test(before) ? "p" : /(?:\s|^)(?:à|en|au|dans|vers)\s$/i.test(before) ? "l" : null; if (c && !cls[n]) { cls[n] = c; names.push(n); } } });
     const yearOpts = (y) => { const o = new Set(); [-1, 1, -2.4, 2.2, -3.5, 3.7].forEach((m) => { const sp = y > 1500 ? 4 : 10; const v = Math.round(y + m * sp); if (v > 0 && v !== y) o.add(String(v)); }); return Array.from(o).slice(0, 3); };
     sents.filter(okS).forEach((st, k) => {
       if (/av\. ?J/.test(st)) return;
       const ys = st.match(/(?<![\d ])\b(?:[5-9]\d{2}|1\d{3})\b(?![\d])/g) || [];
       if (ys.length === 1 && !/\d[\d  ]{0,2}\d{3}\b/.test(st.replace(ys[0], ""))) {
         const y = +ys[0], q = st.replace(ys[0], "…");
-        out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: ys[0], w: yearOpts(y), e: st }, `${e.id}:${i}:cy${k}`, e.title, lv.title), { sigTxt: (st + " " + ys[0]).toLowerCase() }));
+        out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: ys[0], w: yearOpts(y), e: st }, `${e.id}:${i}:cy${k}`, e.title, lv.title), { sigTxt: (st + " " + ys[0]).toLowerCase(), cloze: true }));
       }
       const own = (st.slice(1).match(NAME) || []).map((n) => n.trim()).filter((n) => names.includes(n));
       const uniq = Array.from(new Set(own));
@@ -235,7 +235,7 @@
         const pool = names.filter((n) => n !== a && cls[n] === cls[a] && !a.includes(n) && !n.includes(a) && !st.includes(n));
         if (pool.length >= 3) {
           const q = st.split(a).join("…");
-          out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: a, w: shuffle(pool).slice(0, 3), e: st }, `${e.id}:${i}:cn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase() }));
+          out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: a, w: shuffle(pool).slice(0, 3), e: st }, `${e.id}:${i}:cn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase(), cloze: true }));
         }
       }
     });
@@ -256,7 +256,8 @@
     const chosen = [], sigs = [];
     fixed.filter((it) => it.type === "year").forEach((it) => sigs.push(topicSig(Object.assign({}, it, { sigTxt: it.q + " " + it.y }))));
     const add = (it) => { const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
-    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need) add(it); });
+    let nCloze = 0;
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || (it.cloze && nCloze >= 1)) return; if (add(it) && it.cloze) nCloze++; });
     // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
     shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) chosen.push(it); });
     return shuffle(fixed.concat(chosen));
