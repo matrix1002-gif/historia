@@ -162,7 +162,7 @@
   };
   const TSTOP = new Set("quelle quelles quel quels était étaient entre depuis pendant avant après lorsque comment pourquoi laquelle lequel dans leur leurs cette selon aussi appelé appelée nommé vrai faux année siècle roi reine france français française".split(" "));
   const topicSig = (it) => {
-  const txt = (it.q + " " + ((it.opts || []).find((o) => o.ok) || {}).t || "" + " " + (it.e || "")).toLowerCase();
+  const txt = (it.sigTxt || (it.q + " " + ((it.opts || []).find((o) => o.ok) || {}).t || "" + " " + (it.e || ""))).toLowerCase();
   const nums = new Set(txt.match(/\d{3,4}/g) || []);
   const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !TSTOP.has(w)));
     return { nums, words };
@@ -174,6 +174,40 @@
     return (n > 0 && w > 0) || w >= 3;
   };
 
+  /* Questions supplémentaires tirées du contenu du chapitre lui-même (associations, frises, dates). */
+  const derivedFromLevel = (e, i) => {
+    const lv = e.levels[i], out = [];
+    const mk = (q, c, w, ex, sg, tag) => { const ws = Array.from(new Set(w)).filter((x) => x && x !== c); if (ws.length < 3) return; out.push(Object.assign(prep("qcm", { q, c, w: shuffle(ws).slice(0, 3), e: ex }, `${e.id}:${i}:d${tag}${out.length}`, e.title, lv.title), { sigTxt: sg.toLowerCase() })); };
+    const num = (v) => (/^\d{3,4}$/.test(String(v).trim()) ? +v : null);
+    const yearOpts = (y, spread) => { const o = new Set(); [-2.2, -1, 1, 2.4, -3.1, 3.3].forEach((m) => { const v = Math.round(y + m * spread); if (v > 0 && v !== y && v <= 2000) o.add(String(v)); }); return Array.from(o).slice(0, 3); };
+    lv.items.forEach((d) => {
+      if (d.type === "match" && d.pairs && d.pairs.length >= 3) {
+        const stem = d.q.replace(/[.\s]+$/, "");
+        d.pairs.forEach((pr, k) => {
+          const others = d.pairs.filter((_, m) => m !== k);
+          mk(`${stem} — que faut-il associer à « ${pr[0]} » ?`, pr[1], others.map((x) => x[1]), `${pr[0]} : ${pr[1]}.`, `${pr[0]} ${pr[1]}`, "m");
+          mk(`${stem} — à quoi correspond « ${pr[1]} » ?`, pr[0], others.map((x) => x[0]), `${pr[1]} : ${pr[0]}.`, `${pr[0]} ${pr[1]}`, "n");
+        });
+      } else if (d.type === "order" && d.items && d.items.length >= 4) {
+        const dated = d.items.filter((x) => num(x.y) !== null);
+        if (dated.length >= 4) {
+          const ys = dated.map((x) => num(x.y));
+          if (new Set(ys).size === ys.length) {
+            const first = dated.slice().sort((a, b) => num(a.y) - num(b.y))[0], last = dated.slice().sort((a, b) => num(b.y) - num(a.y))[0];
+            const chron = dated.slice().sort((a, b) => num(a.y) - num(b.y)).map((x) => `${x.t} (${x.y})`).join(" → ");
+            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus ancien ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), first.t, dated.filter((x) => x !== first).map((x) => x.t), chron, dated.map((x) => x.t).join(" "), "o");
+            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus récent ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), last.t, dated.filter((x) => x !== last).map((x) => x.t), chron, dated.map((x) => x.t).join(" ") + " récent", "p");
+          }
+          dated.forEach((x) => { const y = num(x.y); mk(`En quelle année a lieu l'événement suivant : « ${x.t} » ?`, String(y), yearOpts(y, Math.max(4, Math.round((Math.max(...ys) - Math.min(...ys)) / 6))), `${x.t} : ${y}.`, `${x.t} ${y}`, "y"); });
+        }
+      } else if (d.type === "year" && d.y > 0 && d.max > d.min) {
+        const sp = Math.max(3, Math.round((d.max - d.min) / 12));
+        mk(d.q, String(d.y), yearOpts(d.y, sp), d.e || "", `${d.q} ${d.y}`, "z");
+      }
+    });
+    return out;
+  };
+
   const levelItems = (e, i) => {
     const lv = e.levels[i];
     const own = lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title));
@@ -181,21 +215,14 @@
     const flex = own.filter((it) => it.type === "qcm" || it.type === "tf");
     let cand = [];
     try {
-      // Questions simples de la même époque, uniquement celles qui portent sur CE chapitre (écrites pour lui, ou dont la réponse figure dans sa fiche).
-      const hand = easyList().filter((x) => x.era === e.id && !isGen(x));
-      const mine = hand.filter((x) => x.lv === i || (x.lv === undefined && inLesson(x, lv)));
-      cand = mine.map((x) => prep("qcm", x.d, x.key, e.title, lv.title));
+      // Uniquement la matière du chapitre : questions écrites pour lui, et questions fabriquées à partir de son propre contenu.
+      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(derivedFromLevel(e, i));
     } catch (err) { /* les questions de la fiche suffisent */ }
     const need = flex.length;
-    // Révision : 2 ou 3 questions de chapitres déjà vus de la même époque.
-    const rev = [];
-    for (let j = 0; j < i; j++) e.levels[j].items.forEach((d, k) => { if (d.type === "qcm" || d.type === "tf") rev.push(prep(d.type, d, `${e.id}:${j}:${k}`, e.title, e.levels[j].title)); });
-    const kRev = i > 0 ? Math.min(rev.length, 2 + Math.floor(Math.random() * 2)) : 0;
     const chosen = [], sigs = [];
+    fixed.filter((it) => it.type === "year").forEach((it) => sigs.push(topicSig(Object.assign({}, it, { sigTxt: it.q + " " + it.y }))));
     const add = (it) => { const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
-    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need - kRev) add(it); });
-    shuffle(rev).forEach((it) => { if (chosen.length < need) add(it); });
-    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) add(it); });
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length < need) add(it); });
     // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
     shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) chosen.push(it); });
     return shuffle(fixed.concat(chosen));
