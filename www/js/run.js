@@ -34,8 +34,8 @@
   var CHAL = ["#9a4a3a", "#4a5f7a", "#b9a05a", "#5f7a54", "#a8764a"];
   EVIDS.forEach(function (k) { EV[k].id = k; });
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 16 + 36 * (1 - Math.exp(-t / 18)) + Math.min(t, 150) * 0.09; }
-  function rowTime(t) { return Math.max(0.46, 1.3 - t * 0.03); }
+  function speedAt(t) { return 17 + 34 * (1 - Math.exp(-t / 20)) + Math.min(t, 240) * 0.17; }
+  function rowTime(t) { return Math.max(0.3 + Math.max(0, 1 - Math.max(0, t - 45) / 90) * 0.1, 1.2 - t * 0.024); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function mixx(c, h, t) { var a = c.indexOf("rgb") === 0 ? c.match(/\d+/g).map(Number) : hex(c), b = hex(h); return "rgb(" + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
@@ -214,8 +214,8 @@
         var c = []; for (var q0 = -1; q0 <= 1; q0++) if (q0 !== lf0 && Math.abs(q0 - lf0) <= maxd) c.push(q0);
         return rnd() < 0.88 && c.length ? c[Math.floor(rnd() * c.length)] : lf0;
       };
-      var rt = Math.max(0.5, rowTime(st.t) * (n > 3 && rnd() < diff * 0.35 ? 0.8 : 1));
-      if (kind !== "lanes") rt = Math.max(rt, st.t > 30 ? 0.8 : 0.86);
+      var rt = Math.max(0.28, rowTime(st.t) * (n > 3 && rnd() < diff * 0.3 ? 0.85 : 1));
+      if (kind !== "lanes") rt = Math.max(rt, st.t > 45 ? 0.6 : st.t > 25 ? 0.7 : 0.86);
       st.gapT = rt; st.lastKind = kind;
       if (kind === "alllow") { var tl = pick(pool.low); for (var l = -1; l <= 1; l++) st.obs.push({ type: tl, cat: "low", lane: l, z: z, hit: false }); }
       else if (kind === "mix") { for (var lm = -1; lm <= 1; lm++) { var cm = rnd() < 0.5 ? "low" : "high"; st.obs.push({ type: pick(pool[cm]), cat: cm, lane: lm, z: z, hit: false }); } }

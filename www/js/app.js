@@ -372,9 +372,28 @@
       }));
       return pool;
     };
+    const STOP = new Set("quelle quelles quel quels était étaient entre depuis pendant avant après lorsque comment pourquoi laquelle lequel dans leur leurs cette selon aussi appelé appelée nommé vrai faux année siècle roi reine france français française".split(" "));
+    const sig = (it) => {
+      const txt = (it.q + " " + (it.opts.find((o) => o.ok) || {}).t + " " + (it.e || "")).toLowerCase();
+      const nums = new Set(txt.match(/\d{3,4}/g) || []);
+      const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !STOP.has(w)));
+      return { nums, words };
+    };
+    const clash = (a, b) => {
+      let n = 0, w = 0;
+      a.nums.forEach((x) => { if (b.nums.has(x)) n++; });
+      a.words.forEach((x) => { if (b.words.has(x)) w++; });
+      return (n > 0 && w > 0) || w >= 3;
+    };
+    const chosen = [];
     const take = (pool, n) => {
       const got = [];
-      shuffle(pool).forEach((it) => { if (got.length < n && !used.has(it.q)) { used.add(it.q); got.push(it); } });
+      shuffle(pool).forEach((it) => {
+        if (got.length >= n || used.has(it.q)) return;
+        const sg = sig(it);
+        if (chosen.some((c) => clash(c, sg))) return;
+        used.add(it.q); chosen.push(sg); got.push(it);
+      });
       return got;
     };
     const easy = easyPool(scope);
@@ -1465,7 +1484,7 @@
       <div class="stack">
         <button class="btn btn-gold" data-act="tstart" data-scope="${r.scope}">Rejouer</button>
         <button class="btn btn-line" data-act="tresor">Menu du Trésor</button>
-        <button class="btn btn-line" data-act="home">Retour aux époques</button>
+        <button class="btn btn-line" data-act="home">Menu principal</button>
       </div>
       ${adSlot()}
     </div>`;
