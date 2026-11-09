@@ -208,6 +208,40 @@
     return out;
   };
 
+  /* Questions « Complète la phrase » : phrases du cours du chapitre, avec une date ou un nom masqué. */
+  const clozeFromLesson = (e, i) => {
+    const lv = e.levels[i], out = [];
+    const txt = String((lv.lesson && lv.lesson.p) || "") + "\n" + lv.items.map((d) => d.e || "").join("\n");
+    if (!txt) return out;
+    const sents = txt.replace(/\n+## [^\n]*\n+/g, "\n").split(/(?<=[.!?»])\s+|\n+/).map((x) => x.trim()).filter((x, k2, arr) => x.length >= 45 && x.length <= 230 && arr.indexOf(x) === k2);
+    const NAME = /(?<![’'\p{L}])\p{Lu}[\p{L}’'-]+(?:\s(?:de la|de|du|des|d’|d')?\s?\p{Lu}[\p{L}’'-]+)*/gu;
+    const BAD = new Set("Je Tu Il Elle Nous Vous Ils Elles On Le La Les Un Une Des En Dans Mais Puis Or Car Ce Cet Cette Ces Voilà Imagine Pour Avec Sans Sous Sur Quand Comme Si Ainsi Alors Aujourd Après Avant Depuis Pendant Selon Chez Entre Vers Dieu Roi Reine Pape Empereur Seigneur Saint Sainte".split(" "));
+    const PLACE = /(?:^|\s)(?:à|en|au|aux|dans|vers|près de|depuis|de)\s$/i, PERS = /(?:roi|reine|duc|duchesse|comte|empereur|impératrice|pape|évêque|abbé|saint|sainte|chef|général|cardinal|marquis|prince|princesse|nommé|nommée|appelé|appelée|dit|surnommé|ministre|moine|maréchal|chevalier|philosophe|écrivain|Mme|Madame|Monsieur)\s$/i;
+    const cls = {}; const names = [];
+    const okS = (st) => /^[A-ZÉÈÀÂÎÔÛ«]/.test(st) && /[.!?»]$/.test(st);
+    sents.filter(okS).forEach((st) => { let m; NAME.lastIndex = 0; while ((m = NAME.exec(st))) { const n = m[0].trim(); if (m.index === 0 || BAD.has(n) || n.length < 4) continue; const before = st.slice(0, m.index); const c = PERS.test(before) ? "p" : /(?:\s|^)(?:à|en|au|aux|dans|vers)\s$/i.test(before) ? "l" : null; if (c && !cls[n]) { cls[n] = c; names.push(n); } } });
+    const yearOpts = (y) => { const o = new Set(); [-1, 1, -2.4, 2.2, -3.5, 3.7].forEach((m) => { const sp = y > 1500 ? 4 : 10; const v = Math.round(y + m * sp); if (v > 0 && v !== y) o.add(String(v)); }); return Array.from(o).slice(0, 3); };
+    sents.filter(okS).forEach((st, k) => {
+      if (/av\. ?J/.test(st)) return;
+      const ys = st.match(/(?<![\d ])\b(?:[5-9]\d{2}|1\d{3})\b(?![\d])/g) || [];
+      if (ys.length === 1 && !/\d[\d  ]{0,2}\d{3}\b/.test(st.replace(ys[0], ""))) {
+        const y = +ys[0], q = st.replace(ys[0], "…");
+        out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: ys[0], w: yearOpts(y), e: st }, `${e.id}:${i}:cy${k}`, e.title, lv.title), { sigTxt: (st + " " + ys[0]).toLowerCase() }));
+      }
+      const own = (st.slice(1).match(NAME) || []).map((n) => n.trim()).filter((n) => names.includes(n));
+      const uniq = Array.from(new Set(own));
+      if (uniq.length >= 1 && uniq.length <= 3 && cls[uniq[0]]) {
+        const a = uniq[0];
+        const pool = names.filter((n) => n !== a && cls[n] === cls[a] && !a.includes(n) && !n.includes(a) && !st.includes(n));
+        if (pool.length >= 3) {
+          const q = st.split(a).join("…");
+          out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: a, w: shuffle(pool).slice(0, 3), e: st }, `${e.id}:${i}:cn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase() }));
+        }
+      }
+    });
+    return out;
+  };
+
   const levelItems = (e, i) => {
     const lv = e.levels[i];
     const own = lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title));
@@ -216,7 +250,7 @@
     let cand = [];
     try {
       // Uniquement la matière du chapitre : questions écrites pour lui, et questions fabriquées à partir de son propre contenu.
-      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(derivedFromLevel(e, i));
+      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(derivedFromLevel(e, i), clozeFromLesson(e, i));
     } catch (err) { /* les questions de la fiche suffisent */ }
     const need = flex.length;
     const chosen = [], sigs = [];
