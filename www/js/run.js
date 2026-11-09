@@ -34,8 +34,8 @@
   var CHAL = ["#9a4a3a", "#4a5f7a", "#b9a05a", "#5f7a54", "#a8764a"];
   EVIDS.forEach(function (k) { EV[k].id = k; });
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 15 + 32 * (1 - Math.exp(-t / 20)) + Math.min(t, 150) * 0.07; }
-  function rowTime(t) { return Math.max(0.5, 1.4 - t * 0.026); }
+  function speedAt(t) { return 16 + 36 * (1 - Math.exp(-t / 18)) + Math.min(t, 150) * 0.09; }
+  function rowTime(t) { return Math.max(0.46, 1.3 - t * 0.03); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function mixx(c, h, t) { var a = c.indexOf("rgb") === 0 ? c.match(/\d+/g).map(Number) : hex(c), b = hex(h); return "rgb(" + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
@@ -207,25 +207,27 @@
       var diff = Math.min(1, st.t / 40), b = bioAt(st.dist + z * 1.4), pool = (evAt(st.dist + z * 1.4) || {}).pool || POOL[b];
       var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
       var rtPrev = st.gapT || 1.1, r = rnd();
-      var fx = Math.min(1.6, 0.05 + st.t / 22), kind = n < 5 ? "lanes" : r < 0.14 * fx ? "alllow" : r < 0.28 * fx ? "allhigh" : r < 0.46 * fx ? "mix" : r < 0.62 * fx ? "mixb" : "lanes";
-      if (kind !== "lanes" && kind === st.lastKindRow && (st.runLen || 1) >= 2) kind = "lanes";
-      st.runLen = kind === st.lastKindRow ? (st.runLen || 1) + 1 : 1;
+      var fx = Math.min(1.6, 0.5 + st.t / 20), kind = n < 4 ? "lanes" : r < 0.07 * fx ? "alllow" : r < 0.14 * fx ? "allhigh" : r < 0.34 * fx ? "mixb" : "lanes";
+      if (kind !== "lanes" && kind === st.lastKindRow) kind = "lanes";
+      var lf0 = st.lastFree || 0, maxd = rtPrev < 0.78 ? 1 : 2;
+      var nextFree = function () {
+        var c = []; for (var q0 = -1; q0 <= 1; q0++) if (q0 !== lf0 && Math.abs(q0 - lf0) <= maxd) c.push(q0);
+        return rnd() < 0.88 && c.length ? c[Math.floor(rnd() * c.length)] : lf0;
+      };
       var rt = Math.max(0.5, rowTime(st.t) * (n > 3 && rnd() < diff * 0.35 ? 0.8 : 1));
       if (kind !== "lanes") rt = Math.max(rt, st.t > 30 ? 0.8 : 0.86);
       st.gapT = rt; st.lastKind = kind;
       if (kind === "alllow") { var tl = pick(pool.low); for (var l = -1; l <= 1; l++) st.obs.push({ type: tl, cat: "low", lane: l, z: z, hit: false }); }
       else if (kind === "mix") { for (var lm = -1; lm <= 1; lm++) { var cm = rnd() < 0.5 ? "low" : "high"; st.obs.push({ type: pick(pool[cm]), cat: cm, lane: lm, z: z, hit: false }); } }
-      else if (kind === "mixb") { var sf = Math.floor(rnd() * 3) - 1; if (st.lastKindRow === "lanes" && rtPrev < 0.78) sf = Math.max(-1, Math.min(1, st.lastFree + Math.floor(rnd() * 3) - 1)); st.lastFree = sf; for (var lb = -1; lb <= 1; lb++) { var qb = rnd(), cb = lb === sf ? (qb < 0.5 ? "low" : "high") : qb < 0.34 ? "low" : qb < 0.67 ? "high" : "block"; st.obs.push({ type: pick(pool[cb]), cat: cb, lane: lb, z: z, hit: false }); } }
+      else if (kind === "mixb") { var sf = nextFree(); st.lastFree = sf; for (var lb = -1; lb <= 1; lb++) { var qb = rnd(), cb = lb === sf ? (qb < 0.5 ? "low" : "high") : qb < 0.34 ? "low" : qb < 0.67 ? "high" : "block"; st.obs.push({ type: pick(pool[cb]), cat: cb, lane: lb, z: z, hit: false }); } }
       else if (kind === "allhigh") { var th = pick(pool.high); for (var l2 = -1; l2 <= 1; l2++) st.obs.push({ type: th, cat: "high", lane: l2, z: z, hit: false }); }
       else {
-        var shift = rnd() < 0.5 ? 0 : (rnd() < 0.5 ? -1 : 1);
-        if (rtPrev >= 0.78 && rnd() < 0.3 + diff * 0.25 && st.lastKindRow === "lanes") shift = st.lastFree === 0 ? (rnd() < 0.5 ? -2 : 2) : -2 * st.lastFree;
-        var free = Math.max(-1, Math.min(1, st.lastFree + shift));
+        var free = nextFree();
         st.lastFree = free;
         for (var ln = -1; ln <= 1; ln++) {
           if (ln === free) { if (rnd() < 0.6) { var cn = 3 + Math.floor(rnd() * 3); for (var ci = 0; ci < cn; ci++) st.coinsL.push({ lane: ln, z: z - 3 + ci * 1.8, got: false }); } continue; }
           if (n < 3 && rnd() < 0.5) continue;
-          var q = rnd(), cat = q < 0.4 ? "low" : q < 0.62 ? "block" : "high";
+          var q = rnd(), cat = q < 0.3 ? "low" : q < 0.7 ? "block" : "high";
           st.obs.push({ type: pick(pool[cat]), cat: cat, lane: ln, z: z, hit: false });
         }
       }
