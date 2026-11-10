@@ -177,16 +177,18 @@
   /* Questions supplémentaires tirées du contenu du chapitre lui-même (associations, frises, dates). */
   const derivedFromLevel = (e, i) => {
     const lv = e.levels[i], out = [];
-    const mk = (q, c, w, ex, sg, tag) => { const ws = Array.from(new Set(w)).filter((x) => x && x !== c); if (ws.length < 3) return; out.push(Object.assign(prep("qcm", { q, c, w: shuffle(ws).slice(0, 3), e: ex }, `${e.id}:${i}:d${tag}${out.length}`, e.title, lv.title), { sigTxt: sg.toLowerCase() })); };
+    let curK = -1;
+    const mk = (q, c, w, ex, sg, tag) => { const ws = Array.from(new Set(w)).filter((x) => x && x !== c); if (ws.length < 3) return; out.push(Object.assign(prep("qcm", { q, c, w: shuffle(ws).slice(0, 3), e: ex }, `${e.id}:${i}:d${tag}${out.length}`, e.title, lv.title), { sigTxt: sg.toLowerCase(), src: curK })); };
     const num = (v) => (/^\d{3,4}$/.test(String(v).trim()) ? +v : null);
     const yearOpts = (y, spread) => { const o = new Set(); [-2.2, -1, 1, 2.4, -3.1, 3.3].forEach((m) => { const v = Math.round(y + m * spread); if (v > 0 && v !== y && v <= 2000) o.add(String(v)); }); return Array.from(o).slice(0, 3); };
-    lv.items.forEach((d) => {
+    lv.items.forEach((d, kk) => {
+      curK = kk;
       if (d.type === "match" && d.pairs && d.pairs.length >= 3) {
         const stem = d.q.replace(/[.\s]+$/, "");
         d.pairs.forEach((pr, k) => {
           const others = d.pairs.filter((_, m) => m !== k);
-          mk(`${stem} — que faut-il associer à « ${pr[0]} » ?`, pr[1], others.map((x) => x[1]), `${pr[0]} : ${pr[1]}.`, `${pr[0]} ${pr[1]}`, "m");
-          mk(`${stem} — à quoi correspond « ${pr[1]} » ?`, pr[0], others.map((x) => x[0]), `${pr[1]} : ${pr[0]}.`, `${pr[0]} ${pr[1]}`, "n");
+          mk(`Quelle réponse correspond à « ${pr[0]} » ?`, pr[1], others.map((x) => x[1]), `${pr[0]} : ${pr[1]}.`, `${pr[0]} ${pr[1]}`, "m");
+          mk(`Quelle réponse correspond à « ${pr[1]} » ?`, pr[0], others.map((x) => x[0]), `${pr[1]} : ${pr[0]}.`, `${pr[0]} ${pr[1]}`, "n");
         });
       } else if (d.type === "order" && d.items && d.items.length >= 4) {
         const dated = d.items.filter((x) => num(x.y) !== null);
@@ -245,16 +247,32 @@
   const levelItems = (e, i) => {
     const lv = e.levels[i];
     const own = lv.items.map((d, k) => prep(d.type, d, `${e.id}:${i}:${k}`, e.title, lv.title));
-    const fixed = own.filter((it) => it.type !== "qcm" && it.type !== "tf");
     const flex = own.filter((it) => it.type === "qcm" || it.type === "tf");
+    const dv = (() => { try { return derivedFromLevel(e, i); } catch (err) { return []; } })();
+    const sigs = [];
+    const regFixed = (d, it) => {
+      if (d.type === "match" && d.pairs) d.pairs.forEach((pr) => sigs.push(topicSig({ sigTxt: (pr[0] + " " + pr[1]).toLowerCase() })));
+      else if (d.type === "order" && d.items) d.items.forEach((x) => sigs.push(topicSig({ sigTxt: (x.t + " " + x.y).toLowerCase() })));
+      else if (d.type === "year") sigs.push(topicSig({ sigTxt: (d.q + " " + d.y).toLowerCase() }));
+      else sigs.push(topicSig(it));
+    };
+    // Exercices (association, frise, date) : soit l'exercice lui-même, soit UNE question tirée du même contenu, jamais les deux.
+    const fixed = [], derivedSrc = new Set();
+    lv.items.forEach((d, k) => {
+      if (d.type === "qcm" || d.type === "tf") return;
+      const mine = dv.filter((x) => x.src === k);
+      if (mine.length && Math.random() < 0.5) {
+        const pick = shuffle(mine)[0];
+        fixed.push(pick); sigs.push(topicSig(pick)); derivedSrc.add(k);
+      } else { const it = own[k]; fixed.push(it); regFixed(d, it); }
+    });
     let cand = [];
     try {
-      // Uniquement la matière du chapitre : questions écrites pour lui, et questions fabriquées à partir de son propre contenu.
-      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(derivedFromLevel(e, i), clozeFromLesson(e, i));
+      // Uniquement la matière du chapitre : questions écrites pour lui, et phrases à trous de sa fiche.
+      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(clozeFromLesson(e, i));
     } catch (err) { /* les questions de la fiche suffisent */ }
     const need = flex.length;
-    const chosen = [], sigs = [];
-    fixed.filter((it) => it.type === "year").forEach((it) => sigs.push(topicSig(Object.assign({}, it, { sigTxt: it.q + " " + it.y }))));
+    const chosen = [];
     const add = (it) => { const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
     let nCloze = 0;
     shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || (it.cloze && nCloze >= 1)) return; if (add(it) && it.cloze) nCloze++; });
@@ -637,6 +655,7 @@
     if (view.name === "lesson" && eraById(view.id)) return ($app.innerHTML = lessonScreen(eraById(view.id), view.lv || 0));
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
+    if (view.name === "settings") { $app.innerHTML = withTabs(settingsScreen(), "home"); return; }
     if (view.name === "board") { $app.innerHTML = withTabs(boardScreen(), "tresor"); return; }
     if (view.name === "jeux") { $app.innerHTML = withTabs(jeuxMenu(), "jeux"); return; }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
@@ -803,7 +822,7 @@
     DF.game = window.HistoriaDefense.create(canvas, { lang: EN ? "en" : "fr", sfx, buzz, onOver: (r) => { if (DF) dfRec(r); }, onEnd: (r) => { if (DF) { DF.phase = "end"; dfEnd(r); } } });
     DF.game.start();
   }
-  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="df-back" data-act="dfquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button><button class="icon-btn snd-btn df-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button>
+  const defenseScreen = () => `<div class="screen dfscreen" id="defense"><button class="df-back" data-act="dfquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button>
     <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : conquête de territoires", "Game: conquer territories")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function defenseCard() {
     const st = (S.stats && S.stats.defense) || { plays: 0, wins: 0, best: 0 };
@@ -885,7 +904,7 @@
     RN.game = rnMake();
     RN.game.start();
   }
-  const runScreen = () => `<div class="screen dfscreen" id="run"><button class="df-back" data-act="rnquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button><button class="icon-btn snd-btn df-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button>
+  const runScreen = () => `<div class="screen dfscreen" id="run"><button class="df-back" data-act="rnquit" aria-label="${L2("Retour", "Back")}">${UI.back}<span>${L2("Retour", "Back")}</span></button>
     <div class="df-wrap"><canvas id="df-canvas" aria-label="${L2("Jeu : fuir la garde royale", "Game: escape the royal guard")}"></canvas><div class="df-over" id="df-over"></div></div></div>`;
   function runCard() {
     const st = (S.stats && S.stats.run) || { plays: 0, best: 0 };
@@ -938,6 +957,7 @@
     return `
     <div class="screen">
       <header class="brand">
+        <button class="set-pill" data-act="settings" aria-label="${L2("Paramètres", "Settings")}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         <button class="lang-pill" data-act="lang" aria-label="Langue / Language">${EN ? "FR" : "EN"}</button>
         <h1 class="wordmark">HISTORIA</h1>
         <p class="tagline">L'histoire de France et de la chrétienté</p>
@@ -1369,7 +1389,7 @@
   }
 
   /* ===== Écrans : Trésor, personnages, médailles ===== */
-  const topBar = (title) => `<div class="top"><h1 class="page-title">${esc(title)}</h1><button class="icon-btn snd-btn top-snd" data-act="tmuteall" aria-label="${L2("Couper / remettre le son", "Mute / unmute sound")}">${UI.sound(!allMuted())}</button></div>`;
+  const topBar = (title) => `<div class="top"><h1 class="page-title">${esc(title)}</h1></div>`;
   const allMuted = () => S.music === false && !S.sound;
 
   function jeuxMenu() {
@@ -1451,6 +1471,25 @@
         <p class="mix-note">${L2("Un compte (e-mail + pseudo) est nécessaire, et une connexion internet. Seuls ton pseudo et ton record sont publics.", "An account (e-mail + nickname) and an internet connection are required. Only your nickname and record are public.")}</p>`;
     }
     return `<div class="screen">${topBar(L2("Classement", "Leaderboard"))}${body}<button class="btn btn-line" data-act="back">${L2("Retour", "Back")}</button></div>`;
+  }
+  const afterTog = () => { if (view.name === "settings") render(); else { closeSheet(); openRanks(); } };
+  function settingsScreen() {
+    const VIB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8M2 10v4M22 10v4"/></svg>';
+    const tg = (act, on, label, hint) => `<button class="set-row ${on ? "on" : ""}" data-act="${act}" role="switch" aria-checked="${on}"><span class="set-ic">${act === "tvib" ? VIB : UI.sound(on)}</span><span class="set-tx"><b>${label}</b><small>${hint}</small></span><span class="set-sw" aria-hidden="true"><i></i></span></button>`;
+    return `<div class="screen">${topBar(L2("Paramètres", "Settings"))}
+      <h2 class="section">${L2("Son et vibrations", "Sound and vibration")}</h2>
+      ${tg("tmusic", S.music !== false, L2("Musique", "Music"), L2("Musique des jeux et des quiz", "Music in games and quizzes"))}
+      ${tg("tsound", !!S.sound, L2("Effets sonores", "Sound effects"), L2("Bruitages, sauts, réponses", "Sound effects, jumps, answers"))}
+      ${tg("tvib", !!S.vib, L2("Vibrations", "Vibration"), L2("Retour tactile dans les jeux", "Haptic feedback in games"))}
+      <h2 class="section">${L2("Langue", "Language")}</h2>
+      <div class="langrow" role="group" aria-label="Langue / Language"><button class="seg ${EN ? "" : "on"}" data-act="setlang" data-l="fr">Français</button><button class="seg ${EN ? "on" : ""}" data-act="setlang" data-l="en">English</button></div>
+      ${canSell() ? `<h2 class="section">${L2("Publicités", "Ads")}</h2>${noAdsCard()}` : ""}
+      <h2 class="section">${L2("Compte", "Account")}</h2>
+      <button class="btn btn-line" data-act="bdopen">${L2("Classement des joueurs et mon compte", "Player leaderboard and my account")}</button>
+      <h2 class="section">${L2("Informations", "Information")}</h2>
+      <button class="btn btn-line" data-act="privacy">${L2("Confidentialité", "Privacy policy")}</button>
+      <button class="btn btn-line" data-act="reset">${L2("Effacer ma progression", "Erase my progress")}</button>
+      <button class="btn btn-line" data-act="back">${L2("Retour", "Back")}</button></div>`;
   }
   function boardRefresh(msg) { if (msg !== undefined) BD.msg = msg; if (view.name === "board") render(); }
   function boardLoad() {
@@ -1764,9 +1803,10 @@
       case "quit": Q = null; back(); break;
       case "ranks": openRanks(); break;
       case "close-sheet": closeSheet(); break;
-      case "tmusic": S.music = S.music === false; save(); closeSheet(); openRanks(); sfx("tap"); break;
-      case "tsound": S.sound = !S.sound; save(); closeSheet(); openRanks(); sfx("tap"); break;
-      case "tvib": S.vib = !S.vib; save(); closeSheet(); openRanks(); buzz(30); break;
+      case "tmusic": S.music = S.music === false; save(); afterTog(); sfx("tap"); break;
+      case "tsound": S.sound = !S.sound; save(); afterTog(); sfx("tap"); break;
+      case "tvib": S.vib = !S.vib; save(); afterTog(); buzz(30); break;
+      case "settings": go("settings"); break;
       case "reset":
         if (confirm(HT("Effacer toute votre progression (XP, rangs, niveaux, sceaux, série) ?"))) {
           S = defaults(); save(); closeSheet(); render();
