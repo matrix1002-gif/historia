@@ -200,6 +200,11 @@
             mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus ancien ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), first.t, dated.filter((x) => x !== first).map((x) => x.t), chron, dated.map((x) => x.t).join(" "), "o");
             mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus récent ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), last.t, dated.filter((x) => x !== last).map((x) => x.t), chron, dated.map((x) => x.t).join(" ") + " récent", "p");
           }
+          const srt = dated.slice().sort((a, b) => num(a.y) - num(b.y));
+          if (new Set(ys).size === ys.length) for (let q2 = 0; q2 < srt.length - 1; q2++) {
+            const prev = srt[q2], nxt = srt[q2 + 1], oth = srt.filter((x) => x !== prev && x !== nxt);
+            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel arrive juste après « ${prev.t} » ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), nxt.t, oth.map((x) => x.t), `${prev.t} (${prev.y}) → ${nxt.t} (${nxt.y}).`, `${prev.t} ${nxt.t} ${prev.y} ${nxt.y}`, "a");
+          }
           dated.forEach((x) => { const y = num(x.y); mk(`En quelle année a lieu l'événement suivant : « ${x.t} » ?`, String(y), yearOpts(y, Math.max(4, Math.round((Math.max(...ys) - Math.min(...ys)) / 6))), `${x.t} : ${y}.`, `${x.t} ${y}`, "y"); });
         }
       } else if (d.type === "year" && d.y > 0 && d.max > d.min) {
@@ -207,6 +212,13 @@
         mk(d.q, String(d.y), yearOpts(d.y, sp), d.e || "", `${d.q} ${d.y}`, "z");
       }
     });
+    // Affirmations vraies / fausses du chapitre regroupées en une seule question.
+    curK = -1;
+    const tfs = lv.items.filter((d) => d.type === "tf" && typeof d.a === "boolean");
+    const T = tfs.filter((d) => d.a), Fz = tfs.filter((d) => !d.a);
+    const cut = (d) => d.q.replace(/\s+/g, " ");
+    if (T.length >= 1 && Fz.length >= 3) { const t = shuffle(T)[0]; mk("Laquelle de ces affirmations est exacte ?", cut(t), Fz.map(cut), t.e || "", cut(t), "t"); }
+    if (Fz.length >= 1 && T.length >= 3) { const f = shuffle(Fz)[0]; mk("Laquelle de ces affirmations est fausse ?", cut(f), T.map(cut), f.e || "", cut(f), "f"); }
     return out;
   };
 
@@ -229,6 +241,8 @@
       if (ys.length === 1 && !/\d[\d  ]{0,2}\d{3}\b/.test(st.replace(ys[0], ""))) {
         const y = +ys[0], q = st.replace(ys[0], "…");
         out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: ys[0], w: yearOpts(y), e: st }, `${e.id}:${i}:cy${k}`, e.title, lv.title), { sigTxt: (st + " " + ys[0]).toLowerCase(), cloze: true }));
+        const wy = yearOpts(y)[0], truth = Math.random() < 0.5;
+        if (wy) out.push(Object.assign(prep("tf", { q: `Vrai ou faux ? « ${truth ? st : st.replace(ys[0], wy)} »`, a: truth, e: truth ? `Exact : ${st}` : `Faux. Dans le cours : ${st}` }, `${e.id}:${i}:ty${k}`, e.title, lv.title), { sigTxt: (st + " " + ys[0]).toLowerCase(), cloze: true }));
       }
       const own = (st.slice(1).match(NAME) || []).map((n) => n.trim()).filter((n) => names.includes(n));
       const uniq = Array.from(new Set(own));
@@ -238,6 +252,8 @@
         if (pool.length >= 3) {
           const q = st.split(a).join("…");
           out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: a, w: shuffle(pool).slice(0, 3), e: st }, `${e.id}:${i}:cn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase(), cloze: true }));
+          const wn = shuffle(pool)[0], truth = Math.random() < 0.5;
+          out.push(Object.assign(prep("tf", { q: `Vrai ou faux ? « ${truth ? st : st.split(a).join(wn)} »`, a: truth, e: truth ? `Exact : ${st}` : `Faux. Dans le cours : ${st}` }, `${e.id}:${i}:tn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase(), cloze: true }));
         }
       }
     });
@@ -256,28 +272,26 @@
       else if (d.type === "year") sigs.push(topicSig({ sigTxt: (d.q + " " + d.y).toLowerCase() }));
       else sigs.push(topicSig(it));
     };
-    // Exercices (association, frise, date) : soit l'exercice lui-même, soit UNE question tirée du même contenu, jamais les deux.
+    // Exercices (association, frise, date) : présents une fois sur deux ; sinon leur contenu sert à fabriquer d'autres questions.
     const fixed = [], derivedSrc = new Set();
     lv.items.forEach((d, k) => {
       if (d.type === "qcm" || d.type === "tf") return;
-      const mine = dv.filter((x) => x.src === k);
-      if (mine.length && Math.random() < 0.5) {
-        const pick = shuffle(mine)[0];
-        fixed.push(pick); sigs.push(topicSig(pick)); derivedSrc.add(k);
-      } else { const it = own[k]; fixed.push(it); regFixed(d, it); }
+      const has = dv.some((x) => x.src === k);
+      if (has && Math.random() < 0.5) derivedSrc.add(k); else { fixed.push(own[k]); regFixed(d, own[k]); }
     });
     let cand = [];
     try {
-      // Uniquement la matière du chapitre : questions écrites pour lui, et phrases à trous de sa fiche.
-      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(clozeFromLesson(e, i));
+      // Uniquement la matière du chapitre : questions écrites pour lui, phrases à trous de sa fiche, questions tirées de ses exercices.
+      cand = easyList().filter((x) => x.era === e.id && !isGen(x) && x.lv === i).map((x) => prep("qcm", x.d, x.key, e.title, lv.title)).concat(clozeFromLesson(e, i), dv.filter((x) => x.src === -1 || derivedSrc.has(x.src)));
     } catch (err) { /* les questions de la fiche suffisent */ }
-    const need = flex.length;
+    const need = lv.items.length - fixed.length;
     const chosen = [];
-    const add = (it) => { const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
+    const add = (it) => { if (chosen.some((c) => c.q === it.q)) return false; const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
     let nCloze = 0;
-    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || (it.cloze && nCloze >= 1)) return; if (add(it) && it.cloze) nCloze++; });
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || (it.cloze && nCloze >= 2)) return; if (add(it) && it.cloze) nCloze++; });
     // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
-    shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.includes(it)) chosen.push(it); });
+    shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.some((c) => c.q === it.q)) chosen.push(it); });
+    shuffle(fixed.length ? [] : []);
     return shuffle(fixed.concat(chosen));
   };
 
