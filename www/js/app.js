@@ -306,6 +306,7 @@
     // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
     // Si le tri a été trop strict, on complète avec des questions qui ne sont pas des doublons certains (jamais la même réponse deux fois).
     const hs = () => chosen.concat(fixed).map(topicSig);
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || chosen.some((c) => c.q === it.q) || srcUsed(it)) return; const sg = topicSig(it); if (!hs().some((c) => topicClash(c, sg))) chosen.push(it); });
     shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || chosen.some((c) => c.q === it.q) || srcUsed(it)) return; const sg = topicSig(it); if (!hs().some((c) => hardClash(c, sg))) chosen.push(it); });
     shuffle(fixed.length ? [] : []);
     return shuffle(fixed.concat(chosen));
@@ -671,7 +672,10 @@
     document.documentElement.dataset.era = e ? e.scene : view.name === "tgame" || view.name === "tresor" || view.name === "tresult" ? "tresor" : "";
   };
 
-  const applyMusic = () => { if (Art.music) Art.music.sync(S.music !== false && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "fuite" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor"); };
+  let adOn = false;
+  const applyMusic = () => { if (Art.music) Art.music.sync(S.music !== false && !adOn && (view.name === "quiz" || view.name === "tgame" || view.name === "defense" || view.name === "run"), view.name === "defense" ? "croisades" : view.name === "run" ? "fuite" : view.name === "quiz" ? (Q && Q.eraId) || "tresor" : T && T.scope !== "all" ? T.scope : "tresor"); };
+  window.addEventListener("historia:adshow", () => { adOn = true; applyMusic(); });
+  window.addEventListener("historia:adhide", () => { adOn = false; applyMusic(); });
 
   const render = () => {
     if (view.name !== "defense" && DF) { flushGames(); if (DF.game) DF.game.destroy(); DF = null; }
@@ -787,8 +791,8 @@
       fig = `<h2 class="today-name">${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p><p class="today-text">${esc(f[3])}</p>`;
     }
     const saint = sn ? `<p class="today-saint">${CROSS_ICO}<span>${L2("Saint du jour", "Saint of the day")} : <b>${esc(sn[0])}</b></span></p>` : "";
-    const more = f ? `<p class="today-go">${L2("En savoir plus", "Learn more")} ›</p>` : "";
-    return `<section class="today${f ? " tap" : ""}" ${f ? `role="button" tabindex="0" data-act="today-more"` : ""} aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}${more}</section>`;
+    const more = f ? `<button type="button" class="today-go" data-act="today-more">${L2("En savoir plus", "Learn more")} ›</button>` : "";
+    return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}${more}</section>`;
   }
   function openToday() {
     const now = new Date();
@@ -837,8 +841,8 @@
   function dfIntro() {
     const st = dfStats();
     return `<div class="df-card"><h2>${L2("Conquête !", "Conquest!")}</h2>
-      <p>${L2("Chevalier d'Orient, ouvre-toi un royaume : franchis les obstacles, chaque porte te donne un territoire. Vise les 200 !", "Knight of the East, carve out a kingdom: clear the obstacles, every gate wins you a territory. Aim for 200!")}</p>
-      <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Ça s'accélère, puis les obstacles se mettent à bouger. Après 200, la course continue…", "It speeds up, then the obstacles start to move. After 200, the ride goes on…")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
+      <p>${L2("Chevalier d'Orient, ouvre-toi un royaume : franchis les obstacles, chaque porte te donne un territoire. Et ça ne s'arrête jamais !", "Knight of the East, carve out a kingdom: clear the obstacles, every gate wins you a territory. And it never ends!")}</p>
+      <ul class="df-how"><li><b>${L2("Touche l'écran", "Tap the screen")}</b> ${L2("pour faire bondir ton cheval.", "to make your horse leap.")}</li><li>${L2("Ça s'accélère, puis les obstacles se mettent à bouger. Après 200, la course continue vers la Perse, la Chine et le Japon…", "It speeds up, then the obstacles start to move. After 200, the ride goes on…")}</li><li>${L2("Le paysage change : campagne, hameau, village, ville, château, empire.", "The scenery changes: countryside, hamlet, village, city, castle, empire.")}</li><li>${L2("Ton chevalier gagne en prestance à chaque palier.", "Your knight grows more splendid at every stage.")}</li></ul>
       <button class="btn btn-gold" data-act="dfgo">${L2("En selle !", "Ride!")}</button>
       <button class="btn btn-line" data-act="dfquit">${L2("Retour", "Back")}</button>
       ${st.plays ? `<small class="df-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : ""}</div>`;
@@ -847,7 +851,7 @@
     const st = dfStats();
     dfRec(r);
     const rec = !!(DF && DF.game && DF.game._rec);
-    const xp = Math.min(40, Math.floor(r.score / 5)) + (r.score > 200 ? Math.min(20, Math.floor((r.score - 200) / 5)) : 0);
+    const xp = Math.min(40, Math.floor(r.score / 5)) + (r.score > 200 ? Math.min(60, Math.floor((r.score - 200) / 4)) : 0);
     S.xp += xp;
     save();
     if (window.HistoriaAds) window.HistoriaAds.quizFinished();
@@ -886,7 +890,7 @@
     const rec = st.plays ? `<small class="mz-rec">${L2(`Record : ${st.best} territoires`, `Best: ${st.best} territories`)}</small>` : "";
     return `<section class="df-menu"><div class="df-menu-art" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 52 L46 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M10 44 L22 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M50 52 L18 14" stroke="#e8edf5" stroke-width="5" stroke-linecap="round"/><path d="M54 44 L42 56" stroke="#b8892b" stroke-width="5" stroke-linecap="round"/><path d="M22 10 l6 8 4-10 4 10 6-8 -2 14 h-16z" fill="#f0c64b" stroke="#7a5818" stroke-width="2"/></svg></div>
       <div><h2>${L2("Conquête !", "Conquest!")}</h2>
-      <p>${L2("Un chevalier, un cheval qui bondit, 200 territoires à conquérir. Le paysage et ton armure changent à chaque étape. Touche pour sauter !", "A knight, a leaping horse, 200 territories to conquer. The scenery and your armour change at every stage. Tap to jump!")}</p>
+      <p>${L2("Un chevalier, un cheval qui bondit, des territoires à l'infini : de la Terre sainte jusqu'au Japon. Le paysage et ton armure changent à chaque étape. Touche pour sauter !", "A knight, a leaping horse, endless territories: from the Holy Land all the way to Japan. The scenery and your armour change at every stage. Tap to jump!")}</p>
       <button class="btn btn-gold" data-act="dfstart">${L2("Jouer", "Play")}</button>${rec}</div></section>`;
   }
 
@@ -1417,7 +1421,7 @@
         buttons = (R.nextOpen ? `<button class="btn btn-gold" data-act="next-level">Étape suivante : la fiche</button>` : "")
           + `<button class="btn ${R.nextOpen ? "btn-line" : "btn-gold"}" data-act="replay">${R.stars < 3 ? "Recommencer le quiz (viser 3 étoiles)" : "Recommencer le quiz"}</button>`;
       }
-      buttons += `<button class="btn btn-line" data-act="era" data-id="${e.id}">Carte de l'époque</button><button class="btn btn-line" data-act="home">Menu principal</button>`;
+      buttons += `<button class="btn btn-line" data-act="home">Menu principal</button>`;
     } else {
       buttons = '<button class="btn btn-gold" data-act="home">Menu principal</button>';
     }
@@ -1496,7 +1500,7 @@
 
 
   /* ---- Classement en ligne (top 10, quiz « Tous les thèmes ») ---- */
-  let BD = { mode: "in", list: null, msg: "", busy: false };
+  let BD = { mode: "in", list: null, msg: "", busy: false, me: undefined };
   const fbErr = (e) => {
     const c = (e && (e.code || e.message)) || "";
     if (/name/.test(c)) return L2("Choisis un pseudo de 3 à 16 caractères.", "Choose a nickname of 3 to 16 characters.");
@@ -1515,7 +1519,8 @@
       body = `<p class="mix-note">${L2("Le classement en ligne n'est pas encore disponible.", "The online leaderboard is not available yet.")}</p>`;
     } else {
       const list = BD.list ? (BD.list.length ? `<ol class="bd-list">${BD.list.map((r, i) => `<li class="${u && u.uid === r.uid ? "me" : ""}"><b>${i + 1}</b><span>${esc(r.name)}</span><em>${fmtEcus(r.score)}</em></li>`).join("")}</ol>` : `<p class="mix-note">${L2("Personne n'est encore classé. Sois le premier !", "Nobody is ranked yet. Be the first!")}</p>`) : `<p class="mix-note">${L2("Chargement…", "Loading…")}</p>`;
-      const acct = u ? `<p class="mix-note">${L2("Connecté :", "Signed in:")} <b>${esc(u.name)}</b> · ${L2("ton record", "your record")} ${fmtEcus(best)}</p>
+      const mine = !u ? "" : BD.me === undefined ? `<p class="bd-me">${L2("Calcul de ton rang…", "Working out your rank…")}</p>` : BD.me && BD.me.rank ? `<p class="bd-me"><b>${L2("Ton rang", "Your rank")} : ${BD.me.rank}${EN ? "" : BD.me.rank === 1 ? "er" : "e"}</b> · ${fmtEcus(BD.me.score)}</p>` : `<p class="bd-me">${L2("Tu n'es pas encore classé : termine le quiz « Tous les thèmes » (ou envoie ton record) pour entrer au classement.", "You are not ranked yet: finish the “All themes” quiz (or submit your record) to enter the ranking.")}</p>`;
+      const acct = u ? `${mine}<p class="mix-note">${L2("Connecté :", "Signed in:")} <b>${esc(u.name)}</b> · ${L2("ton record", "your record")} ${fmtEcus(best)}</p>
         <div class="bd-row"><button class="btn btn-gold" data-act="bdsend">${L2("Envoyer mon record", "Submit my record")}</button></div>
         <div class="bd-row"><button class="btn btn-line" data-act="bdout">${L2("Se déconnecter", "Sign out")}</button><button class="btn btn-line" data-act="bddel">${L2("Supprimer mon compte", "Delete my account")}</button></div>`
         : `<div class="bd-form"><input id="bd-mail" type="email" autocomplete="email" placeholder="${L2("E-mail", "E-mail")}" aria-label="E-mail">
@@ -1551,6 +1556,7 @@
   function boardRefresh(msg) { if (msg !== undefined) BD.msg = msg; if (view.name === "board") render(); }
   function boardLoad() {
     const B = window.HistoriaBoard; if (!B || !B.enabled()) return;
+    if (B.user()) B.myRank().then((m) => { BD.me = m; boardRefresh(); }).catch(() => { BD.me = null; boardRefresh(); });
     B.top().then((l) => { BD.list = l; boardRefresh(); }).catch((e) => { BD.list = BD.list || []; boardRefresh(fbErr(e)); });
   }
   function boardAct(act) {
@@ -1774,7 +1780,7 @@
       case "rngo": rnGo(); break;
       case "rnquit": if (!RN || RN.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (RN && RN.game) RN.game.destroy(); RN = null; back(); } break;
       case "dfquit": if (!DF || DF.phase !== "play" || confirm(L2("Quitter la partie ?", "Leave the game?"))) { flushGames(); if (DF && DF.game) DF.game.destroy(); DF = null; back(); } break;
-      case "bdopen": BD.msg = ""; BD.list = null; go("board"); if (window.HistoriaBoard && window.HistoriaBoard.enabled()) window.HistoriaBoard.init().then(() => { render(); boardLoad(); }).catch((e) => boardRefresh(fbErr(e))); break;
+      case "bdopen": BD.msg = ""; BD.list = null; BD.me = undefined; go("board"); if (window.HistoriaBoard && window.HistoriaBoard.enabled()) window.HistoriaBoard.init().then(() => { render(); boardLoad(); }).catch((e) => boardRefresh(fbErr(e))); break;
       case "bdmode": case "bdgo": case "bdreset": case "bdsend": case "bdout": case "bddel": boardAct(act); break;
       case "tstart": startTresor(el.dataset.scope); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;

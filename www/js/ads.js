@@ -49,7 +49,8 @@
       if (info && info.canRequestAds === false) return;
       await AdMob.initialize({ initializeForTesting: ADS.TEST, tagForChildDirectedTreatment: false, tagForUnderAgeOfConsent: false, maxAdContentRating: "ParentalGuidance" });
       AdMob.addListener("bannerAdSizeChanged", function (s) { if (bannerOn) setSpace(s && s.height); });
-      AdMob.addListener("interstitialAdDismissed", function () { hot = false; prepare(); });
+      AdMob.addListener("interstitialAdDismissed", function () { hot = false; window.dispatchEvent(new Event("historia:adhide")); prepare(); });
+      AdMob.addListener("interstitialAdFailedToShow", function () { hot = false; window.dispatchEvent(new Event("historia:adhide")); prepare(); });
       ready = true;
       prepare();
       if ((wanted !== "quiz" && wanted !== "tgame" && wanted !== "defense" && wanted !== "run")) showBanner();
@@ -64,7 +65,9 @@
     quizFinished: function () {
       done++;
       if (ready && hot && !adFree() && done % ADS.EVERY_N_QUIZ === 0) {
-        AdMob.showInterstitial().catch(function () {});
+        // La musique du jeu se tait pendant la publicité, puis reprend à sa fermeture.
+        window.dispatchEvent(new Event("historia:adshow"));
+        AdMob.showInterstitial().catch(function () { window.dispatchEvent(new Event("historia:adhide")); });
       }
     }
   };

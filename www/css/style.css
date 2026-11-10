@@ -1025,7 +1025,9 @@ body[data-tab="medals"] .medal, body[data-tab="medals"] li { border-left: 5px so
 .set-row.on .set-sw i { transform: translateX(22px); }
 .screen > .btn { margin-top: 10px; }
 
-.today.tap { cursor: pointer; }
-.today-go { margin-top: 10px; font-family: var(--display); font-size: 14px; letter-spacing: 0.08em; color: var(--gold-500); text-align: right; }
+.today-go { display: block; margin: 10px 0 0 auto; padding: 8px 4px; background: none; border: 0; cursor: pointer; }
+.today-go { font-family: var(--display); font-size: 14px; letter-spacing: 0.08em; color: var(--gold-500); text-align: right; }
 .who-h { margin-top: 14px; font-family: var(--display); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-500); }
 .who-t { margin-top: 4px; font-size: 18px; line-height: 1.45; }
+
+.bd-me { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--gold-500); border-radius: 12px; background: rgba(240, 198, 75, 0.18); font-size: 17px; }

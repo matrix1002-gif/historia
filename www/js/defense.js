@@ -1,5 +1,5 @@
 /* Historia — « Conquête » : un chevalier bondit de porte en porte.
-   Chaque porte franchie = un territoire conquis (jusqu'à 200). Le paysage et le chevalier changent avec la conquête. */
+   Chaque porte franchie = un territoire conquis, sans limite : la course continue vers la Perse et l'Extrême-Orient. Le paysage et le chevalier changent avec la conquête. */
 (function () {
   var W = 360, H = 560, GY = 490, KX = 100, TOTAL = 200;
   /* physique (px et secondes) : bond franc, chute plus violente que la montée */
@@ -7,9 +7,9 @@
   var FLAP = 227 * TS, GU = 558 * TS * TS, GD = 558 * TS * TS, VMAX = 335 * TS, STEP = 1 / 120;
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function ramp(n) { return 1 - Math.exp(-n / 22); }
-  function speedOf(n) { return (120 + 60 * ramp(n) + Math.min(n, 150) * 0.38) * TS; }
-  function gapOf(n) { return Math.max(140, 184 - 46 * ramp(n)); }
-  function spaceOf(n) { return Math.max(186, 224 - 42 * ramp(n)); }
+  function speedOf(n) { return (120 + 60 * ramp(n) + Math.min(n, 150) * 0.38 + Math.min(Math.max(0, n - 150), 300) * 0.12) * TS; }
+  function gapOf(n) { return Math.max(124, 184 - 46 * ramp(n) - Math.min(Math.max(0, n - 150), 200) * 0.08); }
+  function spaceOf(n) { return Math.max(180, 224 - 42 * ramp(n) - Math.min(Math.max(0, n - 150), 200) * 0.03); }
   var STAGES = [
     { at: 0, fr: "Campagne de Terre sainte", en: "Holy Land countryside", sky: ["#f6c978", "#fbe6b4"], far: "#d9a867", mid: "#c58f4f", ground: ["#d8b06a", "#b88e4a"], pil: ["#d7b57a", "#b48c52", "#8e6a38"], line: ["Tu quittes la Terre sainte, l'épée au côté.", "You leave the Holy Land, sword at your side."] },
     { at: 20, fr: "Hameau", en: "Hamlet", sky: ["#9fd0ea", "#e8f3df"], far: "#8fb36f", mid: "#6f9a52", ground: ["#7fae52", "#5b8a3a"], pil: ["#b08a5a", "#8a6638", "#5e4220"], line: ["Quelques chaumières : le premier hameau est à toi !", "A few thatched huts: your first hamlet is yours!"] },
@@ -18,7 +18,11 @@
     { at: 105, fr: "Ville fortifiée", en: "Fortified city", sky: ["#7cb4e2", "#f1efe0"], far: "#8c97ad", mid: "#6c7890", ground: ["#7a9c52", "#566f38"], pil: ["#c4c0b6", "#98948a", "#6c685e"], line: ["Des murailles de pierre et des tours !", "Stone walls and towers!"] },
     { at: 140, fr: "Domaine du château", en: "Castle domain", sky: ["#6aa6dc", "#f4ecd6"], far: "#8d8aa8", mid: "#6c6a8c", ground: ["#6f9a4c", "#4d6f34"], pil: ["#cfcabc", "#a29d8e", "#74705f"], line: ["Un château dresse ses donjons sur tes terres.", "A castle raises its keeps on your lands."] },
     { at: 170, fr: "Cité royale", en: "Royal city", sky: ["#f2b27a", "#fde7c0"], far: "#a8849a", mid: "#86668a", ground: ["#7a9a4a", "#556f30"], pil: ["#e8d9a8", "#c2ae72", "#8e7a3c"], line: ["Une cathédrale, des bannières : une cité royale !", "A cathedral, banners: a royal city!"] },
-    { at: 200, fr: "Empire", en: "Empire", sky: ["#f0a860", "#fff0b8"], far: "#b07a8c", mid: "#8a5c7c", ground: ["#86a048", "#5a7430"], pil: ["#f2e3a0", "#d0b65c", "#9a8030"], line: ["Tu règnes sur un empire !", "You rule an empire!"] }
+    { at: 200, fr: "Empire", en: "Empire", sky: ["#f0a860", "#fff0b8"], far: "#b07a8c", mid: "#8a5c7c", ground: ["#86a048", "#5a7430"], pil: ["#f2e3a0", "#d0b65c", "#9a8030"], line: ["Tu règnes sur un empire !", "You rule an empire!"] },
+    { at: 240, fr: "Perse", en: "Persia", sky: ["#e8b86a", "#fbe3b0"], far: "#c9926a", mid: "#a8704c", ground: ["#d6b274", "#b48a4c"], pil: ["#e5cfa0", "#c2a468", "#8a7240"], line: ["Persépolis : colonnes de pierre et coupoles turquoise.", "Persepolis: stone columns and turquoise domes."] },
+    { at: 285, fr: "Route de la soie", en: "Silk Road", sky: ["#f0c49a", "#fff0d0"], far: "#d4a070", mid: "#b88458", ground: ["#e0bc80", "#c09858"], pil: ["#d9b27a", "#b98a52", "#86602e"], line: ["La route de la soie : caravanes, dunes et yourtes.", "The Silk Road: caravans, dunes and yurts."] },
+    { at: 335, fr: "Chine impériale", en: "Imperial China", sky: ["#a8cfe0", "#f0ebd8"], far: "#7fa39c", mid: "#6a8f88", ground: ["#86a85a", "#5f8038"], pil: ["#c0392b", "#9a2a20", "#6a1a14"], line: ["La Chine impériale : pagodes, lanternes et Grande Muraille.", "Imperial China: pagodas, lanterns and the Great Wall."] },
+    { at: 400, fr: "Japon des shoguns", en: "Shogun Japan", sky: ["#f4c8d0", "#fff0ea"], far: "#9fa8c4", mid: "#7a86a8", ground: ["#8ab060", "#628a3e"], pil: ["#4a4a54", "#30303a", "#1a1a20"], line: ["Le Japon des shoguns : torii, cerisiers et mont Fuji.", "Shogun Japan: torii gates, cherry trees and Mount Fuji."] }
   ];
   function stageOf(n) { var s = 0; for (var i = 0; i < STAGES.length; i++) if (n >= STAGES[i].at) s = i; return s; }
 
@@ -161,6 +165,59 @@
       rect(x + w / 2 - 3, y - h + 12, 6, 12, "#2b2a36");
       if (flag) { rect(x + w / 2, y - h - 28, 2, 22, "#443"); poly([x + w / 2 + 2, y - h - 28, x + w / 2 + 16, y - h - 22, x + w / 2 + 2, y - h - 16], "#b02a37"); }
     }
+    function pagoda(x, y, w, n, wall, roof) {
+      var cy = y;
+      for (var i = 0; i < n; i++) {
+        var ww = w * (1 - i * 0.14), xx = x + (w - ww) / 2, hh = 14;
+        rect(xx + 3, cy - hh, ww - 6, hh, wall);
+        var ry = cy - hh;
+        poly([xx - 10, ry + 3, xx - 2, ry - 1, xx + ww / 2, ry - 9, xx + ww + 2, ry - 1, xx + ww + 10, ry + 3, xx + ww + 2, ry + 5, xx - 2, ry + 5], roof);
+        cy = ry - 2;
+      }
+      rect(x + w / 2 - 1, cy - 14, 2, 14, "#d9b13a");
+    }
+    function camel(x, y, k) {
+      ctx.fillStyle = "#9a6a3a"; ctx.strokeStyle = "#9a6a3a"; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.ellipse(x, y - 26 * k, 16 * k, 8 * k, 0, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(x - 4 * k, y - 33 * k, 6 * k, Math.PI, 0); ctx.arc(x + 7 * k, y - 33 * k, 5 * k, Math.PI, 0); ctx.fill();
+      ctx.lineWidth = 5 * k; ctx.beginPath(); ctx.moveTo(x + 13 * k, y - 28 * k); ctx.quadraticCurveTo(x + 22 * k, y - 34 * k, x + 22 * k, y - 46 * k); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(x + 26 * k, y - 46 * k, 6 * k, 3 * k, 0.2, 0, 7); ctx.fill();
+      ctx.lineWidth = 3 * k;
+      for (var i = 0; i < 4; i++) { var lx = x - 10 * k + i * 7 * k, sw = Math.sin(t * 5 + i * 1.7) * 2 * k; ctx.beginPath(); ctx.moveTo(lx, y - 22 * k); ctx.lineTo(lx + sw, y); ctx.stroke(); }
+      rect(x - 8 * k, y - 38 * k, 14 * k, 5 * k, "#b02a37");
+    }
+    function nearEast(s) {
+      var i;
+      if (s === 8) { // Perse
+        palm(34, GY, 1);
+        rect(80, GY - 40, 70, 40, "#e6d6b0"); ctx.fillStyle = "#2aa7b0"; ctx.beginPath(); ctx.arc(115, GY - 40, 26, Math.PI, 0); ctx.fill();
+        rect(114, GY - 78, 2, 12, "#d9b13a"); ctx.fillStyle = "#2b3a58"; ctx.beginPath(); ctx.moveTo(105, GY); ctx.lineTo(105, GY - 18); ctx.arc(115, GY - 18, 10, Math.PI, 0); ctx.lineTo(125, GY); ctx.fill();
+        rect(160, GY - 84, 8, 84, "#e6d6b0"); ctx.fillStyle = "#2aa7b0"; ctx.beginPath(); ctx.arc(164, GY - 84, 7, Math.PI, 0); ctx.fill();
+        for (i = 0; i < 3; i++) { rect(207 + i * 34, GY - 60, 12, 60, "#d9c79a"); rect(204 + i * 34, GY - 66, 18, 6, "#c4ae7a"); }
+        rect(200, GY - 74, 94, 8, "#c4ae7a"); rect(204, GY - 80, 86, 6, "#b89c64");
+        ctx.fillStyle = "#2f5a3a"; ctx.beginPath(); ctx.ellipse(328, GY - 30, 7, 30, 0, 0, 7); ctx.fill();
+      } else if (s === 9) { // route de la soie
+        ctx.fillStyle = "#e0bc80"; ctx.beginPath(); ctx.moveTo(0, GY); ctx.quadraticCurveTo(60, GY - 34, 130, GY - 12); ctx.quadraticCurveTo(220, GY - 48, 300, GY - 10); ctx.quadraticCurveTo(330, GY - 4, 360, GY); ctx.fill();
+        camel(70, GY, 1); camel(124, GY, 0.92); camel(172, GY, 0.96);
+        ctx.strokeStyle = "#7a4a2a"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(92, GY - 36); ctx.lineTo(112, GY - 36); ctx.moveTo(144, GY - 35); ctx.lineTo(160, GY - 35); ctx.stroke();
+        rect(246, GY - 20, 46, 20, "#efe6d0"); poly([242, GY - 20, 269, GY - 46, 296, GY - 20], "#e4d9bc"); rect(246, GY - 12, 46, 4, "#b02a37"); rect(264, GY - 14, 10, 14, "#7a4a2a");
+        rect(322, GY - 30, 3, 30, "#6a4a2a"); poly([325, GY - 30, 345, GY - 25, 325, GY - 20], "#b02a37");
+      } else if (s === 10) { // Chine
+        rect(0, GY - 30, 360, 30, "#b9a98a"); for (i = 0; i < 18; i++) rect(i * 20 + 3, GY - 38, 12, 9, "#b9a98a");
+        rect(30, GY - 64, 42, 64, "#a8987a"); poly([20, GY - 64, 30, GY - 70, 51, GY - 84, 72, GY - 70, 82, GY - 64, 72, GY - 60, 30, GY - 60], "#9a2a20"); rect(46, GY - 50, 10, 16, "#3a2a22");
+        pagoda(130, GY, 40, 3, "#e9d9b0", "#9a2a20");
+        for (i = 0; i < 2; i++) { var lx = 220 + i * 34; ctx.strokeStyle = "#5a3a22"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(lx, GY - 70); ctx.lineTo(lx, GY - 54); ctx.stroke(); ctx.fillStyle = "#d9322b"; ctx.beginPath(); ctx.ellipse(lx, GY - 46, 8, 10, 0, 0, 7); ctx.fill(); rect(lx - 5, GY - 58, 10, 3, "#d9b13a"); }
+        for (i = 0; i < 4; i++) { var bh = 70 + (i % 2) * 16; rect(288 + i * 10, GY - bh, 4, bh, "#4f8a3a"); for (var kn = GY - bh + 14; kn < GY; kn += 20) rect(287 + i * 10, kn, 6, 2, "#2f5a22"); }
+      } else { // Japon
+        rect(34, GY - 60, 7, 60, "#c0392b"); rect(70, GY - 60, 7, 60, "#c0392b"); rect(30, GY - 50, 51, 4, "#c0392b");
+        poly([24, GY - 62, 87, GY - 62, 82, GY - 72, 29, GY - 72], "#26262c");
+        pagoda(130, GY, 34, 5, "#efe3c8", "#3a3a44");
+        rect(206, GY - 16, 6, 16, "#9a9a9a"); rect(202, GY - 24, 14, 8, "#9a9a9a"); poly([199, GY - 24, 209, GY - 34, 219, GY - 24], "#7a7a7a");
+        rect(252, GY - 32, 6, 32, "#5a3a2a"); ctx.fillStyle = "#f4a8bc";
+        [[255, GY - 44, 17], [241, GY - 36, 13], [269, GY - 36, 13], [255, GY - 56, 11]].forEach(function (c) { ctx.beginPath(); ctx.arc(c[0], c[1], c[2], 0, 7); ctx.fill(); });
+        rect(318, GY - 22, 4, 22, "#5a3a2a"); ctx.fillStyle = "#f7b9ca"; ctx.beginPath(); ctx.arc(320, GY - 30, 11, 0, 7); ctx.arc(311, GY - 24, 8, 0, 7); ctx.arc(329, GY - 24, 8, 0, 7); ctx.fill();
+      }
+    }
     function nearScene(s, ox) {
       // éléments répétés sur 360 px, défilant à vitesse moyenne
       var o = -(ox % W);
@@ -174,6 +231,7 @@
         else if (s === 3) { house(10, GY, 40, 34, "#e0d2ac", "#8e3a2c", "timber"); house(62, GY, 36, 40, "#d8caa4", "#7a3328", "timber"); rect(120, GY - 56, 30, 56, "#bdb8aa"); poly([116, GY - 56, 135, GY - 90, 154, GY - 56], "#555a66"); house(176, GY, 44, 34, "#e0d2ac", "#8e3a2c", "timber"); rect(240, GY - 18, 70, 18, "#8a6638"); rect(244, GY - 34, 62, 16, "#c9503c"); rect(300, GY - 60, 8, 60, "#6a4a28"); }
         else if (s === 4) { rect(0, GY - 54, 360, 54, "#a9a59a"); for (var i = 0; i < 18; i++) rect(i * 20 + 2, GY - 62, 12, 10, "#a9a59a"); tower(40, GY, 42, 100, "#b4b0a4", true); tower(250, GY, 44, 112, "#b4b0a4", true); house(130, GY - 54, 40, 30, "#d8caa4", "#8e3a2c", "stone"); house(190, GY - 54, 36, 24, "#d8caa4", "#7a3328", "stone"); }
         else if (s === 5) { rect(30, GY - 90, 290, 90, "#b9b4a8"); for (var j = 0; j < 14; j++) rect(30 + j * 21 + 2, GY - 100, 13, 11, "#b9b4a8"); tower(14, GY, 46, 140, "#a8a396", true); tower(300, GY, 46, 140, "#a8a396", true); rect(150, GY - 160, 60, 160, "#aeab9e"); for (var m = 0; m < 4; m++) rect(150 + m * 16, GY - 168, 11, 10, "#aeab9e"); poly([145, GY - 160, 180, GY - 214, 215, GY - 160], "#7a2a34"); rect(172, GY - 60, 16, 60, "#3a2e22"); rect(177, GY - 215, 2, 24, "#443"); poly([179, GY - 215, 196, GY - 208, 179, GY - 201], "#d9b13a"); }
+        else if (s >= 8) { nearEast(s); }
         else { rect(0, GY - 40, 360, 40, "#d8c690"); for (var q = 0; q < 6; q++) { rect(q * 62 + 12, GY - 70, 34, 70, "#eadba8"); poly([q * 62 + 8, GY - 70, q * 62 + 29, GY - 104, q * 62 + 50, GY - 70], q % 2 ? "#9a2f3c" : "#2f5a9a"); rect(q * 62 + 28, GY - 128, 2, 24, "#443"); poly([q * 62 + 30, GY - 128, q * 62 + 44, GY - 122, q * 62 + 30, GY - 116], q % 2 ? "#d9b13a" : "#b02a37"); } rect(150, GY - 190, 62, 190, "#efe2b4"); poly([142, GY - 190, 181, GY - 262, 220, GY - 190], "#c9a24a"); rect(176, GY - 70, 12, 70, "#6a4a22"); ctx.fillStyle = "#6aa2e0"; ctx.beginPath(); ctx.arc(181, GY - 138, 12, 0, 7); ctx.fill(); }
         ctx.restore();
       }
@@ -185,6 +243,13 @@
         ctx.beginPath(); ctx.moveTo(o + k * W, GY);
         for (var x = 0; x <= W; x += 20) ctx.lineTo(o + k * W + x, GY - 70 - Math.sin(x * 0.03 + 1) * 24 - Math.sin(x * 0.08) * 10 - (s >= 4 ? 20 : 0));
         ctx.lineTo(o + k * W + W, GY); ctx.fill();
+      }
+      if (s === 11 || s === 10) {
+        for (var k3 = 0; k3 < 2; k3++) {
+          var b0 = o + k3 * W;
+          if (s === 11) { poly([b0 + 110, GY - 66, b0 + 190, GY - 156, b0 + 270, GY - 66], "#b3bcd6"); poly([b0 + 168, GY - 133, b0 + 190, GY - 156, b0 + 212, GY - 133, b0 + 200, GY - 128, b0 + 190, GY - 136, b0 + 178, GY - 128], "#f4f6fb"); }
+          else { ctx.fillStyle = "#7a9d96"; [60, 190, 300].forEach(function (x0, q) { ctx.beginPath(); ctx.moveTo(b0 + x0 - 24, GY - 56); ctx.quadraticCurveTo(b0 + x0 - 14, GY - 120 - q * 10, b0 + x0, GY - 132 - q * 8); ctx.quadraticCurveTo(b0 + x0 + 14, GY - 120, b0 + x0 + 24, GY - 56); ctx.fill(); }); }
+        }
       }
       ctx.fillStyle = STAGES[s].mid;
       for (var k2 = 0; k2 < 2; k2++) {
@@ -243,6 +308,15 @@
         } else if (s === 5) { // tour de garde avec blason
           for (k = y + 12; k < y + h; k += 16) { ctx.beginPath(); ctx.moveTo(x, k); ctx.lineTo(x + w, k); ctx.stroke(); }
           for (k = y + 52; k < y + h; k += 120) { ctx.fillStyle = "#7a2a34"; ctx.beginPath(); ctx.moveTo(x + 12, k); ctx.lineTo(x + w - 12, k); ctx.lineTo(x + w - 12, k + 16); ctx.lineTo(x + w / 2, k + 30); ctx.lineTo(x + 12, k + 16); ctx.fill(); ctx.fillStyle = "#f0c64b"; ctx.beginPath(); ctx.arc(x + w / 2, k + 12, 5, 0, 7); ctx.fill(); }
+        } else if (s === 8) { // faïences turquoise
+          for (k = y + 10; k < y + h; k += 24) { ctx.fillStyle = "rgba(42,167,176,0.75)"; ctx.fillRect(x + 4, k, w - 8, 14); ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.beginPath(); ctx.moveTo(x + w / 2, k + 1); ctx.lineTo(x + w - 8, k + 7); ctx.lineTo(x + w / 2, k + 13); ctx.lineTo(x + 8, k + 7); ctx.closePath(); ctx.fill(); }
+        } else if (s === 9) { // tentures de caravane
+          for (k = y + 8; k < y + h; k += 30) { ctx.fillStyle = (((k - y) / 30) | 0) % 2 ? "rgba(176,42,55,0.8)" : "rgba(40,70,140,0.75)"; ctx.fillRect(x, k, w, 12); ctx.fillStyle = "rgba(240,198,75,0.9)"; ctx.fillRect(x, k + 12, w, 2); }
+        } else if (s === 10) { // laque rouge, bandes d'or
+          for (k = y + 14; k < y + h; k += 52) { ctx.fillStyle = "#e6b93a"; ctx.fillRect(x, k, w, 5); ctx.beginPath(); ctx.arc(x + w / 2, k + 24, 8, 0, 7); ctx.strokeStyle = "rgba(240,198,75,0.9)"; ctx.lineWidth = 2; ctx.stroke(); }
+        } else if (s === 11) { // bois sombre, treillis blanc
+          ctx.strokeStyle = "rgba(245,240,230,0.7)"; ctx.lineWidth = 2;
+          for (k = y + 10; k < y + h; k += 28) { ctx.strokeRect(x + 6, k, w - 12, 20); ctx.beginPath(); ctx.moveTo(x + w / 2, k); ctx.lineTo(x + w / 2, k + 20); ctx.moveTo(x + 6, k + 10); ctx.lineTo(x + w - 6, k + 10); ctx.stroke(); }
         } else { // colonnes cannelées dorées et gemmes
           ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 2;
           for (k = x + 10; k < x + w - 4; k += 10) { ctx.beginPath(); ctx.moveTo(k, y); ctx.lineTo(k, y + h); ctx.stroke(); }
@@ -257,7 +331,14 @@
         shade(x - 7, cy2, w + 14, 20);
         rect(x - 7, cy2, w + 14, 4, "rgba(255,255,255,0.35)"); rect(x - 7, cy2 + 16, w + 14, 4, "rgba(0,0,0,0.3)");
         if (s >= 5) { rect(x - 7, cy2 + 8, w + 14, 3, "#f0c64b"); }
-        if (s >= 3) { var cr = capTop ? cy2 + 20 : cy2 - 10; for (var q = 0; q < 4; q++) { shade(x - 7 + q * 17, cr, 11, 10); } }
+        if (s === 8) { rect(x - 7, cy2 + 6, w + 14, 8, "#2aa7b0"); }
+        if (s === 9) { for (var tq = 0; tq < 5; tq++) rect(x - 7 + tq * 13, cy2 + 5, 7, 10, tq % 2 ? "#b02a37" : "#e6b93a"); }
+        if (s === 10 || s === 11) { // toit aux bords relevés, tourné vers l'ouverture
+          var dn = capTop ? 1 : -1, y0 = capTop ? cy2 + 20 : cy2, rc = s === 10 ? "#9a2a20" : "#2a2a32";
+          poly([x - 20, y0 - dn * 3, x - 12, y0 - dn * 8, x - 7, y0 - dn * 12, x + w + 7, y0 - dn * 12, x + w + 12, y0 - dn * 8, x + w + 20, y0 - dn * 3, x + w + 8, y0 + dn * 1, x - 8, y0 + dn * 1], rc);
+          rect(x - 7, y0 - dn * 12 - (dn > 0 ? 0 : 0), w + 14, 2, "#e6b93a");
+        }
+        if (s >= 3 && s < 8) { var cr = capTop ? cy2 + 20 : cy2 - 10; for (var q = 0; q < 4; q++) { shade(x - 7 + q * 17, cr, 11, 10); } }
         // ombre portée sous le chapiteau
         var sg = ctx.createLinearGradient(0, capTop ? cy2 + 20 : cy2 - 14, 0, capTop ? cy2 + 34 : cy2);
         sg.addColorStop(capTop ? 0 : 1, "rgba(0,0,0,0.28)"); sg.addColorStop(capTop ? 1 : 0, "rgba(0,0,0,0)");
@@ -326,11 +407,12 @@
       var s = stageOf(st.score);
       ctx.fillStyle = "rgba(30,18,6,0.55)"; ctx.fillRect(0, 0, W, 44);
       ctx.fillStyle = "#f4e6c0"; ctx.font = "700 16px Georgia, serif"; ctx.textAlign = "left";
-      ctx.fillText((FR ? "Territoires " : "Territories ") + st.score + (st.score < TOTAL ? " / " + TOTAL : " ★"), 12, 20);
+      ctx.fillText((FR ? "Territoires " : "Territories ") + st.score + (st.score >= TOTAL ? " ★" : ""), 12, 20);
       ctx.fillStyle = "#e6c36a"; ctx.font = "13px Georgia, serif";
       ctx.fillText(FR ? STAGES[s].fr : STAGES[s].en, 12, 37);
       ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fillRect(W - 112, 14, 100, 10);
-      ctx.fillStyle = "#f0c64b"; ctx.fillRect(W - 112, 14, 100 * Math.min(1, st.score / TOTAL), 10);
+      ctx.fillStyle = "#f0c64b"; var s1 = STAGES[s + 1], prg = s1 ? (st.score - STAGES[s].at) / (s1.at - STAGES[s].at) : ((st.score - STAGES[s].at) % 100) / 100;
+      ctx.fillRect(W - 112, 14, 100 * Math.max(0, Math.min(1, prg)), 10);
       ctx.strokeStyle = "#f4e6c0"; ctx.lineWidth = 1; ctx.strokeRect(W - 112.5, 13.5, 101, 11);
       ctx.textAlign = "center"; ctx.lineJoin = "round";
       var big = String(st.score), by = 112;

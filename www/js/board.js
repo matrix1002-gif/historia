@@ -48,5 +48,17 @@
     return init().then(function () { return db.collection("board").orderBy("score", "desc").limit(10).get(); })
       .then(function (q) { return q.docs.map(function (d) { var v = d.data(); return { uid: d.id, name: v.name, score: v.score }; }); });
   }
-  window.HistoriaBoard = { enabled: enabled, init: init, user: user, signUp: signUp, signIn: signIn, signOut: signOut, reset: reset, deleteAccount: deleteAccount, submit: submit, top: top };
+  // Rang du joueur connecté : 1 + nombre de joueurs avec un meilleur score (null s'il n'a encore aucun score en ligne).
+  function myRank() {
+    return init().then(function () {
+      var u = auth.currentUser; if (!u) return null;
+      return db.collection("board").doc(u.uid).get().then(function (d) {
+        if (!d.exists) return { rank: null, score: 0 };
+        var sc = d.data().score, q = db.collection("board").where("score", ">", sc);
+        var p = typeof q.count === "function" ? q.count().get().then(function (r) { return r.data().count; }) : q.get().then(function (r) { return r.size; });
+        return p.then(function (n) { return { rank: n + 1, score: sc }; });
+      });
+    });
+  }
+  window.HistoriaBoard = { myRank: myRank, enabled: enabled, init: init, user: user, signUp: signUp, signIn: signIn, signOut: signOut, reset: reset, deleteAccount: deleteAccount, submit: submit, top: top };
 })();
