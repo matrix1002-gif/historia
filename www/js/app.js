@@ -162,16 +162,26 @@
   };
   const TSTOP = new Set("quelle quelles quel quels était étaient entre depuis pendant avant après lorsque comment pourquoi laquelle lequel dans leur leurs cette selon aussi appelé appelée nommé vrai faux année siècle roi reine france français française".split(" "));
   const topicSig = (it) => {
-  const txt = (it.sigTxt || (it.q + " " + ((it.opts || []).find((o) => o.ok) || {}).t || "" + " " + (it.e || ""))).toLowerCase();
-  const nums = new Set(txt.match(/\d{3,4}/g) || []);
-  const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !TSTOP.has(w)));
-    return { nums, words };
+    const ok = ((it.opts || []).find((o) => o.ok) || {}).t || "";
+    const txt = (it.sigTxt || (it.q + " " + ok)).toLowerCase();
+    const nums = new Set(txt.match(/\d{3,4}/g) || []);
+    const words = new Set((txt.match(/[a-zàâçéèêëîïôûùüÿœ'-]{5,}/g) || []).filter((w) => !TSTOP.has(w)));
+    const full = String(it.ans || ok).toLowerCase().trim();
+    return { nums, words, txt, full: full.length >= 3 && !/^(vrai|faux)$/.test(full) ? full : "" };
   };
+  // Doublon certain : même réponse, réponse de l'une citée dans l'autre, même contenu.
+  const hardClash = (a, b) => (a.full && a.full === b.full) || a.txt === b.txt || !!(a.full && b.full && b.txt.includes(a.full) && a.txt.includes(b.full));
   const topicClash = (a, b) => {
     let n = 0, w = 0;
     a.nums.forEach((x) => { if (b.nums.has(x)) n++; });
     a.words.forEach((x) => { if (b.words.has(x)) w++; });
-    return (n > 0 && w > 0) || w >= 3;
+    if ((n > 0 && w > 0) || w >= 3) return true;
+    // Même réponse, ou réponse de l'une citée dans l'autre, avec un autre point commun : c'est le même sujet.
+    if (a.full && a.full === b.full) return true;
+    if (a.txt === b.txt) return true;
+    if (a.full && b.full && b.txt.includes(a.full) && a.txt.includes(b.full)) return true;
+    if (w >= 2 && ((a.full && b.txt.includes(a.full)) || (b.full && a.txt.includes(b.full)))) return true;
+    return false;
   };
 
   /* Questions supplémentaires tirées du contenu du chapitre lui-même (associations, frises, dates). */
@@ -197,8 +207,8 @@
           if (new Set(ys).size === ys.length) {
             const first = dated.slice().sort((a, b) => num(a.y) - num(b.y))[0], last = dated.slice().sort((a, b) => num(b.y) - num(a.y))[0];
             const chron = dated.slice().sort((a, b) => num(a.y) - num(b.y)).map((x) => `${x.t} (${x.y})`).join(" → ");
-            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus ancien ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), first.t, dated.filter((x) => x !== first).map((x) => x.t), chron, dated.map((x) => x.t).join(" "), "o");
-            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus récent ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), last.t, dated.filter((x) => x !== last).map((x) => x.t), chron, dated.map((x) => x.t).join(" ") + " récent", "p");
+            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus ancien ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), first.t, dated.filter((x) => x !== first).map((x) => x.t), chron, dated.map((x) => x.t + " " + x.y).join(" "), "o");
+            mk(`${d.q.replace(/^Remets /, "Parmi ces événements, ").replace(/ dans l'ordre chronologique\.?$/, "").replace(/\.$/, "")}, lequel est le plus récent ?`.replace(/^Parmi ces événements, ces /, "Parmi ces "), last.t, dated.filter((x) => x !== last).map((x) => x.t), chron, dated.map((x) => x.t + " " + x.y).join(" ") + " récent", "p");
           }
           const srt = dated.slice().sort((a, b) => num(a.y) - num(b.y));
           if (new Set(ys).size === ys.length) for (let q2 = 0; q2 < srt.length - 1; q2++) {
@@ -231,9 +241,10 @@
     const NAME = /(?<![’'\p{L}])\p{Lu}[\p{L}’'-]+(?:\s(?:de la|de|du|des|d’|d')?\s?\p{Lu}[\p{L}’'-]+)*/gu;
     const BAD = new Set("Je Tu Il Elle Nous Vous Ils Elles On Le La Les Un Une Des En Dans Mais Puis Or Car Ce Cet Cette Ces Voilà Imagine Pour Avec Sans Sous Sur Quand Comme Si Ainsi Alors Aujourd Après Avant Depuis Pendant Selon Chez Entre Vers Dieu Roi Reine Pape Empereur Seigneur Saint Sainte".split(" "));
     const PLACE = /(?:^|\s)(?:à|en|au|aux|dans|vers|près de|depuis|de)\s$/i, PERS = /(?:roi|reine|duc|duchesse|comte|empereur|impératrice|pape|évêque|abbé|saint|sainte|chef|général|cardinal|marquis|prince|princesse|nommé|nommée|appelé|appelée|dit|surnommé|ministre|moine|maréchal|chevalier|philosophe|écrivain|Mme|Madame|Monsieur)\s$/i;
-    const cls = {}; const names = [];
+    const cls = {}; const names = []; const seenAfter = {};
+    const tokBefore = (st, idx) => { const m2 = st.slice(0, idx).match(/([\p{L}’']+)\s$/u); return m2 ? m2[1].toLowerCase() : ""; };
     const okS = (st) => /^[A-ZÉÈÀÂÎÔÛ«]/.test(st) && /[.!?»]$/.test(st);
-    sents.filter(okS).forEach((st) => { let m; NAME.lastIndex = 0; while ((m = NAME.exec(st))) { const n = m[0].trim(); if (m.index === 0 || BAD.has(n) || n.length < 4) continue; const before = st.slice(0, m.index); const c = PERS.test(before) ? "p" : /(?:\s|^)(?:à|en|au|dans|vers)\s$/i.test(before) ? "l" : null; if (c && !cls[n]) { cls[n] = c; names.push(n); } } });
+    sents.filter(okS).forEach((st) => { let m; NAME.lastIndex = 0; while ((m = NAME.exec(st))) { const n = m[0].trim(); if (m.index === 0 || BAD.has(n) || n.length < 4) continue; const before = st.slice(0, m.index); const tk = tokBefore(st, m.index); (seenAfter[tk] = seenAfter[tk] || new Set()).add(n); const c = PERS.test(before) ? "p" : /(?:\s|^)(?:à|en|au|dans|vers)\s$/i.test(before) ? "l" : null; if (c && !cls[n]) { cls[n] = c; names.push(n); } } });
     const yearOpts = (y) => { const o = new Set(); [-1, 1, -2.4, 2.2, -3.5, 3.7].forEach((m) => { const sp = y > 1500 ? 4 : 10; const v = Math.round(y + m * sp); if (v > 0 && v !== y) o.add(String(v)); }); return Array.from(o).slice(0, 3); };
     sents.filter(okS).forEach((st, k) => {
       if (/av\. ?J/.test(st)) return;
@@ -248,7 +259,9 @@
       const uniq = Array.from(new Set(own));
       if (uniq.length >= 1 && uniq.length <= 3 && cls[uniq[0]]) {
         const a = uniq[0];
-        const pool = names.filter((n) => n !== a && cls[n] === cls[a] && !a.includes(n) && !n.includes(a) && !st.includes(n));
+        const tkA = tokBefore(st, st.indexOf(a));
+        // Les faux choix doivent s'accorder avec le mot qui précède le trou (la, le, à, en…) : on ne garde que des noms vus après ce même mot dans le cours.
+        const pool = names.filter((n) => n !== a && cls[n] === cls[a] && !a.includes(n) && !n.includes(a) && !st.includes(n) && (!tkA || (seenAfter[tkA] && seenAfter[tkA].has(n))));
         if (pool.length >= 3) {
           const q = st.split(a).join("…");
           out.push(Object.assign(prep("qcm", { q: `Complète la phrase du cours : « ${q} »`, c: a, w: shuffle(pool).slice(0, 3), e: st }, `${e.id}:${i}:cn${k}`, e.title, lv.title), { sigTxt: (st + " " + a).toLowerCase(), cloze: true }));
@@ -286,11 +299,14 @@
     } catch (err) { /* les questions de la fiche suffisent */ }
     const need = lv.items.length - fixed.length;
     const chosen = [];
-    const add = (it) => { if (chosen.some((c) => c.q === it.q)) return false; const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
+    const srcUsed = (it) => it.src >= 0 && chosen.some((c) => c.src === it.src);
+    const add = (it) => { if (chosen.some((c) => c.q === it.q) || srcUsed(it)) return false; const sg = topicSig(it); if (sigs.some((c) => topicClash(c, sg))) return false; sigs.push(sg); chosen.push(it); return true; };
     let nCloze = 0;
     shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || (it.cloze && nCloze >= 2)) return; if (add(it) && it.cloze) nCloze++; });
     // Si le tri a écarté trop de questions, on complète avec celles de la fiche.
-    shuffle(flex).forEach((it) => { if (chosen.length < need && !chosen.some((c) => c.q === it.q)) chosen.push(it); });
+    // Si le tri a été trop strict, on complète avec des questions qui ne sont pas des doublons certains (jamais la même réponse deux fois).
+    const hs = () => chosen.concat(fixed).map(topicSig);
+    shuffle(flex.concat(cand)).forEach((it) => { if (chosen.length >= need || chosen.some((c) => c.q === it.q) || srcUsed(it)) return; const sg = topicSig(it); if (!hs().some((c) => hardClash(c, sg))) chosen.push(it); });
     shuffle(fixed.length ? [] : []);
     return shuffle(fixed.concat(chosen));
   };

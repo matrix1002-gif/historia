@@ -35,7 +35,7 @@ gaule|10|Quel peuple franchit le Rhin en 406 ?|Les Vandales, Alains et Suèves|L
 gaule|10|Quel événement de 476 met fin à l'Empire romain d'Occident ?|Le dernier empereur est déposé|Une guerre civile gauloise|Le baptême de Clovis|La mort de César|Odoacre dépose Romulus Augustule.
 gaule|10|Quel roi des Huns est battu en 451 aux champs Catalauniques ?|Attila|Clovis|Alaric|Théodoric|Romains et Wisigoths s'allient contre lui.
 gaule|10|Quel peuple s'installe en Gaule du Nord et deviendra maître du pays ?|Les Francs|Les Mongols|Les Mayas|Les Arabes|Les Francs donneront leur nom à la France.
-evangelisation|1|Quel est le métier de Paul avant sa conversion ?|Il persécute les chrétiens|Il est pêcheur|Il est roi|Il est soldat romain|Il s'appelle d'abord Saul.
+evangelisation|1|Que fait Saul, le futur Paul, avant sa conversion ?|Il persécute les chrétiens|Il est pêcheur|Il est roi|Il est soldat romain|Il s'appelle d'abord Saul et pourchasse les premiers chrétiens, jusqu'à sa conversion sur le chemin de Damas.
 evangelisation|1|Sur quelle route Paul a-t-il la vision qui le convertit ?|La route de Damas|La route de Rome|La route de Paris|La route de Jérusalem|Une lumière l'aveugle.
 evangelisation|1|Comment voyage Paul pour annoncer l'Évangile ?|À pied et en bateau|En avion|En voiture|À cheval uniquement|Il fait de longs voyages.
 evangelisation|1|Que fait Paul pour garder le contact avec les premières communautés ?|Il écrit des lettres|Il téléphone|Il envoie des mails|Il fait des affiches|Ses lettres sont dans le Nouveau Testament.

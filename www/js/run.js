@@ -34,8 +34,8 @@
   var CHAL = ["#9a4a3a", "#4a5f7a", "#b9a05a", "#5f7a54", "#a8764a"];
   EVIDS.forEach(function (k) { EV[k].id = k; });
   function rngOf(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function speedAt(t) { return 14 + 37 * (1 - Math.exp(-t / 32)) + Math.min(t, 240) * 0.16; }
-  function rowTime(t) { return Math.max(0.46 + Math.max(0, 1 - Math.max(0, t - 45) / 90) * 0.1, 1.5 - t * 0.024); }
+  function speedAt(t) { return 15.5 + 37 * (1 - Math.exp(-t / 32)) + Math.min(t, 240) * 0.16; }
+  function rowTime(t) { return Math.max(0.46 + Math.max(0, 1 - Math.max(0, t - 45) / 90) * 0.1, 1.42 - t * 0.024); }
   function bioAt(d) { return Math.floor(Math.max(0, d) / BLEN) % 4; }
   function bioMix(d) { var p = ((d % BLEN) + BLEN) % BLEN, b = bioAt(d); return p > BLEN - 40 ? { a: b, b: (b + 1) % 4, t: (p - (BLEN - 40)) / 40 } : { a: b, b: b, t: 0 }; }
   function mixx(c, h, t) { var a = c.indexOf("rgb") === 0 ? c.match(/\d+/g).map(Number) : hex(c), b = hex(h); return "rgb(" + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
@@ -209,9 +209,11 @@
       var diff = Math.min(1, st.t / 40), b = bioAt(st.dist + z * 1.4), pool = (evAt(st.dist + z * 1.4) || {}).pool || POOL[b];
       var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
       var rtPrev = st.gapT || 1.1, r = rnd();
-      var fx = Math.min(1.6, 0.2 + st.t / 25), kind = n < 4 ? "lanes" : r < 0.07 * fx ? "alllow" : r < 0.14 * fx ? "allhigh" : r < 0.34 * fx ? "mixb" : "lanes";
+      var fx = Math.min(1.6, 0.55 + st.t / 22), kind = n < 3 ? "lanes" : r < 0.06 * fx ? "alllow" : r < 0.12 * fx ? "allhigh" : r < 0.38 * fx ? "mixb" : "lanes";
       if (kind !== "lanes" && kind === st.lastKindRow) kind = "lanes";
-      var lf0 = st.lastFree || 0, maxd = 1;
+      var lf0 = st.lastFree || 0, maxd = 1, rtNow = rowTime(st.t);
+      // Quand l'écart est confortable, la voie libre peut passer d'un bord à l'autre (deux glissements) : plus de variété sans resserrer les rangées.
+      if (n > 2 && rtNow >= 0.85 && rnd() < 0.5) maxd = 2;
       var nextFree = function () {
         var c = []; for (var q0 = -1; q0 <= 1; q0++) if (q0 !== lf0 && Math.abs(q0 - lf0) <= maxd) c.push(q0);
         return rnd() < 0.88 && c.length ? c[Math.floor(rnd() * c.length)] : lf0;
@@ -228,8 +230,8 @@
         st.lastFree = free;
         for (var ln = -1; ln <= 1; ln++) {
           if (ln === free) { if (rnd() < 0.6) { var cn = 3 + Math.floor(rnd() * 3); for (var ci = 0; ci < cn; ci++) st.coinsL.push({ lane: ln, z: z - 3 + ci * 1.8, got: false }); } continue; }
-          if (n < 3 && rnd() < 0.5) continue;
-          var q = rnd(), cat = q < 0.3 ? "low" : q < 0.7 ? "block" : "high";
+          if (n < 2 && rnd() < 0.5) continue;
+          var q = rnd(), cat = q < 0.2 ? "low" : q < 0.72 ? "block" : "high";
           st.obs.push({ type: pick(pool[cat]), cat: cat, lane: ln, z: z, hit: false });
         }
       }
