@@ -55,7 +55,7 @@
     HY = Math.round(H * 0.37);
     canvas.style.aspectRatio = W + " / " + H;
     var ctx = canvas.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
     function setDpr(d) { dpr = d; canvas.width = Math.round(W * d); canvas.height = Math.round(H * d); ctx.setTransform(d, 0, 0, d, 0, 0); }
     var slow = 0, ema = 16;
     canvas.width = W * dpr; canvas.height = H * dpr;
@@ -803,7 +803,7 @@
     function loop(ts) {
       if (dead) return;
       var raw = (ts - (last || ts)), dt = Math.min(0.05, raw / 1000); last = ts;
-      if (raw > 0 && raw < 250) { ema += (raw - ema) * 0.05; if (ema > 24 && dpr > 1) { slow++; if (slow > 40) { slow = 0; ema = 16; setDpr(dpr > 1.25 ? 1.25 : 1); } } else slow = 0; }
+      if (raw > 0 && raw < 250) { ema += (raw - ema) * 0.05; if (ema > 30 && dpr > 1) { slow++; if (slow > 90) { slow = 0; ema = 16; setDpr(dpr > 1.5 ? 1.5 : 1); } } else slow = 0; }
       acc += dt; while (acc >= STEP) { update(STEP); acc -= STEP; }
       draw();
       raf = requestAnimationFrame(loop);
