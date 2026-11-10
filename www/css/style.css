@@ -1031,3 +1031,5 @@ body[data-tab="medals"] .medal, body[data-tab="medals"] li { border-left: 5px so
 .who-t { margin-top: 4px; font-size: 18px; line-height: 1.45; }
 
 .bd-me { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--gold-500); border-radius: 12px; background: rgba(240, 198, 75, 0.18); font-size: 17px; }
+.today-pname { font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.05em; color: #5b2a14; margin-top: 6px; }
+.today-page .top { display: flex; align-items: center; }

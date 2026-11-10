@@ -690,6 +690,7 @@
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "settings") { $app.innerHTML = withTabs(settingsScreen(), "home"); return; }
+    if (view.name === "today") return ($app.innerHTML = todayScreen());
     if (view.name === "board") { $app.innerHTML = withTabs(boardScreen(), "tresor"); return; }
     if (view.name === "jeux") { $app.innerHTML = withTabs(jeuxMenu(), "jeux"); return; }
     if (view.name === "tgame" && T) return ($app.innerHTML = tgameScreen());
@@ -794,29 +795,24 @@
     const more = f ? `<button type="button" class="today-go" data-act="today-more">${L2("En savoir plus", "Learn more")} ›</button>` : "";
     return `<section class="today" aria-label="${L2("Aujourd'hui", "Today")}"><p class="today-date">${L2("Aujourd'hui", "Today")}, ${esc(dateTxt)}</p>${fig}${saint}${more}</section>`;
   }
-  function openToday() {
+  function todayScreen() {
     const now = new Date();
     const key = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
     const maps = dailyMaps();
     const f = maps.f[key];
-    if (!f) return;
+    if (!f) return `<div class="screen"><div class="top"><button class="icon-btn" data-act="back" aria-label="${L2("Retour", "Back")}">${UI.back}</button></div></div>`;
     const y = fmtYear(Number(f[2]));
     const when = f[0] === "n" ? L2(`Né en ${y}`, `Born in ${y}`) : f[0] === "m" ? L2(`Mort en ${y}`, `Died in ${y}`) : L2(`En ${y}`, `In ${y}`);
     const sn = maps.s[key];
-    const o = document.createElement("div");
-    o.id = "overlay";
-    o.className = "overlay";
-    o.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(f[1])}">
-      <h2>${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p>
+    return `<div class="screen today-page">
+      <div class="top"><button class="icon-btn" data-act="back" aria-label="${L2("Retour", "Back")}">${UI.back}</button></div>
+      <h2 class="today-pname">${esc(f[1])}</h2><p class="today-sub">${esc(when)}</p>
       ${maps.w[key] ? `<p class="who-h">${L2("Qui est-ce ?", "Who is it?")}</p><p class="who-t">${esc(maps.w[key])}</p>` : ""}
       <p class="who-h">${L2("Ce jour-là", "On this day")}</p>
       <p class="who-t">${esc(f[3])}</p>${maps.m[key] ? `<p class="who-t">${esc(maps.m[key])}</p>` : ""}
       <p class="today-ctx">${esc(yearContext(Number(f[2]), now))}</p>
       ${sn ? `<p class="today-saint">${CROSS_ICO}<span>${L2("Saint du jour", "Saint of the day")} : <b>${esc(sn[0])}</b></span></p>` : ""}
-      <div class="stack"><button class="btn btn-line" data-act="close-sheet">${L2("Fermer", "Close")}</button></div></div>`;
-    o.addEventListener("click", (e) => { if (e.target === o) closeSheet(); });
-    document.body.appendChild(o);
-    sfx("tap");
+      <div class="stack"><button class="btn btn-line" data-act="back">${L2("Retour", "Back")}</button></div></div>`;
   }
 
   /* ===== Conquête (jeu du chevalier) ===== */
@@ -1866,7 +1862,7 @@
       case "quit": Q = null; back(); break;
       case "ranks": openRanks(); break;
       case "close-sheet": closeSheet(); break;
-      case "today-more": openToday(); break;
+      case "today-more": go("today"); break;
       case "tmusic": S.music = S.music === false; save(); afterTog(); sfx("tap"); break;
       case "tsound": S.sound = !S.sound; save(); afterTog(); sfx("tap"); break;
       case "tvib": S.vib = !S.vib; save(); afterTog(); buzz(30); break;
