@@ -25,7 +25,7 @@
   document.write('<script src="js/daily/who-' + lang + '.js"><\/script>'); // fiche « qui est-ce ? » du jour
   document.write('<script src="js/easy/more-' + lang + '.js"><\/script>'); // questions thématiques supplémentaires
   document.write('<script src="js/easy/lv-' + lang + '.js"><\/script>'); // questions par chapitre
-  if (lang === 'fr') document.write('<script src="js/easy/lv3-fr.js"><\/script>'); // questions de chapitre tirées du cours (remplace lv-fr)
+  document.write('<script src="js/easy/lv3-' + lang + '.js"><\/script>'); // questions de chapitre tirées du cours (remplace lv-fr)
   document.write('<script src="js/easy/' + lang + '.js"><\/script>'); // questions de culture générale
 
   if (lang !== "en") return;
