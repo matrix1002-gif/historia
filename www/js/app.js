@@ -745,21 +745,26 @@
   window.addEventListener("historia:iap", () => { if (view.name === "home" && !document.getElementById("overlay")) render(); });
 
   /* ===== Pour aller plus loin (livres, liens affiliés) ===== */
+  const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.200a2 2 0 0 1-2-1.800L5 8z"/><path d="M8.500 8V6.500a3.500 3.500 0 0 1 7 0V8"/></svg>';
   const shopOn = () => { const A = window.HistoriaAff; return !!(A && A.enabled()); };
   const shopCard = () => shopOn()
-    ? `<button class="shopcard" data-act="shop"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${EN ? "Shop" : "Boutique"}</b><small>${EN ? "Objects inspired by each era" : "Des objets inspirés de chaque époque"}</small></span><span class="go">${UI.go}</span></button>`
+    ? `<button class="shopcard" data-act="shop" aria-label="${EN ? "Open the shop" : "Ouvrir la boutique"}">
+        <span class="shop-ico">${BAG}</span>
+        <span class="shop-tx"><i class="shop-tag">${EN ? "New" : "Nouveau"}</i><b>${EN ? "The Historia Shop" : "La boutique Historia"}</b><small>${EN ? "Helmets, chess sets, calligraphy… objects inspired by each era" : "Casques, échecs, calligraphie… des objets inspirés de chaque époque"}</small></span>
+        <span class="shop-go">${UI.go}</span>
+      </button>`
     : "";
   function shopScreen() {
     const A = window.HistoriaAff;
     const blocks = ERAS.map((e) => {
       const list = A && A.enabled() ? A.books(e.id) : [];
       if (!list.length) return "";
-      return `<section class="books"><h2 class="section">${esc(e.title)}</h2>
-      <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul></section>`;
+      return `<section class="shop-era" style="--accent:${e.accent}"><h2 class="shop-era-h"><span class="medal">${ICONS[e.icon]}</span><span>${esc(e.title)}<small>${esc(e.period)}</small></span></h2>
+      <ul>${list.map((b) => `<li><button class="book shop-item" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${BAG}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${EN ? "See on Amazon" : "Voir sur Amazon"}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul></section>`;
     }).join("");
     return `<div class="screen"><div class="top"><button class="icon-btn" data-act="back" aria-label="${L2("Retour", "Back")}">${UI.back}</button></div>
-      <h1 class="learn-title">${EN ? "Shop" : "Boutique"}</h1>
-      <p class="learn-sub">${EN ? "Objects inspired by each era. Links open Amazon." : "Des objets inspirés de chaque époque. Les liens ouvrent Amazon."}</p>
+      <div class="shop-hero"><span class="shop-ico big">${BAG}</span><h1>${EN ? "The Historia Shop" : "La boutique Historia"}</h1>
+      <p>${EN ? "Objects inspired by each era. Links open Amazon." : "Des objets inspirés de chaque époque. Les liens ouvrent Amazon."}</p></div>
       ${blocks}
       <p class="aff-note">${esc(A ? A.disclosure() : "")}</p></div>`;
   }
@@ -1048,8 +1053,8 @@
         </span>
       </button>
 
-      ${todayCard()}
       ${shopCard()}
+      ${todayCard()}
       <header class="learn-head">
         <p class="learn-orn" aria-hidden="true"><span></span>✦<span></span></p>
         <h2 class="learn-title">Voyage à travers les siècles</h2>

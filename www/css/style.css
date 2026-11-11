@@ -1034,11 +1034,31 @@ body[data-tab="medals"] .medal, body[data-tab="medals"] li { border-left: 5px so
 .today-pname { font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.05em; color: #5b2a14; margin-top: 6px; }
 .today-page .top { display: flex; align-items: center; }
 
-.shopcard { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; margin: 14px 0 6px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--gold-500); background: rgba(255, 249, 232, 0.75); color: var(--ink); }
-.shopcard .bk-ico { width: 28px; height: 28px; flex: none; color: var(--gold-400); }
-.shopcard .bk-ico svg { width: 28px; height: 28px; }
-.shopcard .bk-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
-.shopcard b { font-family: var(--display); font-size: 18px; letter-spacing: 0.05em; }
-.shopcard small { color: var(--parch-dim); font-size: 14px; }
-.shopcard .go { width: 22px; height: 22px; flex: none; }
-.shopcard .go svg { width: 22px; height: 22px; }
+.shopcard { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; margin: 16px 0 8px; padding: 16px; border-radius: 18px; border: 1px solid #8a6414; background: linear-gradient(135deg, #f3d98a 0%, #d9a93d 55%, #b8841f 100%); color: #3a2606; box-shadow: 0 6px 18px rgba(110, 78, 20, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.55); position: relative; overflow: hidden; }
+.shopcard::after { content: ""; position: absolute; top: -40%; right: -10%; width: 45%; height: 200%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent); transform: rotate(12deg); animation: shopshine 4.5s ease-in-out infinite; pointer-events: none; }
+@keyframes shopshine { 0%, 60% { transform: translateX(-260%) rotate(12deg); } 100% { transform: translateX(420%) rotate(12deg); } }
+@media (prefers-reduced-motion: reduce) { .shopcard::after { animation: none; display: none; } }
+.shop-ico { width: 52px; height: 52px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #3a2606; color: #f3d98a; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+.shop-ico svg { width: 28px; height: 28px; }
+.shop-ico.big { width: 64px; height: 64px; margin: 0 auto 8px; }
+.shop-ico.big svg { width: 34px; height: 34px; }
+.shop-tx { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.shop-tag { justify-self: start; font-style: normal; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #7a1f1f; color: #fff3d6; }
+.shop-tx b { font-family: var(--display); font-size: 19px; letter-spacing: 0.04em; line-height: 1.15; }
+.shop-tx small { font-size: 14px; line-height: 1.3; color: #5a3d0c; }
+.shop-go { width: 26px; height: 26px; flex: none; color: #3a2606; }
+.shop-go svg { width: 26px; height: 26px; }
+.shop-hero { text-align: center; margin: 6px 0 14px; padding: 18px 14px; border-radius: 18px; border: 1px solid #8a6414; background: linear-gradient(135deg, #f3d98a, #d9a93d 60%, #b8841f); color: #3a2606; box-shadow: 0 6px 18px rgba(110, 78, 20, 0.3); }
+.shop-hero h1 { margin: 4px 0; font-family: var(--display); font-size: 24px; letter-spacing: 0.05em; }
+.shop-hero p { margin: 0; font-size: 16px; color: #5a3d0c; }
+.shop-era { margin-top: 18px; }
+.shop-era-h { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-family: var(--display); font-size: 17px; letter-spacing: 0.04em; color: var(--ink); }
+.shop-era-h small { display: block; font-family: inherit; font-size: 13px; letter-spacing: 0.02em; color: var(--parch-dim); }
+.shop-era-h .medal { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--accent, var(--gold-500)); background: rgba(255, 249, 232, 0.8); color: var(--accent, var(--gold-400)); }
+.shop-era-h .medal svg { width: 24px; height: 24px; }
+.shop-era ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.shop-item { border-left: 4px solid var(--accent, var(--gold-500)); }
+.shop-item .bk-ico { color: var(--accent, var(--gold-400)); }
+.shop-item small { font-size: 13px; }
+.shop-item .go { width: 20px; height: 20px; flex: none; color: var(--parch-dim); }
+.shop-item .go svg { width: 20px; height: 20px; }
