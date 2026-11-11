@@ -1,6 +1,6 @@
 /* Historia — achat « sans publicité » (Google Play Billing, achat unique à vie).
    Actif uniquement dans l'application Android. Le produit se crée dans la Play Console :
-   Monétiser > Produits > Produits in-app, identifiant : remove_ads, prix : 4,99 €. */
+   Monétiser > Produits > Produits in-app, identifiant : remove_ads, prix : 3,99 €. */
 (function () {
   "use strict";
   var PRODUCT = "remove_ads";

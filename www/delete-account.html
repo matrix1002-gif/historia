@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historia – Supprimer mon compte</title>
+<style>
+  body { margin: 0; background: #0b1430; color: #f3ead2; font: 18px/1.6 Georgia, "Times New Roman", serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 28px 20px 60px; }
+  h1 { font-size: 28px; color: #e9cf8e; letter-spacing: .04em; }
+  a { color: #e9cf8e; }
+</style>
+</head>
+<body>
+<main id="fr">
+  <h1>Supprimer mon compte Historia</h1>
+  <p>Historia fonctionne sans compte. Un compte n'existe que si vous avez choisi de figurer au classement en ligne (e-mail, pseudo, meilleur score).</p>
+  <p><b>Dans l'application :</b> Quiz › Classement des joueurs › Supprimer mon compte. Votre compte, votre pseudo et votre score sont alors effacés définitivement.</p>
+  <p><b>Sans l'application :</b> écrivez à <a href="mailto:matteo09090@gmail.com?subject=Suppression%20de%20compte%20Historia">matteo09090@gmail.com</a> depuis l'adresse e-mail du compte, en indiquant « Suppression de compte Historia ». Le compte et les données associées sont supprimés sous 30 jours.</p>
+  <p>Les données de progression stockées sur votre téléphone se suppriment en désinstallant l'application.</p>
+  <p><a href="privacy.html">Politique de confidentialité</a></p>
+</main>
+<main id="en" lang="en" hidden>
+  <h1>Delete my Historia account</h1>
+  <p>Historia works without an account. An account exists only if you chose to appear on the online leaderboard (e-mail, nickname, best score).</p>
+  <p><b>In the app:</b> Quiz › Player leaderboard › Delete my account. Your account, nickname and score are then permanently erased.</p>
+  <p><b>Without the app:</b> write to <a href="mailto:matteo09090@gmail.com?subject=Historia%20account%20deletion">matteo09090@gmail.com</a> from the e-mail address of the account, with the subject “Historia account deletion”. The account and its data are deleted within 30 days.</p>
+  <p>Progress data stored on your phone is removed by uninstalling the app.</p>
+  <p><a href="privacy.html?lang=en">Privacy policy</a></p>
+</main>
+<script>
+  if (/[?&]lang=en/.test(location.search) || (!/[?&]lang=fr/.test(location.search) && !/^fr/i.test(navigator.language || "fr"))) {
+    document.getElementById("fr").hidden = true; document.getElementById("en").hidden = false; document.documentElement.lang = "en";
+  }
+</script>
+</body>
+</html>
