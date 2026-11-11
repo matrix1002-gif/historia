@@ -1602,7 +1602,7 @@ gaule|3|Which two groups really counted in Gaul according to Caesar?|Druids and 
 gaule|3|How many years could a druid's training last?|Up to twenty|One|Three|Five|Pupils learned verses by heart.
 gaule|3|With what tool does the priest cut mistletoe from the oak?|A golden sickle|An iron axe|A sword|A silver knife|Pliny the Elder describes the ceremony.
 gaule|3|Which god is the master of thunder?|Taranis|Cernunnos|Lug|Epona|The Romans identified him with their own gods.
-gaule|3|Which goddess protects horses?|Epona|Taranis|Cernunnos|Lug|Even the Roman cavalry adopted her.
+gaule|3|Which Gaulish deity protects horses?|Epona|Taranis|Cernunnos|Lug|Even the Roman cavalry adopted her.
 gaule|3|Where did peasants find a large bronze calendar in 1897?|At Coligny, in the Ain|At Vix, in Burgundy|At Alesia|At Bibracte|The letters are Latin but the language is Gaulish.
 gaule|4|How many people did the Helvetii number, according to Caesar?|More than three hundred thousand|About a thousand|Ten thousand|A million|They left with women, children and wagons.
 gaule|4|From which wood were the Veneti's big ships built?|Oak|Pine|Fir|Bronze|They were sturdier than Roman galleys.
@@ -2702,7 +2702,7 @@ gaule|3|What did the druids teach about the soul?|That it passes from one body t
 gaule|3|Where did the druids meet once a year?|In the territory of the Carnutes|In Lyon|In Paris|In Marseille|Regarded as the centre of Gaul.
 gaule|3|With what was mistletoe cut, according to Pliny the Elder?|A golden sickle|An iron axe|A bronze knife|A stone blade|From an oak, on the sixth day of the moon.
 gaule|3|Which Gaulish god was master of thunder?|Taranis|Epona|Lug|Cernunnos|Epona protected horses.
-gaule|3|Which goddess became so popular that Roman cavalry adopted her?|Epona|Taranis|Lug|Cernunnos|She was protector of horses.
+gaule|3|Which Gaulish deity became so popular that Roman cavalry adopted it?|Epona|Taranis|Lug|Cernunnos|She was protector of horses.
 gaule|3|How is Cernunnos shown?|With stag antlers|With wings|With a hammer|With a sickle|As on a famous pillar found in Paris.
 gaule|4|Which province did Caesar obtain as governor?|Narbonese Gaul|Britain|Spain|Egypt|He sought glory and wealth.
 gaule|4|Which people burned their villages and migrated westward in 58 BC?|The Helvetii|The Belgae|The Veneti|The Nervii|From present-day Switzerland.

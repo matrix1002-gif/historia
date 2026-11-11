@@ -882,7 +882,7 @@ modernes|3|Quel colonel découvre l'erreur judiciaire ?|Picquart|Esterhazy|Henry
 modernes|4|Quelle exposition universelle de 1900 attire des millions de visiteurs ?|L'Exposition de Paris|L'Exposition de Londres|L'Exposition de Chicago|L'Exposition de Rome|Elle met en valeur la modernité.
 modernes|4|Quelle ligne de métro ouvre à Paris en 1900 ?|La ligne 1|La ligne 14|La ligne 6|La ligne 10|Elle relie Vincennes à Maillot.
 modernes|4|Quels frères inventent le cinématographe en 1895 ?|Les frères Lumière|Les frères Wright|Les frères Montgolfier|Les frères Pereire|La première séance publique a lieu à Paris.
-modernes|4|Quel savant découvre la radioactivité avec Pierre Curie ?|Marie Curie|Louis Pasteur|Henri Becquerel seul|Claude Bernard|Elle reçoit deux prix Nobel.
+modernes|4|Quelle savante découvre la radioactivité avec Pierre Curie ?|Marie Curie|Lise Meitner|Rosalind Franklin|Ada Lovelace|Elle reçoit deux prix Nobel.
 modernes|4|Quel ingénieur construit la tour Eiffel ?|Gustave Eiffel|Haussmann|Lesseps|Vauban|Elle est terminée en 1889.
 modernes|4|Quelle hauteur la tour Eiffel atteint-elle environ ?|300 mètres|100 mètres|1 000 mètres|50 mètres|Elle fut la plus haute du monde.
 modernes|5|En quelle année la Première Guerre mondiale commence-t-elle ?|1914|1905|1918|1939|Elle dure quatre ans.
@@ -2420,7 +2420,7 @@ gaule|3|Quels deux groupes comptent vraiment en Gaule selon César ?|Les druides
 gaule|3|Combien d'années peut durer la formation d'un druide ?|Jusqu'à vingt ans|Un an|Trois ans|Cinq ans|Les élèves apprennent des vers par cœur.
 gaule|3|Avec quel outil le prêtre coupe-t-il le gui sur le chêne ?|Une serpe d'or|Une hache de fer|Une épée|Un couteau d'argent|Pline l'Ancien décrit la cérémonie.
 gaule|3|Quel dieu gaulois est le maître du tonnerre ?|Taranis|Cernunnos|Lug|Épona|Les Romains l'assimilent à leurs propres dieux.
-gaule|3|Quelle déesse gauloise protège les chevaux ?|Épona|Taranis|Cernunnos|Lug|Même la cavalerie romaine l'adoptera.
+gaule|3|Quelle divinité gauloise protège les chevaux ?|Épona|Taranis|Cernunnos|Lug|Même la cavalerie romaine l'adoptera.
 gaule|3|Où des paysans trouvent-ils en 1897 un grand calendrier de bronze ?|À Coligny, dans l'Ain|À Vix, en Bourgogne|À Alésia|À Bibracte|Les lettres sont latines, mais la langue est gauloise.
 gaule|4|Combien de personnes les Helvètes comptent-ils, d'après César ?|Plus de trois cent mille|Environ mille|Dix mille|Un million|Ils partent avec femmes, enfants et chariots.
 gaule|4|En quel bois sont construits les grands navires des Vénètes ?|En chêne|En pin|En sapin|En bronze|Ils sont plus solides que les galères romaines.

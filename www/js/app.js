@@ -448,7 +448,11 @@
   /* Questions fabriquées à partir des personnages et événements du jour : plus de 1 800 questions supplémentaires. */
   function genEasy() {
     const maps = dailyMaps();
-    const F = Object.keys(maps.f).sort().map((k) => ({ k, t: maps.f[k][0], name: maps.f[k][1], y: Number(maps.f[k][2]), text: maps.f[k][3] || "", more: maps.m[k] || "" })).filter((f) => f.name && !isNaN(f.y));
+    // Genre du personnage (pour que les mauvaises réponses soient du même genre que la bonne : sinon le prénom suffit à répondre).
+    const FEM_NAMES = /^(Marie|Anne|Catherine|Jeanne|Aliénor|Blanche|Joséphine|Louise|Élisabeth|Claire|Hildegarde|Clotilde|Radegonde|Brunehaut|Frédégonde|Bathilde|Berthe|Olga|Isabelle|Marguerite|Thérèse|Olympe|Charlotte|Simone|Coco|Madame|Cléopâtre|Harriet|Diane|Mathilde|Gabrielle|Henriette|Agnès|Théodora|Mary|Joan|Jane|Eleanor|Elizabeth|Isabella|Margaret|Bridget|Brigitte|Bernadette|Florence|Bertha|Hildegard|Clare|Teresa|Cleopatra|Bathild|Genevieve|Geneviève|Queen|Reine|Sainte|Saint-Marie|Empress|Impératrice|Eugénie|Eugenie|Victoria|Lucie|Lucy|Sophie|Françoise|Jacqueline|Édith|Edith|Pauline|Caroline|Laure|Marthe|Cécile|Agathe)(\s|-|,|$)/;
+    const FEM_CUE = EN ? /^(she\b|born a slave|a former slave, she|the last queen|the visionary|the maid|queen\b|daughter of|mother of|spanish carmelite|a spanish carmelite|an italian mystic|mystic and founder|german abbess|abbess|english novelist|british nurse|first woman|archduchess|henry viii's second wife|the last stuart|a clergyman's daughter|the daughter of a dyer)/i : /^(elle\b|née\b|ancienne esclave|la « reine|la reine|la dernière reine|la voyante|la pucelle|la jeune fille|mystique et fondatrice|mystique italienne|carmélite|romancière|archiduchesse|abbesse|prisonnière|première femme|fille d|compagne d|disciple d|la deuxième épouse|mère de|reine d|impératrice|fondatrice)/i;
+    const genderOf = (f) => (FEM_NAMES.test(f.name) || (f.t !== "e" && (FEM_CUE.test(f.text.trim()) || FEM_CUE.test(f.more.trim()))) ? "f" : "m");
+    const F = Object.keys(maps.f).sort().map((k) => ({ k, t: maps.f[k][0], name: maps.f[k][1], y: Number(maps.f[k][2]), text: maps.f[k][3] || "", more: maps.m[k] || "" })).filter((f) => f.name && !isNaN(f.y)).map((f) => { f.g = genderOf(f); return f; });
     const S2 = Object.keys(maps.s).sort().map((k) => ({ k, name: maps.s[k][0] })).filter((x) => x.name);
     let seed = 7;
     const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
@@ -458,7 +462,7 @@
     const add = (f, q, c, w, e, tag) => { if (w.length === 3 && new Set([c, ...w]).size === 4) out.push({ era: easyEra(f.y), d: { q, c, w, e }, key: `easy:${tag}:${f.k}` }); };
     const when = (f) => { const y = fmtYear(f.y); return f.t === "n" ? L2(`né en ${y}`, `born in ${y}`) : f.t === "m" ? L2(`mort en ${y}`, `died in ${y}`) : L2(`en ${y}`, `in ${y}`); };
     const info = (f) => `${f.name} (${when(f)}). ${f.text}`;
-    const same = (f) => (g) => g.k === f.k || g.name === f.name || (f.t === "e") !== (g.t === "e");
+    const same = (f) => (g) => g.k === f.k || g.name === f.name || (f.t === "e") !== (g.t === "e") || (f.t !== "e" && g.g !== f.g);
     F.forEach((f) => {
       const isEv = f.t === "e";
       const who = isEv ? L2("De quel événement s'agit-il ?", "Which event is this?") : L2("De quel personnage s'agit-il ?", "Which historical figure is this?");
@@ -715,11 +719,11 @@
   const canSell = () => IAP() && IAP().available;
   function noAdsCard() {
     if (!canSell()) return "";
-    if (IAP().adFree()) return '<p class="noads-done">Sans publicité ✓</p>';
+    if (IAP().adFree()) return `<p class="noads-done">${EN ? "Ad-free ✓" : "Sans publicité ✓"}</p>`;
     const pr = IAP().price();
-    return `<section class="noads"><div><b>Sans publicité</b><span>${EN ? "Remove ads for life with a single purchase." : "Supprime les publicités à vie, en un seul achat."}</span></div>
+    return `<section class="noads"><div><b>${EN ? "Ad-free" : "Sans publicité"}</b><span>${EN ? "Remove ads for life with a single purchase." : "Supprime les publicités à vie, en un seul achat."}</span></div>
       <button class="btn btn-gold" data-act="noads">${EN ? "Remove ads" : "Supprimer les pubs"}${pr ? ` · ${esc(pr)}` : ""}</button>
-      <button class="linkbtn" data-act="restore">Rétablir mon achat</button></section>`;
+      <button class="linkbtn" data-act="restore">${EN ? "Restore my purchase" : "Rétablir mon achat"}</button></section>`;
   }
   function buyNoAds(btn) {
     if (!canSell()) return;
@@ -744,7 +748,7 @@
     const A = window.HistoriaAff;
     const list = A && A.enabled() ? A.books(e.id) : [];
     if (!list.length) return "";
-    return `<section class="books"><h2 class="section">Pour aller plus loin</h2>
+    return `<section class="books"><h2 class="section">${EN ? "Going further" : "Pour aller plus loin"}</h2>
       <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${esc(b.author)}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul>
       <p class="aff-note">${esc(A.disclosure())}</p></section>`;
   }
