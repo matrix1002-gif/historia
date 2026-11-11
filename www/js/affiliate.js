@@ -6,7 +6,7 @@
   "use strict";
   // Un identifiant par boutique : français -> amazon.fr (programme Partenaires amazon.fr), anglais -> amazon.com (programme amazon.com).
   // Une langue sans identifiant n'affiche pas la rubrique.
-  var TAG = { fr: "", en: "" };
+  var TAG = { fr: "", en: "historiaquiz-20" };
   var STORE = { fr: "https://www.amazon.fr", en: "https://www.amazon.com" };
 
   // Objets (pas de livres), un lien de recherche Amazon par objet : [libellé FR, libellé EN, recherche Amazon, courte description FR, EN]
