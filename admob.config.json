@@ -1,7 +1,7 @@
 {
   "_aide": "Un seul endroit pour les publicités. Tant que test = true, ce sont les publicités de test de Google (aucun revenu, aucun risque). Pour les vraies publicités : remplacez les trois identifiants par ceux de votre compte AdMob, puis mettez test à false.",
-  "test": true,
-  "appId": "ca-app-pub-3940256099942544~3347511713",
-  "bannerId": "ca-app-pub-3940256099942544/9214589741",
-  "interstitialId": "ca-app-pub-3940256099942544/1033173712"
+  "test": false,
+  "appId": "ca-app-pub-7412272380997188~9054346949",
+  "bannerId": "ca-app-pub-7412272380997188/3825557641",
+  "interstitialId": "ca-app-pub-7412272380997188/8775145345"
 }
