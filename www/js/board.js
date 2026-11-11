@@ -18,6 +18,8 @@
     return ready;
   }
   function user() { return auth && auth.currentUser ? { uid: auth.currentUser.uid, name: auth.currentUser.displayName || "" } : null; }
+  var COLL = { all: "board", defense: "board_defense", run: "board_run" };
+  function coll(k) { return COLL[k] || "board"; }
   function clean(n) { return String(n || "").replace(/[<>&"']/g, "").trim().slice(0, 16); }
   function signUp(email, pass, name) {
     name = clean(name); if (name.length < 3) return Promise.reject(new Error("name"));
@@ -30,31 +32,32 @@
   function deleteAccount() {
     return init().then(function () {
       var u = auth.currentUser; if (!u) return;
-      return db.collection("board").doc(u.uid).delete().catch(function () {}).then(function () { return u.delete(); });
+      var dels = Object.keys(COLL).map(function (k) { return db.collection(COLL[k]).doc(u.uid).delete().catch(function () {}); });
+      return Promise.all(dels).then(function () { return u.delete(); });
     });
   }
-  function submit(score) {
+  function submit(score, kind) {
     if (!enabled() || !score) return Promise.resolve();
     return init().then(function () {
       var u = auth.currentUser; if (!u) return;
-      var ref = db.collection("board").doc(u.uid);
+      var ref = db.collection(coll(kind)).doc(u.uid);
       return ref.get().then(function (d) {
         if (d.exists && d.data().score >= score) return;
         return ref.set({ name: clean(u.displayName) || "Anonyme", score: score, ts: firebase.firestore.FieldValue.serverTimestamp() });
       });
     }).catch(function () {});
   }
-  function top() {
-    return init().then(function () { return db.collection("board").orderBy("score", "desc").limit(10).get(); })
+  function top(kind) {
+    return init().then(function () { return db.collection(coll(kind)).orderBy("score", "desc").limit(10).get(); })
       .then(function (q) { return q.docs.map(function (d) { var v = d.data(); return { uid: d.id, name: v.name, score: v.score }; }); });
   }
   // Rang du joueur connecté : 1 + nombre de joueurs avec un meilleur score (null s'il n'a encore aucun score en ligne).
-  function myRank() {
+  function myRank(kind) {
     return init().then(function () {
       var u = auth.currentUser; if (!u) return null;
-      return db.collection("board").doc(u.uid).get().then(function (d) {
+      return db.collection(coll(kind)).doc(u.uid).get().then(function (d) {
         if (!d.exists) return { rank: null, score: 0 };
-        var sc = d.data().score, q = db.collection("board").where("score", ">", sc);
+        var sc = d.data().score, q = db.collection(coll(kind)).where("score", ">", sc);
         var p = typeof q.count === "function" ? q.count().get().then(function (r) { return r.data().count; }) : q.get().then(function (r) { return r.size; });
         return p.then(function (n) { return { rank: n + 1, score: sc }; });
       });

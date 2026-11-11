@@ -8,3 +8,7 @@
 6. Les coller dans `www/js/firebase-config.js`, puis me renvoyer le build (ou me donner les valeurs, je les mets).
 7. Authentication → Paramètres → Domaines autorisés : ajouter `localhost` (l'appli Android Capacitor utilise localhost).
 Le classement s'affiche alors dans l'onglet Quiz. Tant que la configuration est vide, il est marqué « indisponible ».
+
+
+## Classements des jeux (Conquête et La Fuite)
+Les classements des jeux utilisent deux collections de plus : `board_defense` et `board_run`. Copiez le contenu de `firebase/firestore.rules` dans Firebase › Firestore Database › Règles, puis cliquez sur Publier. Sans cela, le classement du quiz continue de marcher, mais ceux des jeux affichent une erreur.
