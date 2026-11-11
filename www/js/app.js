@@ -694,6 +694,7 @@
     if (view.name === "quiz" && Q) return ($app.innerHTML = quizScreen());
     if (view.name === "tresor") { $app.innerHTML = withTabs(tresorMenu(), "tresor"); return animateBars(); }
     if (view.name === "settings") { $app.innerHTML = withTabs(settingsScreen(), "home"); return; }
+    if (view.name === "shop") return ($app.innerHTML = shopScreen());
     if (view.name === "today") return ($app.innerHTML = todayScreen());
     if (view.name === "board") { $app.innerHTML = withTabs(boardScreen(), "tresor"); return; }
     if (view.name === "jeux") { $app.innerHTML = withTabs(jeuxMenu(), "jeux"); return; }
@@ -744,13 +745,23 @@
   window.addEventListener("historia:iap", () => { if (view.name === "home" && !document.getElementById("overlay")) render(); });
 
   /* ===== Pour aller plus loin (livres, liens affiliés) ===== */
-  function booksSection(e) {
+  const shopOn = () => { const A = window.HistoriaAff; return !!(A && A.enabled()); };
+  const shopCard = () => shopOn()
+    ? `<button class="shopcard" data-act="shop"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${EN ? "Shop" : "Boutique"}</b><small>${EN ? "Objects inspired by each era" : "Des objets inspirés de chaque époque"}</small></span><span class="go">${UI.go}</span></button>`
+    : "";
+  function shopScreen() {
     const A = window.HistoriaAff;
-    const list = A && A.enabled() ? A.books(e.id) : [];
-    if (!list.length) return "";
-    return `<section class="books"><h2 class="section">${EN ? "Shop the era" : "Objets de l'époque"}</h2>
-      <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${esc(b.author)}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul>
-      <p class="aff-note">${esc(A.disclosure())}</p></section>`;
+    const blocks = ERAS.map((e) => {
+      const list = A && A.enabled() ? A.books(e.id) : [];
+      if (!list.length) return "";
+      return `<section class="books"><h2 class="section">${esc(e.title)}</h2>
+      <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul></section>`;
+    }).join("");
+    return `<div class="screen"><div class="top"><button class="icon-btn" data-act="back" aria-label="${L2("Retour", "Back")}">${UI.back}</button></div>
+      <h1 class="learn-title">${EN ? "Shop" : "Boutique"}</h1>
+      <p class="learn-sub">${EN ? "Objects inspired by each era. Links open Amazon." : "Des objets inspirés de chaque époque. Les liens ouvrent Amazon."}</p>
+      ${blocks}
+      <p class="aff-note">${esc(A ? A.disclosure() : "")}</p></div>`;
   }
 
   /* ===== Personnage et saint du jour ===== */
@@ -1038,6 +1049,7 @@
       </button>
 
       ${todayCard()}
+      ${shopCard()}
       <header class="learn-head">
         <p class="learn-orn" aria-hidden="true"><span></span>✦<span></span></p>
         <h2 class="learn-title">Voyage à travers les siècles</h2>
@@ -1093,7 +1105,6 @@
       </div>
       <p class="mix-note">Touche un niveau pour lire sa fiche, puis passe au quiz (<span class="inline-ico">${UI.go}</span>). Réussir un quiz débloque le niveau suivant.</p>
       <ol class="levels">${rows}</ol>
-      ${booksSection(e)}
       ${adSlot()}
     </div>`;
   }
@@ -1783,6 +1794,7 @@
       case "bdopen": BD.msg = ""; BD.list = null; BD.me = undefined; go("board"); if (window.HistoriaBoard && window.HistoriaBoard.enabled()) window.HistoriaBoard.init().then(() => { render(); boardLoad(); }).catch((e) => boardRefresh(fbErr(e))); break;
       case "bdmode": case "bdgo": case "bdreset": case "bdsend": case "bdout": case "bddel": boardAct(act); break;
       case "tstart": startTresor(el.dataset.scope); break;
+      case "shop": go("shop"); sfx("tap"); break;
       case "gallery": go("gallery", {}, view.name === "result" ? "replace" : "push"); break;
       case "medals": go("medals"); break;
       case "char": openChar(el.dataset.id, Number(el.dataset.k)); break;

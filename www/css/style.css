@@ -1033,3 +1033,12 @@ body[data-tab="medals"] .medal, body[data-tab="medals"] li { border-left: 5px so
 .bd-me { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--gold-500); border-radius: 12px; background: rgba(240, 198, 75, 0.18); font-size: 17px; }
 .today-pname { font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.05em; color: #5b2a14; margin-top: 6px; }
 .today-page .top { display: flex; align-items: center; }
+
+.shopcard { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; margin: 14px 0 6px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--gold-500); background: rgba(255, 249, 232, 0.75); color: var(--ink); }
+.shopcard .bk-ico { width: 28px; height: 28px; flex: none; color: var(--gold-400); }
+.shopcard .bk-ico svg { width: 28px; height: 28px; }
+.shopcard .bk-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.shopcard b { font-family: var(--display); font-size: 18px; letter-spacing: 0.05em; }
+.shopcard small { color: var(--parch-dim); font-size: 14px; }
+.shopcard .go { width: 22px; height: 22px; flex: none; }
+.shopcard .go svg { width: 22px; height: 22px; }
