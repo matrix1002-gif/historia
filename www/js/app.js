@@ -748,7 +748,7 @@
     const A = window.HistoriaAff;
     const list = A && A.enabled() ? A.books(e.id) : [];
     if (!list.length) return "";
-    return `<section class="books"><h2 class="section">${EN ? "Going further" : "Pour aller plus loin"}</h2>
+    return `<section class="books"><h2 class="section">${EN ? "Shop the era" : "Objets de l'époque"}</h2>
       <ul>${list.map((b) => `<li><button class="book" data-act="book" data-href="${esc(b.url)}"><span class="bk-ico">${UI.book}</span><span class="bk-text"><b>${esc(b.title)}</b><small>${esc(b.author)}</small></span><span class="go">${UI.go}</span></button></li>`).join("")}</ul>
       <p class="aff-note">${esc(A.disclosure())}</p></section>`;
   }

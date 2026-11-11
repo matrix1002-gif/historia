@@ -1,51 +1,39 @@
-/* Historia — suggestions de lecture (programme Partenaires Amazon).
-   Pour activer : créer un compte Partenaires Amazon (amazon.fr et/ou amazon.com), puis renseigner votre
-   identifiant de suivi ci-dessous (ex. "historia-21"). Tant qu'il est vide, la rubrique reste invisible.
+/* Historia — suggestions d'objets (programme Partenaires Amazon).
+   Pour activer : créer un compte Partenaires Amazon sur amazon.com, puis renseigner votre identifiant de suivi
+   ci-dessous (ex. "historia-20"). Tant qu'il est vide, la rubrique reste invisible.
    Les liens sont des recherches Amazon : aucun prix n'est affiché ni copié depuis Amazon. */
 (function () {
   "use strict";
-  var TAG = { fr: "", en: "" };
-  var STORE = { fr: "https://www.amazon.fr", en: "https://www.amazon.com" };
+  // Un seul compte Partenaires Amazon (amazon.com) pour les deux langues : renseigner l'identifiant ici (ex. "historia-20").
+  var TAG = "";
+  var STORE = "https://www.amazon.com";
 
-  var BOOKS = {
-    fr: {
-      gaule: [["La Guerre des Gaules", "Jules César"], ["Les Celtes : histoire et dictionnaire", "Venceslas Kruta"]],
-      evangelisation: [["La Conversion de l'Europe", "Richard Fletcher"], ["Histoire ecclésiastique du peuple anglais", "Bède le Vénérable"]],
-      carolingiens: [["Charlemagne", "Jean Favier"], ["Vie de Charlemagne", "Éginhard"]],
-      moines: [["La Règle de saint Benoît", "Benoît de Nursie"], ["Le Nom de la rose", "Umberto Eco"]],
-      chevaliers: [["Chevaliers et chevalerie au Moyen Âge", "Jean Flori"], ["Guillaume le Maréchal ou le Meilleur Chevalier du monde", "Georges Duby"]],
-      croisades: [["Les Croisades vues par les Arabes", "Amin Maalouf"], ["L'Épopée des croisades", "René Grousset"]],
-      capetiens: [["Saint Louis", "Jacques Le Goff"], ["La Guerre de Cent Ans", "Philippe Contamine"]],
-      renaissance: [["La Reine Margot", "Alexandre Dumas"], ["Les Guerres de Religion", "Nicolas Le Roux"]],
-      "grand-siecle": [["Louis XIV", "François Bluche"], ["Mémoires", "Saint-Simon"]],
-      revolution: [["Histoire de la Révolution française", "Jules Michelet"], ["Quatre-vingt-treize", "Victor Hugo"]],
-      empire: [["Napoléon", "Jean Tulard"], ["Les Misérables", "Victor Hugo"]]
-    },
-    en: {
-      gaule: [["The Gallic War", "Julius Caesar"], ["The Ancient Celts", "Barry Cunliffe"]],
-      evangelisation: [["The Barbarian Conversion", "Richard Fletcher"], ["Ecclesiastical History of the English People", "Bede"]],
-      carolingiens: [["Two Lives of Charlemagne", "Einhard and Notker"], ["Charlemagne", "Janet Nelson"]],
-      moines: [["The Rule of Saint Benedict", "Benedict of Nursia"], ["The Name of the Rose", "Umberto Eco"]],
-      chevaliers: [["The Knight in History", "Frances Gies"], ["William Marshal", "Georges Duby"]],
-      croisades: [["The Crusades Through Arab Eyes", "Amin Maalouf"], ["The Crusades: The Authoritative History", "Thomas Asbridge"]],
-      capetiens: [["A Distant Mirror", "Barbara Tuchman"], ["Saint Louis", "Jacques Le Goff"]],
-      renaissance: [["Queen Margot", "Alexandre Dumas"], ["The French Wars of Religion", "R. J. Knecht"]],
-      "grand-siecle": [["Louis XIV", "John B. Wolf"], ["Memoirs of the Duke of Saint-Simon", "Saint-Simon"]],
-      revolution: [["Citizens", "Simon Schama"], ["A Tale of Two Cities", "Charles Dickens"]],
-      empire: [["Napoleon: A Life", "Andrew Roberts"], ["Les Misérables", "Victor Hugo"]]
-    }
+  // Objets (pas de livres), un lien de recherche Amazon par objet : [libellé FR, libellé EN, recherche Amazon, courte description FR, EN]
+  var ITEMS = {
+    gaule: [["Casque de légionnaire romain (réplique)", "Roman legionary helmet replica", "roman legionary helmet replica"], ["Bijou celtique", "Celtic knot jewelry", "celtic knot jewelry"]],
+    evangelisation: [["Croix celtique (pendentif)", "Celtic cross necklace", "celtic cross necklace"], ["Carnet style manuscrit enluminé", "Illuminated manuscript notebook", "illuminated manuscript journal"]],
+    carolingiens: [["Jeu d'échecs médiéval", "Medieval chess set", "medieval chess set"], ["Set de calligraphie", "Calligraphy pen set", "calligraphy pen set"]],
+    moines: [["Bougies en cire d'abeille", "Beeswax candles", "pure beeswax candles"], ["Set de calligraphie", "Calligraphy pen set", "calligraphy pen set"]],
+    chevaliers: [["Casque de chevalier (réplique)", "Medieval knight helmet replica", "medieval knight helmet replica"], ["Jeu de société médiéval", "Medieval board game", "medieval board game"]],
+    croisades: [["Carte du Moyen Âge (affiche)", "Medieval world map poster", "medieval world map poster"], ["Jeu de société médiéval", "Medieval strategy board game", "medieval strategy board game"]],
+    capetiens: [["Puzzle cathédrale gothique", "Gothic cathedral jigsaw puzzle", "gothic cathedral jigsaw puzzle"], ["Maquette Notre-Dame", "Notre-Dame cathedral model kit", "notre dame cathedral model kit"]],
+    renaissance: [["Puzzle d'art de la Renaissance", "Renaissance art jigsaw puzzle", "renaissance art jigsaw puzzle 1000"], ["Maquette Léonard de Vinci", "Leonardo da Vinci wooden model kit", "leonardo da vinci wooden model kit"]],
+    "grand-siecle": [["Puzzle du château de Versailles", "Palace of Versailles jigsaw puzzle", "palace of versailles jigsaw puzzle"], ["Jeu de cartes d'histoire de France", "French history playing cards", "french history playing cards"]],
+    revolution: [["Drapeau français", "French flag", "french flag tricolor"], ["Jeu de société Révolution française", "French Revolution board game", "french revolution board game"]],
+    empire: [["Bicorne de Napoléon", "Napoleon bicorne hat", "napoleon bicorne hat"], ["Jeu de stratégie napoléonien", "Napoleonic wars board game", "napoleonic wars board game"]],
+    modernes: [["Maquette de la tour Eiffel", "Eiffel Tower model kit", "eiffel tower model kit"], ["Jeu de société d'histoire", "History board game", "history strategy board game"]]
   };
 
   function lang() { return (window.HI && window.HI.lang) === "en" ? "en" : "fr"; }
-  function url(l, title, author) {
-    return STORE[l] + "/s?k=" + encodeURIComponent(title + " " + author) + "&tag=" + encodeURIComponent(TAG[l]);
+  function url(q) {
+    return STORE + "/s?k=" + encodeURIComponent(q) + "&tag=" + encodeURIComponent(TAG);
   }
   window.HistoriaAff = {
-    enabled: function () { return !!TAG[lang()]; },
+    enabled: function () { return !!TAG; },
     books: function (eraId) {
+      if (!TAG) return [];
       var l = lang();
-      if (!TAG[l]) return [];
-      return ((BOOKS[l] || {})[eraId] || []).map(function (b) { return { title: b[0], author: b[1], url: url(l, b[0], b[1]) }; });
+      return (ITEMS[eraId] || []).map(function (b) { return { title: l === "en" ? b[1] : b[0], author: "", url: url(b[2]) }; });
     },
     disclosure: function () {
       return lang() === "en"
