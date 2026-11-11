@@ -1,12 +1,13 @@
 /* Historia — suggestions d'objets (programme Partenaires Amazon).
-   Pour activer : créer un compte Partenaires Amazon sur amazon.com, puis renseigner votre identifiant de suivi
-   ci-dessous (ex. "historia-20"). Tant qu'il est vide, la rubrique reste invisible.
+   Pour activer : créer un compte Partenaires Amazon (amazon.fr pour le français, amazon.com pour l'anglais), puis
+   renseigner chaque identifiant de suivi ci-dessous (ex. "historia-21"). Tant qu'il est vide, la rubrique reste invisible.
    Les liens sont des recherches Amazon : aucun prix n'est affiché ni copié depuis Amazon. */
 (function () {
   "use strict";
-  // Un seul compte Partenaires Amazon (amazon.com) pour les deux langues : renseigner l'identifiant ici (ex. "historia-20").
-  var TAG = "";
-  var STORE = "https://www.amazon.com";
+  // Un identifiant par boutique : français -> amazon.fr (programme Partenaires amazon.fr), anglais -> amazon.com (programme amazon.com).
+  // Une langue sans identifiant n'affiche pas la rubrique.
+  var TAG = { fr: "", en: "" };
+  var STORE = { fr: "https://www.amazon.fr", en: "https://www.amazon.com" };
 
   // Objets (pas de livres), un lien de recherche Amazon par objet : [libellé FR, libellé EN, recherche Amazon, courte description FR, EN]
   var ITEMS = {
@@ -25,15 +26,15 @@
   };
 
   function lang() { return (window.HI && window.HI.lang) === "en" ? "en" : "fr"; }
-  function url(q) {
-    return STORE + "/s?k=" + encodeURIComponent(q) + "&tag=" + encodeURIComponent(TAG);
+  function url(l, q) {
+    return STORE[l] + "/s?k=" + encodeURIComponent(q) + "&tag=" + encodeURIComponent(TAG[l]);
   }
   window.HistoriaAff = {
-    enabled: function () { return !!TAG; },
+    enabled: function () { return !!TAG[lang()]; },
     books: function (eraId) {
-      if (!TAG) return [];
       var l = lang();
-      return (ITEMS[eraId] || []).map(function (b) { return { title: l === "en" ? b[1] : b[0], author: "", url: url(b[2]) }; });
+      if (!TAG[l]) return [];
+      return (ITEMS[eraId] || []).map(function (b) { return { title: l === "en" ? b[1] : b[0], author: "", url: url(l, l === "en" ? b[2] : b[0].replace(/\s*\(.*\)/, "")) }; });
     },
     disclosure: function () {
       return lang() === "en"
