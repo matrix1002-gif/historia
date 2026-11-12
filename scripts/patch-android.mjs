@@ -17,13 +17,6 @@ if (!manifest.includes("com.google.android.gms.ads.APPLICATION_ID")) {
   fs.writeFileSync(manifestPath, manifest);
 }
 
-// 1b. Autorisation de facturation Google Play (achat « sans publicité »)
-manifest = fs.readFileSync(manifestPath, "utf8");
-if (!manifest.includes("com.android.vending.BILLING")) {
-  manifest = manifest.replace("<application", '<uses-permission android:name="com.android.vending.BILLING" />\n    <application');
-  fs.writeFileSync(manifestPath, manifest);
-}
-
 // 2. Numéro de version
 const gradlePath = "android/app/build.gradle";
 let gradle = fs.readFileSync(gradlePath, "utf8");
