@@ -1,6 +1,6 @@
-/* Historia — achat « sans publicité » (Google Play Billing, achat unique à vie).
-   Actif uniquement dans l'application Android. Le produit se crée dans la Play Console :
-   Monétiser > Produits > Produits in-app, identifiant : remove_ads, prix : 3,99 €. */
+/* Historia — achat « sans publicité » : DÉSACTIVÉ (plugin de facturation retiré de l'application).
+   Sans le plugin NativePurchases, available = false et aucune carte d'achat n'est affichée.
+   Pour le réactiver : ré-ajouter @capgo/native-purchases et la permission BILLING (patch-android.mjs). */
 (function () {
   "use strict";
   var PRODUCT = "remove_ads";
